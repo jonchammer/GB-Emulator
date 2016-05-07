@@ -1,6 +1,6 @@
 roms/
 libs/glew32.lib
 libs/glew32s.lib
-libs/GIU32.Lib
+libs/GLU32.Lib
 libs/glut64.lib
 libs/OpenGL32.Lib
