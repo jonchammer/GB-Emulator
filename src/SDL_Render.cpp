@@ -11,6 +11,7 @@
 
 const int DEFAULT_WINDOW_WIDTH  = 640;
 const int DEFAULT_WINDOW_HEIGHT = 480;
+
 // Globals
 Emulator* em;           // The emulator that is being used
 string title;           // The title of the game (used as the title of the window))
@@ -99,7 +100,7 @@ void updateFPS(SDL_Window* window)
         frame      = 0;
         
         // Update the title so we can see the FPS
-        sprintf(titleBuffer, "%s. FPS = %.2f", title.c_str(), fps);
+        snprintf(titleBuffer, 100, "%s. FPS = %.2f", title.c_str(), fps);
         SDL_SetWindowTitle(window, titleBuffer);
         
         // Save the game if the game has asked for it

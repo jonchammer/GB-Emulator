@@ -73,6 +73,8 @@ Memory::Memory(Emulator* emulator, bool skipBIOS) : mEmulator(emulator)
 
 Memory::~Memory()
 {
+    updateSave();
+    
     delete[] mCartridgeMemory;
     delete[] mMainMemory;
     delete[] mRAMBanks;

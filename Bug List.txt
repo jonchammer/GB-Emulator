@@ -3,3 +3,4 @@
 - Sound during BIOS.
 - Link's Awakening crash after 1st dungeon searching for BowWow
 - Pokemon Red title screen - background is 1 pixel off. Part of text moves with the pokemon sprite.
+- Move all emulator updates / rendering to another thread. Only handle events on the main thread.
