@@ -62,11 +62,11 @@ void SoundUnit2::reset(const bool skipBIOS)
 //Wave pattern duty, Sound length
 void SoundUnit2::NR21Changed(byte value, bool override)
 {
-	if (mCGB && !mSoundController.getAllSoundEnabled() && !override)
+	if (mCGB && !mSoundController.isSoundEnabled() && !override)
 	{
 		return;
 	}
-	if (!mSoundController.getAllSoundEnabled() && !override)
+	if (!mSoundController.isSoundEnabled() && !override)
 	{
 		//While all sound off only length can be written
 		value &= mLengthCounter.getLengthMask();
@@ -81,7 +81,7 @@ void SoundUnit2::NR21Changed(byte value, bool override)
 //Envelope function control
 void SoundUnit2::NR22Changed(byte value, bool override)
 {
-	if (!mSoundController.getAllSoundEnabled() && !override)
+	if (!mSoundController.isSoundEnabled() && !override)
 	{
 		return;
 	}
@@ -97,7 +97,7 @@ void SoundUnit2::NR22Changed(byte value, bool override)
 //Low frequency bits
 void SoundUnit2::NR23Changed(byte value, bool override)
 {
-	if (!mSoundController.getAllSoundEnabled() && !override)
+	if (!mSoundController.isSoundEnabled() && !override)
 	{
 		return;
 	}
@@ -110,7 +110,7 @@ void SoundUnit2::NR23Changed(byte value, bool override)
 //initial, counter/consecutive mode, High frequency bits
 void SoundUnit2::NR24Changed(byte value, bool override)
 {
-	if (!mSoundController.getAllSoundEnabled() && !override)
+	if (!mSoundController.isSoundEnabled() && !override)
 	{
 		return;
 	}

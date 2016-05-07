@@ -7,17 +7,17 @@
 
 #include "Common.h"
 #include "SDL.h"
-#include "Sound/AudioQueue.h"
+#include "Sound/StreamingAudioQueue.h"
 
 const int DEFAULT_WINDOW_WIDTH  = 640;
 const int DEFAULT_WINDOW_HEIGHT = 480;
 
 // Globals
-Emulator* em;           // The emulator that is being used
-string title;           // The title of the game (used as the title of the window))
+Emulator* em;  // The emulator that is being used
+string title;  // The title of the game (used as the title of the window))
 
 // Returns true when the user has chosen to exit the program
-bool handleEvents(SDL_Renderer* renderer)
+bool handleEvents()
 {
     static SDL_Event event;
     
@@ -67,23 +67,13 @@ bool handleEvents(SDL_Renderer* renderer)
                 
                 break;
             }
-            
-            case SDL_WINDOWEVENT:
-            {
-                switch (event.window.event)
-                {
-                    case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    case SDL_WINDOWEVENT_EXPOSED:
-                        SDL_RenderPresent(renderer); break;
-                }
-            }
         }
     }
     
     return false;
 }
 
-// FPS calculation
+// FPS calculation - updates the window title once a second.
 void updateFPS(SDL_Window* window)
 {
     static int frame = 0; 
@@ -109,16 +99,16 @@ void updateFPS(SDL_Window* window)
 }
 
 // Returns true if the user has chosen to exit the program.
-bool update(SDL_Window* window, SDL_Texture* buffer, SDL_Renderer* renderer)
+bool update(SDL_Window* window, SDL_Texture* buffer, SDL_Renderer* renderer, StreamingAudioQueue* audioQueue)
 {
     static int* pixels;
-    static int pitch = SCREEN_WIDTH_PIXELS * 4;
+    static int pitch;
     
     int startTime = SDL_GetTicks();
     updateFPS(window);
 
     // Take care of input and other events
-    if (handleEvents(renderer))
+    if (handleEvents())
         return true;
 
     // Update the emulator
@@ -136,7 +126,7 @@ bool update(SDL_Window* window, SDL_Texture* buffer, SDL_Renderer* renderer)
     // In order to update the audio as fast as it is being handled, we
     // add an additional delay. When this is high, we will update faster.
     // When it is low, we will update slower.
-    int delay = em->getSound()->getAudioQueue()->getDelay();
+    int delay = audioQueue->getDelay();
 
     // Wait a bit to maintain the FPS.
     // 60 fps == 17 milliseconds per update. Subtract out the
@@ -147,6 +137,15 @@ bool update(SDL_Window* window, SDL_Texture* buffer, SDL_Renderer* renderer)
         SDL_Delay(diff);
     
     return false;
+}
+
+// This will be called by the emulator as soon as the internal sound buffer
+// has been filled. We pass it on to the audio queue, which sends it to SDL.
+void soundFunc(void* udata, short* buffer, int length)
+{
+    StreamingAudioQueue* queue = (StreamingAudioQueue*) udata;
+    if (queue != NULL)
+        queue->append(buffer, length);
 }
 
 void initializeRenderer(int argc, char** argv, Emulator* emulator)
@@ -175,13 +174,16 @@ void initializeRenderer(int argc, char** argv, Emulator* emulator)
     SDL_Texture* buffer        = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, 
         SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS);
    
-    StreamingAudioQueue audioQueue(44100, 2048);
-    em->getSound()->setAudioQueue(&audioQueue);
+    // Create the audio queue, and attach the 'soundFunc' callback so the emulator
+    // knows what to do when it fills the sound buffer.
+    StreamingAudioQueue* audioQueue = new StreamingAudioQueue(44100, 2048);
+    em->getSound()->setSoundCallback(&soundFunc, audioQueue);
     
     // Main loop
-    while (!update(window, buffer, renderer));
+    while (!update(window, buffer, renderer, audioQueue));
 
     // Cleanup
+    delete audioQueue;
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

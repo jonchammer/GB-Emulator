@@ -5,7 +5,6 @@
 #include "Sound/SoundUnit2.h"
 #include "Sound/SoundUnit3.h"
 #include "Sound/SoundUnit4.h"
-#include "Sound/StreamingAudioQueue.h"
 
 class SoundUnit1;
 class SoundUnit2;
@@ -77,136 +76,120 @@ const word NR42 = 0xFF21;
 const word NR43 = 0xFF22;
 const word NR44 = 0xFF23;
 
+// Defines the format of the sound callback. The sound callback has space for
+// user data that is not touched by the emulator, the sound buffer, and the
+// length of that buffer in samples.
+typedef void (*soundCallback)(void*, short*, int);
+
 class Sound
 {
 public:
+    
+    // Constructors / Destructors
     Sound(const bool &_CGB, const bool skipBIOS, int sampleRate = 44100, int sampleBufferLength = 1024);
     ~Sound();
 
+    // Sound lifecycle methods.
     void update(int clockDelta);
+    void reset(const bool skipBIOS);
+    
+    // Memory access routines - There are a lot of sound registers, so these handle reading
+    // and writing to them, which simplifies the design of the memory unit.
     void write(word address, byte value);
     byte read(word address);
-    void reset(const bool skipBIOS);
-
-    bool getAllSoundEnabled()
-    {
-        return mAllSoundEnabled > 0;
-    }
-
-    const short* getSoundFramebuffer()
-    {
-        return mSampleBuffer;
-    }
-
-    bool isNewFrameReady()
-    {
-        return mNewFrameReady;
-    }
-
-    void waitForNewFrame()
-    {
-        mNewFrameReady = false;
-    }
-
-    void setAudioQueue(StreamingAudioQueue* audioQueue)
-    {
-        mAudioQueue = audioQueue;
-    }
-
-    StreamingAudioQueue* getAudioQueue() {return mAudioQueue;}
     
-    void setVolume(double vol)
+    // Called by the environment to set the designated sound callback. This function
+    // will be called by the Sound class as soon as a sound buffer is ready to be
+    // sent to the speakers. The user of the callback can provide some extra data
+    // in the 'udata' variable that will be returned to them in the first argument
+    // of the callback function. The user data is not touched by the emulator.
+    void setSoundCallback(soundCallback callback, void* udata)
     {
-	mMasterVolume = vol;
+        mSoundCallback     = callback;
+        mSoundCallbackData = udata;
     }
+        
+    // General getters / setters
+    bool isSoundEnabled() { return mAllSoundEnabled > 0; }
+    void setVolume(double vol) { mMasterVolume = vol; }
     
-    //Debug
-
-    void toggleSound1()
-    {
-        mSound1GlobalToggle = ~mSound1GlobalToggle & 0x1;
-    }
-
-    void toggleSound2()
-    {
-        mSound2GlobalToggle = ~mSound2GlobalToggle & 0x1;
-    }
-
-    void toggleSound3()
-    {
-        mSound3GlobalToggle = ~mSound3GlobalToggle & 0x1;
-    }
-
-    void toggleSound4()
-    {
-        mSound4GlobalToggle = ~mSound4GlobalToggle & 0x1;
-    }
+    // Toggles
+    void toggleSound1() { mSound1GlobalToggle = ~mSound1GlobalToggle & 0x1; }
+    void toggleSound2() { mSound2GlobalToggle = ~mSound2GlobalToggle & 0x1; }
+    void toggleSound3() { mSound3GlobalToggle = ~mSound3GlobalToggle & 0x1; }
+    void toggleSound4() { mSound4GlobalToggle = ~mSound4GlobalToggle & 0x1; }
 
 private:
+    
+    // Functions that handle writes to the 3 control registers
     void NR50Changed(byte value, bool override = false);
     void NR51Changed(byte value, bool override = false);
     void NR52Changed(byte value);
     
-    const bool& mCGB;
-    StreamingAudioQueue* mAudioQueue;
-
     //Sound units
     SoundUnit1* mSound1;
     SoundUnit2* mSound2;
     SoundUnit3* mSound3;
     SoundUnit4* mSound4;
-
-    byte mNR50; // Channel control / ON-OFF / Volume (R/W)
-    // Bit 7 - Vin->SO2 ON/OFF
-    // Bit 6-4 - SO2 output level (volume) (# 0-7)
-    // Bit 3 - Vin->SO1 ON/OFF
-    // Bit 2-0 - SO1 output level (volume) (# 0-7)
-
-    byte mNR51; // Selection of Sound output terminal (R/W)
-    // Bit 7 - Output sound 4 to SO2 terminal
-    // Bit 6 - Output sound 3 to SO2 terminal
-    // Bit 5 - Output sound 2 to SO2 terminal
-    // Bit 4 - Output sound 1 to SO2 terminal
-    // Bit 3 - Output sound 4 to SO1 terminal
-    // Bit 2 - Output sound 3 to SO1 terminal
-    // Bit 1 - Output sound 2 to SO1 terminal
-    // Bit 0 - Output sound 1 to SO1 terminal
-    //
-    // S02 - left channel
-    // S01 - right channel
-
-    byte mAllSoundEnabled;
-    // NR52 - Sound on/off (R/W)
-    // Bit 7 - All sound on/off
-    //	0: stop all sound circuits
-    //	1: operate all sound circuits
-    // Bit 3 - Sound 4 ON flag
-    // Bit 2 - Sound 3 ON flag
-    // Bit 1 - Sound 2 ON flag
-    // Bit 0 - Sound 1 ON flag
-    //
-    // We don't use external NR52 register. NR52 value combined from various variables.
-    // Status bits located in sound unit classes.
-
-    const int mSampleRate;
-    const int mSampleBufferLength;
-    int mSamplePeriod;
-
+    
+    const bool& mCGB;              // True if using GBC mode
+    soundCallback mSoundCallback;  // The function that will be called when the sound buffer is full.
+    void* mSoundCallbackData;      // The data given by the user that will be returned in the callback. (Not touched by the emulator).
+    const int mSampleRate;         // E.g. 44100 Hz
+    int mSamplePeriod;             // 2^22 / sample Rate
+    
+    // Sound buffer information
+    short* mSampleBuffer;          // The buffer we use to hold the synthesized sound data
+    const int mSampleBufferLength; // Size of the sample buffer in samples.
+    int mSampleBufferPos;          // Where in the sample buffer we are currently
+       
+    // Synthesis synchronization variables
     int mSampleCounter;
-    int mSampleBufferPos;
-    short* mSampleBuffer;
-    bool mNewFrameReady;
-
     int mFrameSequencerClock;
     byte mFrameSequencerStep;
 
-    double mMasterVolume;
+    // Allows us to control the volume independently of the OS. [0, 1]
+    double mMasterVolume;     
 
-    //Debug
+    // Switch for each sound unit
     int mSound1GlobalToggle;
     int mSound2GlobalToggle;
     int mSound3GlobalToggle;
     int mSound4GlobalToggle;
+    
+    // Channel control / ON-OFF / Volume (R/W)
+    //   Bit 7 - Vin->SO2 ON/OFF
+    //   Bit 6-4 - SO2 output level (volume) (# 0-7)
+    //   Bit 3 - Vin->SO1 ON/OFF
+    //   Bit 2-0 - SO1 output level (volume) (# 0-7)
+    byte mNR50; 
+    
+    // Selection of Sound output terminal (R/W)
+    //   Bit 7 - Output sound 4 to SO2 terminal
+    //   Bit 6 - Output sound 3 to SO2 terminal
+    //   Bit 5 - Output sound 2 to SO2 terminal
+    //   Bit 4 - Output sound 1 to SO2 terminal
+    //   Bit 3 - Output sound 4 to SO1 terminal
+    //   Bit 2 - Output sound 3 to SO1 terminal
+    //   Bit 1 - Output sound 2 to SO1 terminal
+    //   Bit 0 - Output sound 1 to SO1 terminal
+    //
+    //   S02 - left channel
+    //   S01 - right channel
+    byte mNR51; 
+
+    // NR52 - Sound on/off (R/W)
+    //   Bit 7 - All sound on/off
+    //	  0: stop all sound circuits
+    //	  1: operate all sound circuits
+    //   Bit 3 - Sound 4 ON flag
+    //   Bit 2 - Sound 3 ON flag
+    //   Bit 1 - Sound 2 ON flag
+    //   Bit 0 - Sound 1 ON flag
+    //
+    // We don't use external NR52 register. NR52 value combined from various variables.
+    // Status bits located in sound unit classes.
+    byte mAllSoundEnabled;
 };
 
 #endif

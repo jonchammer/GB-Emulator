@@ -136,7 +136,7 @@ void SoundUnit3::waveRAMChanged(byte pos, byte value)
 //Sound on/off
 void SoundUnit3::NR30Changed(byte value, bool override)
 {
-	if (!mSoundController.getAllSoundEnabled() && !override)
+	if (!mSoundController.isSoundEnabled() && !override)
 	{
 		return;
 	}
@@ -152,7 +152,7 @@ void SoundUnit3::NR30Changed(byte value, bool override)
 //Sound length
 void SoundUnit3::NR31Changed(byte value, bool override)
 {
-	if (mCGB && !mSoundController.getAllSoundEnabled() && !override)
+	if (mCGB && !mSoundController.isSoundEnabled() && !override)
 	{
 		return;
 	}
@@ -164,7 +164,7 @@ void SoundUnit3::NR31Changed(byte value, bool override)
 //Output level
 void SoundUnit3::NR32Changed(byte value, bool override)
 {
-	if (!mSoundController.getAllSoundEnabled() && !override)
+	if (!mSoundController.isSoundEnabled() && !override)
 	{
 		return;
 	}
@@ -175,7 +175,7 @@ void SoundUnit3::NR32Changed(byte value, bool override)
 //Frequency low bits
 void SoundUnit3::NR33Changed(byte value, bool override)
 {
-	if (!mSoundController.getAllSoundEnabled() && !override)
+	if (!mSoundController.isSoundEnabled() && !override)
 	{
 		return;
 	}
@@ -188,7 +188,7 @@ void SoundUnit3::NR33Changed(byte value, bool override)
 //initial, counter/consecutive mode, High frequency bits
 void SoundUnit3::NR34Changed(byte value, bool override)
 {
-	if (!mSoundController.getAllSoundEnabled() && !override)
+	if (!mSoundController.isSoundEnabled() && !override)
 	{
 		return;
 	}

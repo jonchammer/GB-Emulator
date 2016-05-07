@@ -65,18 +65,6 @@ Sound/SoundUnit3.h
 ../include/Sound/SoundUnit3.h
 Sound/SoundUnit4.h
 ../include/Sound/SoundUnit4.h
-Sound/StreamingAudioQueue.h
-../include/Sound/StreamingAudioQueue.h
-
-../include/Sound/AudioQueue.h
-SDL.h
-../include/Sound/SDL.h
-RingBuffer.h
-../include/Sound/RingBuffer.h
-algorithm
--
-iostream
--
 
 ../include/Sound/DutyUnit.h
 ../Common.h
@@ -101,10 +89,6 @@ LFSR15.inc
 ../include/Sound/LengthCounter.h
 ../Common.h
 ../include/Common.h
-
-../include/Sound/RingBuffer.h
-cstdlib
--
 
 ../include/Sound/SoundUnit1.h
 ../Sound.h
@@ -743,8 +727,8 @@ Common.h
 D:/My Documents/NetBeansProjects/GB_Emulator/src/Common.h
 SDL.h
 D:/My Documents/NetBeansProjects/GB_Emulator/src/SDL.h
-Sound/AudioQueue.h
-D:/My Documents/NetBeansProjects/GB_Emulator/src/Sound/AudioQueue.h
+Sound/StreamingAudioQueue.h
+D:/My Documents/NetBeansProjects/GB_Emulator/src/Sound/StreamingAudioQueue.h
 
 D:/My Documents/NetBeansProjects/GB_Emulator/src/Sound.cpp
 Sound.h

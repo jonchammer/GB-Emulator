@@ -63,7 +63,7 @@ void SoundUnit4::reset(const bool skipBIOS)
 //Sound length
 void SoundUnit4::NR41Changed(byte value, bool override)
 {
-	if (mCGB && !mSoundController.getAllSoundEnabled() && !override)
+	if (mCGB && !mSoundController.isSoundEnabled() && !override)
 	{
 		return;
 	}
@@ -75,7 +75,7 @@ void SoundUnit4::NR41Changed(byte value, bool override)
 //Envelope function control
 void SoundUnit4::NR42Changed(byte value, bool override)
 {
-	if (!mSoundController.getAllSoundEnabled() && !override)
+	if (!mSoundController.isSoundEnabled() && !override)
 	{
 		return;
 	}
@@ -91,7 +91,7 @@ void SoundUnit4::NR42Changed(byte value, bool override)
 //LFSR control
 void SoundUnit4::NR43Changed(byte value, bool override)
 {
-	if (!mSoundController.getAllSoundEnabled() && !override)
+	if (!mSoundController.isSoundEnabled() && !override)
 	{
 		return;
 	}
@@ -102,7 +102,7 @@ void SoundUnit4::NR43Changed(byte value, bool override)
 //initial, counter/consecutive mode
 void SoundUnit4::NR44Changed(byte value, bool override)
 {
-	if (!mSoundController.getAllSoundEnabled() && !override)
+	if (!mSoundController.isSoundEnabled() && !override)
 	{
 		return;
 	}

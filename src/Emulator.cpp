@@ -15,10 +15,6 @@ Emulator::Emulator(bool skipBIOS)
     mGraphics = new Graphics(mMemory);
     mInput    = new Input(mMemory, this);
     mSound    = new Sound(mMemory, skipBIOS, 44100, 1024);
-    //mSound->toggleSound1();
-    //mSound->toggleSound2();
-    //mSound->toggleSound3();
-    //mSound->toggleSound4();
 }
 
 Emulator::~Emulator()

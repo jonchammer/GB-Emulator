@@ -1,20 +1,20 @@
 #include "Sound.h"
 #include <algorithm>
 
-Sound::Sound(const bool &_CGB, const bool skipBIOS, int sampleRate, int sampleBufferLength):
+Sound::Sound(const bool &CGB, const bool skipBIOS, int sampleRate, int sampleBufferLength):
     mSound1GlobalToggle(1),
     mSound2GlobalToggle(1),
     mSound3GlobalToggle(1),
     mSound4GlobalToggle(1),
-    mCGB(_CGB),
+    mCGB(CGB),
     mSampleRate(sampleRate),
     mSampleBufferLength(sampleBufferLength),
-    mAudioQueue(NULL)
+    mSoundCallback(NULL),
+    mSoundCallbackData(NULL),
+    mMasterVolume(1.0)
 {
 	mSampleBuffer = new short[mSampleBufferLength];
 	mSamplePeriod = 4194304 / mSampleRate;
-
-	mMasterVolume = 1;
 
 	mSound1 = new SoundUnit1(mCGB, skipBIOS, *this);
 	mSound2 = new SoundUnit2(mCGB, skipBIOS, *this);
@@ -26,11 +26,13 @@ Sound::Sound(const bool &_CGB, const bool skipBIOS, int sampleRate, int sampleBu
 
 Sound::~Sound()
 {
+    // Take care of each of the sound units
 	delete mSound1;
 	delete mSound2;
 	delete mSound3;
 	delete mSound4;
 
+    // Also take care of the sample buffer
 	delete[] mSampleBuffer;
 }
 
@@ -77,35 +79,31 @@ void Sound::update(int clockDelta)
             mSound3->getWaveRightOutput() * mSound3GlobalToggle + 
             mSound4->getWaveRightOutput() * mSound4GlobalToggle;
 
-		//Amplifying sound
-		//Max amplitude for 16-bit audio is 32767. Max channel volume is 15. Max master volume is 7 + 1
-		//So gain is 32767 / (15 * 8 * 4) ~ 64
-		mSampleBuffer[mSampleBufferPos] *= 64;
+		// Amplifying sound
+		// Max amplitude for 16-bit audio is 32767. Max channel volume is 15. Max master volume is 7 + 1
+		// So gain is 32767 / (15 * 8 * 4) ~ 64
+		mSampleBuffer[mSampleBufferPos]     *= 64;
 		mSampleBuffer[mSampleBufferPos + 1] *= 64;
 
-		//DMG doesn't have this one. This is global volume so we don't need to use OS volume settings to change emulator volume
-		mSampleBuffer[mSampleBufferPos]     = short(mSampleBuffer[mSampleBufferPos] * mMasterVolume);
+		// Factor in the master volume (not a function of the original gameboy, but it's nice to have).
+		mSampleBuffer[mSampleBufferPos]     = short(mSampleBuffer[mSampleBufferPos]     * mMasterVolume);
 		mSampleBuffer[mSampleBufferPos + 1] = short(mSampleBuffer[mSampleBufferPos + 1] * mMasterVolume);
-
 		mSampleBufferPos += 2;
 
-		//"Resampling" DMG samples to actual sound samples
+		// When we fill the buffer, call the sound callback so someone can take
+        // care of this data
 		if (mSampleBufferPos >= mSampleBufferLength)
 		{
 			mSampleBufferPos = 0;
-			mNewFrameReady = true;
+            if (mSoundCallback != NULL) 
+                mSoundCallback(mSoundCallbackData, mSampleBuffer, mSampleBufferLength);
 		}
 	}
-    
-    if (mNewFrameReady)
-    {
-        mNewFrameReady = false;
-        if (mAudioQueue != NULL) mAudioQueue->append(mSampleBuffer, mSampleBufferLength);
-    }
 }
 
 void Sound::write(word address, byte value)
 {
+    // Forward the request to whoever can handle it
     switch (address)
     {
         case NR10: mSound1->NR10Changed(value, false); break;
@@ -147,6 +145,7 @@ void Sound::write(word address, byte value)
 
 byte Sound::read(word address)
 {
+    // Forward the request to whoever can handle it
     switch (address)
     {
         case NR10: return mSound1->getNR10();
@@ -202,7 +201,6 @@ void Sound::reset(const bool skipBIOS)
 	mFrameSequencerStep  = 1;
 	mSampleCounter       = 0;
 	mSampleBufferPos     = 0;
-	mNewFrameReady       = false;
     
     // Initialize variables for BIOS
     if (!skipBIOS)
@@ -232,12 +230,12 @@ void Sound::NR51Changed(byte value, bool override)
 
 void Sound::NR52Changed(byte value)
 {
-	//If sound being turned in
+	// If sound being turned in
 	if (value & 0x80)
 	{
 		if (!mAllSoundEnabled)
 		{
-			//On power on frame sequencer starts at 1
+			// On power on frame sequencer starts at 1
 			mFrameSequencerStep  = 1;
 			mFrameSequencerClock = 0;
 			
@@ -246,8 +244,8 @@ void Sound::NR52Changed(byte value)
 			mSound3->NR52Changed(value);
 			mSound4->NR52Changed(value);
 
-			//Very important to let know sound units that frame sequencer was reset.
-			//Test "08-len ctr during power" requires this to pass
+			// Very important to let know sound units that frame sequencer was reset.
+			// Test "08-len ctr during power" requires this to pass
 			mSound1->frameSequencerStep(mFrameSequencerStep);
 			mSound2->frameSequencerStep(mFrameSequencerStep);
 			mSound3->frameSequencerStep(mFrameSequencerStep);
@@ -265,6 +263,6 @@ void Sound::NR52Changed(byte value)
 		mSound4->NR52Changed(value);
 	}
 
-	//Only all sound on/off can be changed
+	// Only all sound on/off can be changed
 	mAllSoundEnabled = value >> 7;
 }
