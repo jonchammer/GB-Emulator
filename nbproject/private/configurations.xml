@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="97">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="include" name="0">
+      <df name="Sound">
+        <in>AudioQueue.h</in>
+        <in>DutyUnit.h</in>
+        <in>EnvelopeUnit.h</in>
+        <in>LFSR.h</in>
+        <in>LFSR15.inc</in>
+        <in>LFSR7.inc</in>
+        <in>LengthCounter.h</in>
+        <in>RingBuffer.h</in>
+        <in>SoundUnit1.h</in>
+        <in>SoundUnit2.h</in>
+        <in>SoundUnit3.h</in>
+        <in>SoundUnit4.h</in>
+        <in>StreamingAudioQueue.h</in>
+        <in>SweepUnit.h</in>
+      </df>
+      <in>CPU.h</in>
+      <in>Common.h</in>
+      <in>Emulator.h</in>
+      <in>Graphics.h</in>
+      <in>Input.h</in>
+      <in>Memory.h</in>
+      <in>Render.h</in>
+      <in>Sound.h</in>
+    </df>
+    <df root="src" name="1">
+      <df name="Sound">
+        <in>SoundUnit1.cpp</in>
+        <in>SoundUnit2.cpp</in>
+        <in>SoundUnit3.cpp</in>
+        <in>SoundUnit4.cpp</in>
+      </df>
+      <in>CPU.cpp</in>
+      <in>Emulator.cpp</in>
+      <in>GL_Render.cpp</in>
+      <in>Graphics.cpp</in>
+      <in>Input.cpp</in>
+      <in>Memory.cpp</in>
+      <in>SDL_Render.cpp</in>
+      <in>Sound.cpp</in>
+      <in>main.cpp</in>
+    </df>
+  </logicalFolder>
+  <projectmakefile>build/Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <platform>3</platform>
+      </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
+      <dbx_gdbdebugger version="1">
+        <gdb_pathmaps>
+        </gdb_pathmaps>
+        <gdb_interceptlist>
+          <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+        </gdb_interceptlist>
+        <gdb_options>
+          <DebugOptions>
+          </DebugOptions>
+        </gdb_options>
+        <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
+      </dbx_gdbdebugger>
+      <nativedebugger version="1">
+        <engine>gdb</engine>
+      </nativedebugger>
+      <runprofile version="9">
+        <runcommandpicklist>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+        </runcommandpicklist>
+        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <rundir>build</rundir>
+        <buildfirst>false</buildfirst>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+  </confs>
+</configurationDescriptor>

@@ -1,0 +1,13 @@
+[  8%] [32mBuilding CXX object CMakeFiles/gb_emulator.dir/src/CPU.cpp.obj[0m
+[ 16%] [32mBuilding CXX object CMakeFiles/gb_emulator.dir/src/Emulator.cpp.obj[0m
+[ 25%] [32mBuilding CXX object CMakeFiles/gb_emulator.dir/src/Graphics.cpp.obj[0m
+[ 33%] [32mBuilding CXX object CMakeFiles/gb_emulator.dir/src/Input.cpp.obj[0m
+[ 41%] [32mBuilding CXX object CMakeFiles/gb_emulator.dir/src/main.cpp.obj[0m
+[ 50%] [32mBuilding CXX object CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj[0m
+[ 58%] [32mBuilding CXX object CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj[0m
+[ 66%] [32mBuilding CXX object CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit2.cpp.obj[0m
+[ 75%] [32mBuilding CXX object CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit3.cpp.obj[0m
+[ 83%] [32mBuilding CXX object CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit4.cpp.obj[0m
+[ 91%] [32mBuilding CXX object CMakeFiles/gb_emulator.dir/src/Sound.cpp.obj[0m
+[100%] [32m[1mLinking CXX executable gb_emulator.exe[0m
+[100%] Built target gb_emulator

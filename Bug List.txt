@@ -1,0 +1,5 @@
+- Synchronize the screen buffer so that there is no visual tearing.
+- Finish going through test roms
+- Sound during BIOS.
+- Link's Awakening crash after 1st dungeon searching for BowWow
+- Pokemon Red title screen - background is 1 pixel off. Part of text moves with the pokemon sprite.
