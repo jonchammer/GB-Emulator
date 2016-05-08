@@ -15,8 +15,8 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    //string game = "roms/tests/dmg_sound.gb";
-    string game = "../roms/Links_Awakening.gb";
+    //string game = "../roms/tests/InstructionTiming/instr_timing.gb";
+    string game = "../roms/Pokemon_Red.gb";
 
     // The save file has the same name with a .sav extension.
     int dot = game.find_last_of('.');

@@ -166,10 +166,10 @@ private:
     void CPU_16BIT_ADD(word source, word& dest);
     void CPU_16BIT_ADD(word& dest);
     
-    void CPU_JUMP_IMMEDIATE(bool useCondition, int flag, bool condition);
-    void CPU_JUMP(bool useCondition, int flag, bool condition);
-    void CPU_CALL(bool useCondition, int flag, bool condition);
-    void CPU_RETURN(bool useCondition, int flag, bool condition);
+    int CPU_JUMP_IMMEDIATE(bool useCondition, int flag, bool condition);
+    int CPU_JUMP(bool useCondition, int flag, bool condition);
+    int CPU_CALL(bool useCondition, int flag, bool condition);
+    int CPU_RETURN(bool useCondition, int flag, bool condition);
     void CPU_RESTART(byte n);
     
     void CPU_CPL();

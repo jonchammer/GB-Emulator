@@ -499,21 +499,29 @@ void CPU::CPU_16BIT_ADD(word& dest)
     else clearFlag(FLAG_HALF);
 }
 
-void CPU::CPU_JUMP_IMMEDIATE(bool useCondition, int flag, bool condition)
+int CPU::CPU_JUMP_IMMEDIATE(bool useCondition, int flag, bool condition)
 {
     signedByte n = (signedByte) getImmediateByte();
     if (!useCondition || (testFlag(flag) == condition))
+    {
         mProgramCounter += n;
+        return 4;
+    }
+    else return 0;
 }
 
-void CPU::CPU_JUMP(bool useCondition, int flag, bool condition)
+int CPU::CPU_JUMP(bool useCondition, int flag, bool condition)
 {
     word address = getImmediateWord();
     if (!useCondition || (testFlag(flag) == condition))
+    {
         mProgramCounter = address;
+        return 4;
+    }
+    else return 0;
 }
 
-void CPU::CPU_CALL(bool useCondition, int flag, bool condition)
+int CPU::CPU_CALL(bool useCondition, int flag, bool condition)
 {
     word nn = getImmediateWord();
    
@@ -521,16 +529,19 @@ void CPU::CPU_CALL(bool useCondition, int flag, bool condition)
     {
         pushWordOntoStack(mProgramCounter);
         mProgramCounter = nn;
+        return 12;
     }
+    else return 0;
 }
 
-void CPU::CPU_RETURN(bool useCondition, int flag, bool condition)
+int CPU::CPU_RETURN(bool useCondition, int flag, bool condition)
 {
     if (!useCondition || (testFlag(flag) == condition))
     {
         mProgramCounter = popWordOffStack();
-        return;
+        return 12;
     }
+    else return 0;
 }
 
 void CPU::CPU_RESTART(byte n)
@@ -999,42 +1010,42 @@ int CPU::executeInstruction(byte opcode)
         case 0x1F: CPU_RR(mRegisters.a);  clearFlag(FLAG_ZERO); return 4;
                 
         // Jumps
-        case 0xC3: CPU_JUMP(false, 0x0, false);                  return 12;
-        case 0xC2: CPU_JUMP(true, FLAG_ZERO, false);             return 12;
-        case 0xCA: CPU_JUMP(true, FLAG_ZERO, true);              return 12;
-        case 0xD2: CPU_JUMP(true, FLAG_CARRY, false);            return 12;
-        case 0xDA: CPU_JUMP(true, FLAG_CARRY, true);             return 12;
-        case 0xE9: mProgramCounter = mRegisters.hl;              return 4;
-        case 0x18: CPU_JUMP_IMMEDIATE(false, 0x0, false);        return 8;
-        case 0x20: CPU_JUMP_IMMEDIATE(true, FLAG_ZERO, false);   return 8;
-        case 0x28: CPU_JUMP_IMMEDIATE(true, FLAG_ZERO, true);    return 8;
-        case 0x30: CPU_JUMP_IMMEDIATE(true, FLAG_CARRY, false);  return 8;
-        case 0x38: CPU_JUMP_IMMEDIATE(true, FLAG_CARRY, true);   return 8;
+        case 0xC3: CPU_JUMP(false, 0x0, false);                     return 16;
+        case 0xC2: {int clocks = CPU_JUMP(true, FLAG_ZERO, false);  return 12 + clocks;} // Cycles is 12 if no jump, 16 if there is.
+        case 0xCA: {int clocks = CPU_JUMP(true, FLAG_ZERO, true);   return 12 + clocks;} // Sim.
+        case 0xD2: {int clocks = CPU_JUMP(true, FLAG_CARRY, false); return 12 + clocks;} // Sim.
+        case 0xDA: {int clocks = CPU_JUMP(true, FLAG_CARRY, true);  return 12 + clocks;} // Sim.
+        case 0xE9: mProgramCounter = mRegisters.hl;                 return 4;
+        case 0x18: CPU_JUMP_IMMEDIATE(false, 0x0, false);           return 12;
+        case 0x20: {int clocks = CPU_JUMP_IMMEDIATE(true, FLAG_ZERO, false);  return 8 + clocks;} // Cycles is 8 if no jump, 12 if there is.
+        case 0x28: {int clocks = CPU_JUMP_IMMEDIATE(true, FLAG_ZERO, true);   return 8 + clocks;} // Sim.
+        case 0x30: {int clocks = CPU_JUMP_IMMEDIATE(true, FLAG_CARRY, false); return 8 + clocks;} // Sim.
+        case 0x38: {int clocks = CPU_JUMP_IMMEDIATE(true, FLAG_CARRY, true);  return 8 + clocks;} // Sim.
         
         // Calls
-        case 0xCD: CPU_CALL(false, 0x0, false);       return 12;
-        case 0xC4: CPU_CALL(true, FLAG_ZERO, false);  return 12;
-        case 0xCC: CPU_CALL(true, FLAG_ZERO, true);   return 12;
-        case 0xD4: CPU_CALL(true, FLAG_CARRY, false); return 12;
-        case 0xDC: CPU_CALL(true, FLAG_CARRY, true);  return 12;
+        case 0xCD: CPU_CALL(false, 0x0, false);       return 24;
+        case 0xC4: {int clocks = CPU_CALL(true, FLAG_ZERO, false);  return 12 + clocks;} // Cycles is 12 if no call, 24 is there is.
+        case 0xCC: {int clocks = CPU_CALL(true, FLAG_ZERO, true);   return 12 + clocks;} // Sim.
+        case 0xD4: {int clocks = CPU_CALL(true, FLAG_CARRY, false); return 12 + clocks;} // Sim.
+        case 0xDC: {int clocks = CPU_CALL(true, FLAG_CARRY, true);  return 12 + clocks;} // Sim.
         
         // Restarts
-        case 0xC7: CPU_RESTART(0x00); return 32;
-        case 0xCF: CPU_RESTART(0x08); return 32;
-        case 0xD7: CPU_RESTART(0x10); return 32;
-        case 0xDF: CPU_RESTART(0x18); return 32;
-        case 0xE7: CPU_RESTART(0x20); return 32;
-        case 0xEF: CPU_RESTART(0x28); return 32;
-        case 0xF7: CPU_RESTART(0x30); return 32;
-        case 0xFF: CPU_RESTART(0x38); return 32;
+        case 0xC7: CPU_RESTART(0x00); return 16;
+        case 0xCF: CPU_RESTART(0x08); return 16;
+        case 0xD7: CPU_RESTART(0x10); return 16;
+        case 0xDF: CPU_RESTART(0x18); return 16;
+        case 0xE7: CPU_RESTART(0x20); return 16;
+        case 0xEF: CPU_RESTART(0x28); return 16;
+        case 0xF7: CPU_RESTART(0x30); return 16;
+        case 0xFF: CPU_RESTART(0x38); return 16;
         
         // Returns
-        case 0xC9: CPU_RETURN(false, 0x0, false);                          return 8;
-        case 0xC0: CPU_RETURN(true, FLAG_ZERO, false);                     return 8;
-        case 0xC8: CPU_RETURN(true, FLAG_ZERO, true);                      return 8;
-        case 0xD0: CPU_RETURN(true, FLAG_CARRY, false);                    return 8;
-        case 0xD8: CPU_RETURN(true, FLAG_CARRY, true);                     return 8;
-        case 0xD9: CPU_RETURN(false, 0x0, false); mInterruptMaster = true; return 8;
+        case 0xC9: CPU_RETURN(false, 0x0, false);                          return 16;
+        case 0xC0: {int clocks = CPU_RETURN(true, FLAG_ZERO, false);       return 8 + clocks;} // Cycles is 8 if no return, 20 if there is.
+        case 0xC8: {int clocks = CPU_RETURN(true, FLAG_ZERO, true);        return 8 + clocks;} // Sim.
+        case 0xD0: {int clocks = CPU_RETURN(true, FLAG_CARRY, false);      return 8 + clocks;} // Sim.
+        case 0xD8: {int clocks = CPU_RETURN(true, FLAG_CARRY, true);       return 8 + clocks;} // Sim.
+        case 0xD9: CPU_RETURN(false, 0x0, false); mInterruptMaster = true; return 16;
         
         // Extended instructions
         case 0xCB: return executeExtendedInstruction();
@@ -1142,7 +1153,7 @@ int CPU::executeExtendedInstruction()
         case 0x43: CPU_TEST_BIT(mRegisters.e, 0);            return 8;
         case 0x44: CPU_TEST_BIT(mRegisters.h, 0);            return 8;
         case 0x45: CPU_TEST_BIT(mRegisters.l, 0);            return 8;
-        case 0x46: CPU_TEST_BIT(readByte(mRegisters.hl), 0); return 16;
+        case 0x46: CPU_TEST_BIT(readByte(mRegisters.hl), 0); return 12;
         case 0x47: CPU_TEST_BIT(mRegisters.a, 0);            return 8;
         case 0x48: CPU_TEST_BIT(mRegisters.b, 1);            return 8;
         case 0x49: CPU_TEST_BIT(mRegisters.c, 1);            return 8;
@@ -1150,7 +1161,7 @@ int CPU::executeExtendedInstruction()
         case 0x4B: CPU_TEST_BIT(mRegisters.e, 1);            return 8;
         case 0x4C: CPU_TEST_BIT(mRegisters.h, 1);            return 8;
         case 0x4D: CPU_TEST_BIT(mRegisters.l, 1);            return 8;
-        case 0x4E: CPU_TEST_BIT(readByte(mRegisters.hl), 1); return 16;
+        case 0x4E: CPU_TEST_BIT(readByte(mRegisters.hl), 1); return 12;
         case 0x4F: CPU_TEST_BIT(mRegisters.a, 1);            return 8;
         case 0x50: CPU_TEST_BIT(mRegisters.b, 2);            return 8;
         case 0x51: CPU_TEST_BIT(mRegisters.c, 2);            return 8;
@@ -1158,7 +1169,7 @@ int CPU::executeExtendedInstruction()
         case 0x53: CPU_TEST_BIT(mRegisters.e, 2);            return 8;
         case 0x54: CPU_TEST_BIT(mRegisters.h, 2);            return 8;
         case 0x55: CPU_TEST_BIT(mRegisters.l, 2);            return 8;
-        case 0x56: CPU_TEST_BIT(readByte(mRegisters.hl), 2); return 16;
+        case 0x56: CPU_TEST_BIT(readByte(mRegisters.hl), 2); return 12;
         case 0x57: CPU_TEST_BIT(mRegisters.a, 2);            return 8;
         case 0x58: CPU_TEST_BIT(mRegisters.b, 3);            return 8;
         case 0x59: CPU_TEST_BIT(mRegisters.c, 3);            return 8;
@@ -1166,7 +1177,7 @@ int CPU::executeExtendedInstruction()
         case 0x5B: CPU_TEST_BIT(mRegisters.e, 3);            return 8;
         case 0x5C: CPU_TEST_BIT(mRegisters.h, 3);            return 8;
         case 0x5D: CPU_TEST_BIT(mRegisters.l, 3);            return 8;
-        case 0x5E: CPU_TEST_BIT(readByte(mRegisters.hl), 3); return 16;
+        case 0x5E: CPU_TEST_BIT(readByte(mRegisters.hl), 3); return 12;
         case 0x5F: CPU_TEST_BIT(mRegisters.a, 3);            return 8;
         case 0x60: CPU_TEST_BIT(mRegisters.b, 4);            return 8;
         case 0x61: CPU_TEST_BIT(mRegisters.c, 4);            return 8;
@@ -1174,7 +1185,7 @@ int CPU::executeExtendedInstruction()
         case 0x63: CPU_TEST_BIT(mRegisters.e, 4);            return 8;
         case 0x64: CPU_TEST_BIT(mRegisters.h, 4);            return 8;
         case 0x65: CPU_TEST_BIT(mRegisters.l, 4);            return 8;
-        case 0x66: CPU_TEST_BIT(readByte(mRegisters.hl), 4); return 16;
+        case 0x66: CPU_TEST_BIT(readByte(mRegisters.hl), 4); return 12;
         case 0x67: CPU_TEST_BIT(mRegisters.a, 4);            return 8;
         case 0x68: CPU_TEST_BIT(mRegisters.b, 5);            return 8;
         case 0x69: CPU_TEST_BIT(mRegisters.c, 5);            return 8;
@@ -1182,7 +1193,7 @@ int CPU::executeExtendedInstruction()
         case 0x6B: CPU_TEST_BIT(mRegisters.e, 5);            return 8;
         case 0x6C: CPU_TEST_BIT(mRegisters.h, 5);            return 8;
         case 0x6D: CPU_TEST_BIT(mRegisters.l, 5);            return 8;
-        case 0x6E: CPU_TEST_BIT(readByte(mRegisters.hl), 5); return 16;
+        case 0x6E: CPU_TEST_BIT(readByte(mRegisters.hl), 5); return 12;
         case 0x6F: CPU_TEST_BIT(mRegisters.a, 5);            return 8;
         case 0x70: CPU_TEST_BIT(mRegisters.b, 6);            return 8;
         case 0x71: CPU_TEST_BIT(mRegisters.c, 6);            return 8;
@@ -1190,7 +1201,7 @@ int CPU::executeExtendedInstruction()
         case 0x73: CPU_TEST_BIT(mRegisters.e, 6);            return 8;
         case 0x74: CPU_TEST_BIT(mRegisters.h, 6);            return 8;
         case 0x75: CPU_TEST_BIT(mRegisters.l, 6);            return 8;
-        case 0x76: CPU_TEST_BIT(readByte(mRegisters.hl), 6); return 16;
+        case 0x76: CPU_TEST_BIT(readByte(mRegisters.hl), 6); return 12;
         case 0x77: CPU_TEST_BIT(mRegisters.a, 6);            return 8;
         case 0x78: CPU_TEST_BIT(mRegisters.b, 7);            return 8;
         case 0x79: CPU_TEST_BIT(mRegisters.c, 7);            return 8;
@@ -1198,7 +1209,7 @@ int CPU::executeExtendedInstruction()
         case 0x7B: CPU_TEST_BIT(mRegisters.e, 7);            return 8;
         case 0x7C: CPU_TEST_BIT(mRegisters.h, 7);            return 8;
         case 0x7D: CPU_TEST_BIT(mRegisters.l, 7);            return 8;
-        case 0x7E: CPU_TEST_BIT(readByte(mRegisters.hl), 7); return 16;
+        case 0x7E: CPU_TEST_BIT(readByte(mRegisters.hl), 7); return 12;
         case 0x7F: CPU_TEST_BIT(mRegisters.a, 7);            return 8;
         
         // Reset Bit
@@ -1245,7 +1256,7 @@ int CPU::executeExtendedInstruction()
         case 0xA8: mRegisters.b = clearBit(mRegisters.b, 5);            return 8;
         case 0xA9: mRegisters.c = clearBit(mRegisters.c, 5);            return 8;
         case 0xAA: mRegisters.d = clearBit(mRegisters.d, 5);            return 8;
-        case 0xAB: mRegisters.e = clearBit(mRegisters.e, 5);             return 8;
+        case 0xAB: mRegisters.e = clearBit(mRegisters.e, 5);            return 8;
         case 0xAC: mRegisters.h = clearBit(mRegisters.h, 5);            return 8;
         case 0xAD: mRegisters.l = clearBit(mRegisters.l, 5);            return 8;
         case 0xAE: {byte n = readByte(mRegisters.hl); writeByte(mRegisters.hl, clearBit(n, 5)); return 16;}
