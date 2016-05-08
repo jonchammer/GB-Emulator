@@ -100,7 +100,8 @@ void Memory::reset(bool skipBIOS)
     
     // Initialize timing information
     mDividerCounter  = 0;
-    mTimerCounter    = 1024;
+    mTimerPeriod     = 1024;
+    mTimerCounter    = 0;
     
     // Start out in the BIOS
     mInBIOS = !skipBIOS;
@@ -187,11 +188,12 @@ void Memory::write(word address, byte data)
     }
     
     // Setting the timer attributes
-    else if (address == TMC)
+    else if (address == TAC)
     {
-        byte currentFrequency = getClockFrequency();
-        mMainMemory[TMC]      = data;
-        byte newFrequency     = getClockFrequency();
+        // The frequency is specified by the lower 2 bits of TMC
+        byte currentFrequency = read(TAC) & 0x3;
+        mMainMemory[TAC]      = data;
+        byte newFrequency     = data & 0x3;
         
         if (currentFrequency != newFrequency)
             setClockFrequency();
@@ -230,26 +232,41 @@ void Memory::updateTimers(int cycles)
     handleDividerRegister(cycles);
     
     // The clock must be enabled for it to be updated
-    if (isClockEnabled())
+    // Bit 2 of TMC determines whether the clock is enabled or not
+    if (testBit(read(TAC), 2))
     {
-        mTimerCounter -= cycles;
+        mTimerCounter += cycles;
         
         // The timer should be updated
-        if (mTimerCounter <= 0)
+        if (mTimerCounter >= mTimerPeriod)
         {
-            // Reset mTimerCounter to the correct value
-            setClockFrequency();
+            int passedPeriods = mTimerCounter / mTimerPeriod;
+            mTimerCounter %= mTimerPeriod;
             
             // Timer is about to overflow
-            if (read(TIMA) == 255)
+            word TIMAVal = read(TIMA);
+            if (TIMAVal + passedPeriods >= 255)
             {
-                write(TIMA, read(TMA));
+                write(TIMA, TIMAVal + passedPeriods + read(TMA));
                 mEmulator->requestInterrupt(2);
             }
             
             // Otherwise update the timer
-            else write(TIMA, read(TIMA) + 1);
+            else write(TIMA, TIMAVal + passedPeriods);
         }
+    }
+}
+
+void Memory::setClockFrequency()
+{
+    // The frequency is specified by the lower 2 bits of TMC
+    byte freq = read(TAC) & 0x3;
+    switch (freq)
+    {
+        case 0 : mTimerPeriod = 1024; break; // Freq = 4096
+        case 1 : mTimerPeriod = 16;   break; // Freq = 262144
+        case 2 : mTimerPeriod = 64;   break; // Freq = 65536
+        case 3 : mTimerPeriod = 256;  break; // Freq = 16382
     }
 }
 
@@ -262,31 +279,7 @@ void Memory::handleDividerRegister(int cycles)
         mMainMemory[DIVIDER_REGISTER]++;
     }
 }
-
-bool Memory::isClockEnabled()
-{
-    // Bit 2 of TMC determines whether the clock is enabled or not
-    return testBit(read(TMC), 2);
-}
-
-byte Memory::getClockFrequency() const
-{
-    // The frequency is specified by the lower 2 bits of TMC
-    return read(TMC) & 0x3;
-}
-
-void Memory::setClockFrequency()
-{
-    byte freq = getClockFrequency();
-    switch (freq)
-    {
-        case 0 : mTimerCounter = 1024; break; // Freq = 4096
-        case 1 : mTimerCounter = 16;   break; // Freq = 262144
-        case 2 : mTimerCounter = 64;   break; // Freq = 65536
-        case 3 : mTimerCounter = 256;  break; // Freq = 16382
-    }
-}
-    
+ 
 void Memory::handleBanking(word address, byte data)
 {
     // Enable writing to RAM

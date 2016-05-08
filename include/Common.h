@@ -32,7 +32,7 @@ const int FLAG_CARRY = 4; // Set when overflow occurs
 const word DIVIDER_REGISTER = 0xFF04; // Location of the divider register in memory
 const word TIMA             = 0xFF05; // Location of timer in memory
 const word TMA              = 0xFF06; // Location of timer reset value, which will probably be 0
-const word TMC              = 0xFF07; // Location of timer frequency
+const word TAC              = 0xFF07; // Location of timer frequency
 
 const word SCANLINE_ADDRESS     = 0xFF44;
 const word COINCIDENCE_ADDRESS  = 0xFF45;

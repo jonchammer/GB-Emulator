@@ -125,7 +125,8 @@ private:
     bool mEnableRAM;        // True if RAM banking is enabled
     byte mCurrentRAMBank;   // Which RAM bank is currently being used. Range is [0, 3]
     
-    int mTimerCounter;      // Keeps track of the rate at which the timer updates
+    int mTimerPeriod;       // Keeps track of the rate at which the timer updates
+    int mTimerCounter;      // Current state of the timer
     int mDividerCounter;    // Keeps track of the rate at which the divider register updates
     
     bool mUpdateSave;       // When true, the save file will be updated
@@ -141,8 +142,6 @@ private:
     
     // Private functions to handle timing updates
     void handleDividerRegister(int cycles);
-    bool isClockEnabled();
-    byte getClockFrequency() const;
     void setClockFrequency();
     
     // Private functions to handle Direct Memory Access
