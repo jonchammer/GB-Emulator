@@ -29,3 +29,12 @@ The CMakeLists.txt file contains information to locate the SDL2 installation, bu
 NOTE: For Windows users, an environment variable "SDL2" has to be set for compilation to be successful. It needs to be set to the library that will be used. For example, 64 bit:
 
 SDL2 = "C:\SDL\SDL2-2.0.4\x86_64-w64-mingw32"
+
+NOTE: For Linux users, make sure to have SDL 2.0.4 installed on your system. Currently,
+
+apt-get install libsdl2.0.0
+
+will install an older version, so you might have to install it from source. See here:
+
+https://wiki.libsdl.org/Installation
+
