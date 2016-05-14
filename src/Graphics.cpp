@@ -26,9 +26,9 @@ void Graphics::reset()
         mScreenData[i] = 0x00;
 }
 
-void Graphics::update(Emulator* emulator, int cycles)
+void Graphics::update(int cycles)
 {
-    setLCDStatus(emulator);
+    setLCDStatus();
     if (!isLCDEnabled()) return;    
     
     mScanlineCounter -= cycles;
@@ -65,7 +65,7 @@ void Graphics::update(Emulator* emulator, int cycles)
     }
 }
 
-void Graphics::setLCDStatus(Emulator* emulator)
+void Graphics::setLCDStatus()
 {
     byte status = mMemory->read(LCD_STATUS_ADDRESS);
     if (!isLCDEnabled())

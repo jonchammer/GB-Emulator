@@ -34,10 +34,9 @@ public:
      * Called during the emulation loop. Used to update the screen buffer
      * with the most recent contents.
      * 
-     * @param emulator. A pointer to the host emulator.
      * @param cycles.   The number of cycles the last instruction took.
      */
-    void update(Emulator* emulator, int cycles);
+    void update(int cycles);
     
     /**
      * Resets the state of the screen buffer to its initial configuration.
@@ -58,7 +57,7 @@ private:
     int mScanlineCounter; // Keeps track of when to move to the next scanline
     
     // Helper functions
-    void setLCDStatus(Emulator* emulator);
+    void setLCDStatus();
     bool isLCDEnabled();
     void drawScanLine();
     void renderTiles();

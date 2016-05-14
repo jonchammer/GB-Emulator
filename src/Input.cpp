@@ -7,7 +7,7 @@
 
 #include "Input.h"
 
-Input::Input(Memory* memory, Emulator* emulator) : mMemory(memory), mEmulator(emulator)
+Input::Input(Memory* memory) : mMemory(memory)
 {
     reset();
 }

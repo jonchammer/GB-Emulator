@@ -18,9 +18,8 @@ public:
      * Create a new Input component.
      * 
      * @param memory.   A pointer to the memory unit of the Gameboy.
-     * @param emulator. A pointer to the hosting emulator.
      */
-    Input(Memory* memory, Emulator* emulator);
+    Input(Memory* memory);
     
     /**
      * Destructor.
@@ -57,7 +56,6 @@ public:
 private:
     byte mJoypadState;    // Contains the current state of each button (1 per bit). 0 is pressed.
     Memory* mMemory;      // Pointer to the main memory unit.
-    Emulator* mEmulator;  // Pointer to the hosting emulator.
 };
 
 #endif /* INPUT_H */

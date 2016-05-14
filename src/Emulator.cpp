@@ -13,7 +13,7 @@ Emulator::Emulator(bool skipBIOS) : mPaused(false)
     mMemory   = new Memory(this, skipBIOS);
     mCPU      = new CPU(mMemory, skipBIOS); 
     mGraphics = new Graphics(mMemory);
-    mInput    = new Input(mMemory, this);
+    mInput    = new Input(mMemory);
     mSound    = new Sound(mMemory, skipBIOS, 44100, 1024);
 }
 
@@ -50,7 +50,7 @@ void Emulator::update()
         cyclesThisUpdate += cycles;
         
         mMemory->updateTimers(cycles);
-        mGraphics->update(this, cycles);
+        mGraphics->update(cycles);
         mSound->update(cycles);
         
         cyclesThisUpdate += mCPU->handleInterrupts();
