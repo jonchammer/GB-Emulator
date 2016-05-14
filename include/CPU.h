@@ -21,56 +21,44 @@ struct Registers
 {
     // Use anonymous unions so we can access either an individual
     // byte or two bytes together
-    struct
+    union
     {
-        union
+        struct
         {
-            struct
-            {
-                byte f;
-                byte a;
-            };
-            word af;
+            byte f;
+            byte a;
         };
+        word af;
     };
-    
-    struct
+
+    union
     {
-        union
+        struct
         {
-            struct
-            {
-                byte c;
-                byte b;
-            };
-            word bc;
+            byte c;
+            byte b;
         };
+        word bc;
     };
-    
-    struct
+
+    union
     {
-        union
+        struct
         {
-            struct
-            {
-                byte e;
-                byte d;
-            };
-            word de;
+            byte e;
+            byte d;
         };
+        word de;
     };
-    
-    struct
+
+    union
     {
-        union
+        struct
         {
-            struct
-            {
-                byte l;
-                byte h;
-            };
-            word hl;
+            byte l;
+            byte h;
         };
+        word hl;
     };
 };
 
@@ -78,13 +66,13 @@ struct Registers
 // Use the union trick again so we can access either the complete
 // word or an individual byte.
 union StackPointer
-{
-    word reg;
+{ 
     struct
     {
         byte lo;
         byte hi;
     };
+    word reg;
 };
 
 class CPU 

@@ -1,5 +1,8 @@
 - Synchronize the screen buffer so that there is no visual tearing.
-- Finish going through test roms.
+- Finish going through test roms. Code currently fails memory timing tests and 01 from Sound1 and Sound2.
+  + Memory tests fail because we need to split instructions into multiple updates. E.g. For an 8 cycle
+    instruction, we might have to do 4 cycles, then do another 4. Right now, the CPU just returns 8, but
+	we would need more granularity.
 - Sound during BIOS.
 - Link's Awakening crash after 1st dungeon searching for BowWow.
 - Pokemon Red title screen - background is 1 pixel off. Part of text moves with the pokemon sprite.
