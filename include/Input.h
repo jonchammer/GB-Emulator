@@ -55,9 +55,9 @@ public:
     void reset();
     
 private:
-    byte mJoypadState;
-    Memory* mMemory;
-    Emulator* mEmulator;
+    byte mJoypadState;    // Contains the current state of each button (1 per bit). 0 is pressed.
+    Memory* mMemory;      // Pointer to the main memory unit.
+    Emulator* mEmulator;  // Pointer to the hosting emulator.
 };
 
 #endif /* INPUT_H */

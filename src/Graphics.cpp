@@ -16,13 +16,14 @@ Graphics::Graphics(Memory* memory) : mMemory(memory), mScanlineCounter(0)
 Graphics::~Graphics()
 {
     delete[] mScreenData;
+    mScreenData = NULL;
 }
 
 void Graphics::reset()
 {
     mScanlineCounter = 0;
     for (int i = 0; i < SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4; ++i)
-        mScreenData[i] = 0x0;
+        mScreenData[i] = 0x00;
 }
 
 void Graphics::update(Emulator* emulator, int cycles)
@@ -170,7 +171,7 @@ void Graphics::renderTiles()
     // Where to draw the visual area and the window
     byte scrollX = mMemory->read(SCROLL_X);
     byte scrollY = mMemory->read(SCROLL_Y);
-    byte windowX = mMemory->read(WINDOW_X) - 7; // TODO Work out if this should be +7 or -7
+    byte windowX = mMemory->read(WINDOW_X) - 7;
     byte windowY = mMemory->read(WINDOW_Y);
     
     bool usingWindow = false;

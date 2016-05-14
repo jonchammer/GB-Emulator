@@ -92,35 +92,6 @@ int CPU::executeNextOpcode()
             mInterruptMaster         = true;
         }
     }
-    
-    //-----------------
-//    mProgramCounter++;
-//    
-//    if (!mHalt && mHaltBug)
-//    {
-//        mHaltBug = false;
-//        mProgramCounter--;
-//    }
-//    
-//    if (mPendingInterruptDisabled > 0)
-//    {
-//        if (mPendingInterruptDisabled == 1)
-//            mInterruptMaster = false;
-//        
-//        mPendingInterruptDisabled--;
-//    }
-//    
-//    if (mPendingInterruptEnabled > 0)
-//    {
-//        if (mPendingInterruptEnabled == 1)
-//            mInterruptMaster = true;
-//
-//        mPendingInterruptEnabled--;
-//    }
-//    
-//    cycles = executeInstruction(opcode);
-    
-    //------------------
 
     return cycles;
 }
@@ -247,514 +218,8 @@ bool CPU::testFlag(int flag)
     return testBit(mRegisters.f, flag);
 }
 
-void CPU::CPU_LDHL()
-{
-    signedByte n  = (signedByte) getImmediateByte();
-    mRegisters.hl = mStackPointer.reg + n;
-    mRegisters.f  = 0x0;
-    
-    // Set carry based on the bottom byte (immediate answer must be interpreted as unsigned)
-    int a = mStackPointer.reg & 0x00FF;
-    int b = ((byte) n) & 0xFF;
-    if (a + b > 0xFF)
-        setFlag(FLAG_CARRY);
-    else clearFlag(FLAG_CARRY);
-    
-    // Set half carry based on the bottom nibble (immediate answer must be interpreted as unsigned)
-    a = a & 0x000F;
-    b = b & 0x000F;
-    if (a + b > 0x0F)
-        setFlag(FLAG_HALF);
-    else clearFlag(FLAG_HALF);
-}
-
-// Add either the next byte in the instructions or the given byte (toAdd) and
-// place the result in 'reg'.
-void CPU::CPU_8BIT_ADD(byte& reg, byte toAdd, bool useImmediate, bool addCarry)
-{
-    byte before = reg;
-    byte other  = toAdd;
-    byte carry  = 0;
-    
-    // Are we adding immediate data or the second param?
-    if (useImmediate)
-        other = getImmediateByte();
-     
-    // Are we also adding the carry flag?
-    if (addCarry && testFlag(FLAG_CARRY))
-        carry = 0x01;
-    
-    reg += (other + carry);
-    
-    // Set the flags
-    mRegisters.f = 0;
-    if (reg == 0)
-        setFlag(FLAG_ZERO);
-    
-    // Half carry
-    word a = (word) (before & 0x0F);
-    word b = (word) (other  & 0x0F);
-    if (a + b + carry > 0x0F)
-        setFlag(FLAG_HALF);
-    
-    // Full carry
-    if ((unsigned int) before + (unsigned int) other + (unsigned int) carry > 0xFF)
-        setFlag(FLAG_CARRY);
-}
-
-void CPU::CPU_8BIT_SUB(byte& reg, byte toSubtract, bool useImmediate, bool subCarry)
-{
-    byte before = reg;
-    byte other  = toSubtract;
-    byte carry  = 0;
-    
-    if (useImmediate)
-        other = getImmediateByte();
-    
-    if (subCarry && testFlag(FLAG_CARRY))
-        carry = 0x01;
-    
-    reg -= (other + carry);
-    
-    // Set flags
-    mRegisters.f = 0x0;
-    if (reg == 0)
-        setFlag(FLAG_ZERO);
-    setFlag(FLAG_NEG);
-    
-    if (before < (other + carry))
-        setFlag(FLAG_CARRY);
-    
-    signedWord hTest = (before & 0x0F);
-    hTest -= (other & 0x0F);
-    hTest -= carry;
-    if (hTest < 0)
-        setFlag(FLAG_HALF);
-}
-
-void CPU::CPU_8BIT_AND(byte& reg, byte toAnd, bool useImmediate)
-{
-    byte other = toAnd;
-    if (useImmediate)
-        other = getImmediateByte();
-    
-    reg &= other;
-    
-    mRegisters.f = 0x0;
-    setFlag(FLAG_HALF);
-    if (reg == 0)
-        setFlag(FLAG_ZERO);
-}
-
-void CPU::CPU_8BIT_OR(byte& reg, byte toOr, bool useImmediate)
-{
-    byte other = toOr;
-    if (useImmediate)
-        other = getImmediateByte();
-    
-    reg |= other;
-    mRegisters.f = 0x0;
-    if (reg == 0)
-        setFlag(FLAG_ZERO);
-}
-
-void CPU::CPU_8BIT_XOR(byte& reg, byte toXor, bool useImmediate)
-{
-    byte other = toXor;
-    if (useImmediate)
-        other = getImmediateByte();
-    
-    reg ^= other;
-    mRegisters.f = 0x0;
-    if (reg == 0)
-        setFlag(FLAG_ZERO);
-}
-
-void CPU::CPU_8BIT_INC(byte& reg)
-{
-    byte oldVal = reg;
-    reg++;
-    
-    // Set flags
-    if (reg == 0)
-        setFlag(FLAG_ZERO);
-    else clearFlag(FLAG_ZERO);
-    
-    clearFlag(FLAG_NEG);
-    
-    // If the low 4 bits were originally 1111, we have a half carry
-    if ((oldVal & 0x0F) == 0x0F)
-        setFlag(FLAG_HALF);
-    else clearFlag(FLAG_HALF);
-}
-
-void CPU::CPU_8BIT_INC(word address)
-{
-    byte oldVal = readByte(address);
-    
-    // If the low 4 bits were originally 1111, we have a half carry
-    if ((oldVal & 0x0F) == 0x0F)
-        setFlag(FLAG_HALF);
-        
-    else clearFlag(FLAG_HALF);
-    
-    // Do the increment
-    oldVal++;
-    
-    // Set flags
-    if (oldVal == 0)
-        setFlag(FLAG_ZERO);
-    else clearFlag(FLAG_ZERO);
-    
-    clearFlag(FLAG_NEG);
-    
-    // Save the result back to the original address
-    writeByte(address, oldVal);
-}
-
-void CPU::CPU_8BIT_DEC(byte& reg)
-{
-    byte oldVal = reg;
-    reg--;
-    
-    // Set flags
-    if (reg == 0)
-        setFlag(FLAG_ZERO);
-    else clearFlag(FLAG_ZERO);
-    
-    setFlag(FLAG_NEG);
-    
-    if ((oldVal & 0x0F) == 0)
-        setFlag(FLAG_HALF);
-    else clearFlag(FLAG_HALF);
-}
-
-void CPU::CPU_8BIT_DEC(word address)
-{
-    byte oldVal = readByte(address);
-    
-    if ((oldVal & 0x0F) == 0)
-        setFlag(FLAG_HALF);
-    else clearFlag(FLAG_HALF);
-    
-    oldVal--;
-    
-    // Set flags
-    if (oldVal == 0)
-        setFlag(FLAG_ZERO);
-    else clearFlag(FLAG_ZERO);
-    
-    setFlag(FLAG_NEG);
-    
-    // Save the result back to the original address
-    writeByte(address, oldVal);
-}
-
-void CPU::CPU_16BIT_ADD(word source, word& dest)
-{
-    word orig = dest;
-    dest += source;
-    
-    clearFlag(FLAG_NEG);
-    int sum = (((int) orig) + source);
-    if (sum > 0xFFFF)
-        setFlag(FLAG_CARRY);
-    else clearFlag(FLAG_CARRY);
-    
-    // To calculate the half carry, first figure out if there was
-    // a carry between bits 7 and 8
-    word c = 0;
-    if ((int)(orig & 0xFF) + (int)(source & 0xFF) > 0xFF)
-        c = 1;
-
-    word a = (source & 0x0F00) >> 8;
-    word b = (orig   & 0x0F00) >> 8;
-    
-    // If the sum of the bytes and the carry is larger than 1 byte, 
-    // there was a half carry
-    if (a + b + c > 0x0F)
-        setFlag(FLAG_HALF);
-    else clearFlag(FLAG_HALF);
-}
-
-void CPU::CPU_16BIT_ADD(word& dest)
-{
-    word orig        = dest;
-    signedByte toAdd = (signedByte) getImmediateByte();
-    dest            += toAdd;
-    mRegisters.f     = 0x0;
-    
-    // Set carry based on the bottom byte (immediate answer must be interpreted as unsigned)
-    int a = orig & 0x00FF;
-    int b = ((byte) toAdd) & 0xFF;
-    if (a + b > 0xFF)
-        setFlag(FLAG_CARRY);
-    else clearFlag(FLAG_CARRY);
-    
-    // Set half carry based on the bottom nibble (immediate answer must be interpreted as unsigned)
-    a = a & 0x000F;
-    b = b & 0x000F;
-    if (a + b > 0x0F)
-        setFlag(FLAG_HALF);
-    else clearFlag(FLAG_HALF);
-}
-
-int CPU::CPU_JUMP_IMMEDIATE(bool useCondition, int flag, bool condition)
-{
-    signedByte n = (signedByte) getImmediateByte();
-    if (!useCondition || (testFlag(flag) == condition))
-    {
-        mProgramCounter += n;
-        return 4;
-    }
-    else return 0;
-}
-
-int CPU::CPU_JUMP(bool useCondition, int flag, bool condition)
-{
-    word address = getImmediateWord();
-    if (!useCondition || (testFlag(flag) == condition))
-    {
-        mProgramCounter = address;
-        return 4;
-    }
-    else return 0;
-}
-
-int CPU::CPU_CALL(bool useCondition, int flag, bool condition)
-{
-    word nn = getImmediateWord();
-   
-    if (!useCondition || (testFlag(flag) == condition))
-    {
-        pushWordOntoStack(mProgramCounter);
-        mProgramCounter = nn;
-        return 12;
-    }
-    else return 0;
-}
-
-int CPU::CPU_RETURN(bool useCondition, int flag, bool condition)
-{
-    if (!useCondition || (testFlag(flag) == condition))
-    {
-        mProgramCounter = popWordOffStack();
-        return 12;
-    }
-    else return 0;
-}
-
-void CPU::CPU_RESTART(byte n)
-{
-    pushWordOntoStack(mProgramCounter);
-    mProgramCounter = n;
-}
-
-void CPU::CPU_RLC(byte& reg)
-{
-    // Correct for RLC, fails for RLCA
-    mRegisters.f = 0x0;
-    reg = (reg << 1) | (reg >> 7);
-    
-    // Set flags
-    if (testBit(reg, 0))
-        setFlag(FLAG_CARRY);
-    
-    if (reg == 0)
-        setFlag(FLAG_ZERO);
-}
-
-void CPU::CPU_RL(byte& reg)
-{
-    bool carry   = testFlag(FLAG_CARRY);
-    mRegisters.f = 0x0;
-    
-    // Copy b7 to carry
-    if (testBit(reg, 7)) setFlag(FLAG_CARRY);
-    
-    reg <<= 1;
-    reg = clearBit(reg, 0);
-    
-    // Copy carry into b0
-    if (carry)    reg = setBit(reg, 0);
-    if (reg == 0) setFlag(FLAG_ZERO);
-}
-
-void CPU::CPU_SLA(byte& reg)
-{
-    // Copy b7 into carry
-    mRegisters.f = 0x0;
-    if (testBit(reg, 7)) setFlag(FLAG_CARRY);
-    
-    reg <<= 1;
-    clearBit(reg, 0);
-    
-    if (reg == 0)
-        setFlag(FLAG_ZERO);
-}
- 
-// Rotate right through carry
-void CPU::CPU_RRC(byte& reg)
-{
-    bool isLSBSet = testBit(reg, 0);
-    mRegisters.f  = 0x0;
-    reg >>= 1;
-    
-    // Set flags
-    if (isLSBSet)
-    {
-        setFlag(FLAG_CARRY);
-        reg = setBit(reg, 7);
-    }
-    
-    if (reg == 0)
-        setFlag(FLAG_ZERO);
-}
-
-void CPU::CPU_RR(byte& reg)
-{
-    bool carry   = testFlag(FLAG_CARRY);
-    mRegisters.f = 0x0;
-    
-    // Copy b0 to carry
-    if (testBit(reg, 0)) setFlag(FLAG_CARRY);
-    
-    reg >>= 1;
-    
-    // Copy carry into b7
-    if (carry)    reg = setBit(reg, 7);
-    if (reg == 0) setFlag(FLAG_ZERO);
-}
-
-void CPU::CPU_SRA(byte& reg)
-{
-    // Save MSB
-    bool msb = testBit(reg, 7);
-    
-    // Copy b0 into carry
-    mRegisters.f = 0x0;
-    if (testBit(reg, 0)) setFlag(FLAG_CARRY);
-    
-    reg >>= 1;
-    reg = clearBit(reg, 7);
-    
-    // Copy MSB back into reg
-    if (msb) reg = setBit(reg, 7);
-    
-    if (reg == 0)
-        setFlag(FLAG_ZERO);
-}
-
-void CPU::CPU_SRL(byte& reg)
-{
-    // Copy b0 into carry
-    mRegisters.f = 0x0;
-    if (testBit(reg, 0)) setFlag(FLAG_CARRY);
-    
-    reg >>= 1;
-    reg = clearBit(reg, 7);
-    
-    if (reg == 0)
-        setFlag(FLAG_ZERO);
-}
-
-// Sets the flags for a given byte
-void CPU::CPU_TEST_BIT(byte reg, int bit)
-{
-    if (testBit(reg, bit))
-        clearFlag(FLAG_ZERO);
-    else setFlag(FLAG_ZERO);
-    
-    clearFlag(FLAG_NEG);
-    setFlag(FLAG_HALF);
-}
-    
-void CPU::CPU_CPL()
-{
-    mRegisters.a ^= 0xFF;
-    setFlag(FLAG_NEG);
-    setFlag(FLAG_HALF);
-}
-
-void CPU::CPU_CCF()
-{
-    clearFlag(FLAG_NEG);
-    clearFlag(FLAG_HALF);
-    mRegisters.f = toggleBit(mRegisters.f, FLAG_CARRY);
-}
-
-void CPU::CPU_SCF()
-{
-    clearFlag(FLAG_NEG);
-    clearFlag(FLAG_HALF);
-    setFlag(FLAG_CARRY);
-}
-
-void CPU::CPU_SWAP(byte& reg)
-{
-    byte lo = reg & 0x0F;
-    byte hi = (reg & 0xF0) >> 4;
-    reg     = lo << 4 | hi;
-    
-    mRegisters.f = 0x0;
-    if (reg == 0)
-        setFlag(FLAG_ZERO);
-}
-
-void CPU::CPU_DECIMAL_ADJUST()
-{
-    int a = mRegisters.a;
-    if (!testFlag(FLAG_NEG))
-    {
-        if (testFlag(FLAG_HALF) || (a & 0xF) > 9)
-            a += 0x06;
-        
-        if (testFlag(FLAG_CARRY) || a > 0x9F)
-            a += 0x60;
-    }
-    else
-    {
-        if (testFlag(FLAG_HALF))
-            a = (a - 6) & 0xFF;
-        
-        if (testFlag(FLAG_CARRY))
-            a -= 0x60;
-    }
-    
-    clearFlag(FLAG_HALF);
-    clearFlag(FLAG_ZERO);
-    
-    if ((a & 0x100) == 0x100)
-        setFlag(FLAG_CARRY);
-    a &= 0xFF;
-    
-    if (a == 0)
-        setFlag(FLAG_ZERO);
-    mRegisters.a = (byte) a;
-}
-
-void CPU::CPU_HALT()
-{
-    if (!mHalt)
-    {
-        if (!mInterruptMaster && (mMemory->read(INTERRUPT_ENABLED_REGISTER) & mMemory->read(INTERRUPT_REQUEST_REGISTER) & 0x1F))
-        {
-            // if GCB, return 4 clock cycles
-            
-            // if GB...
-            mHaltBug = true;
-        }
-        else
-        {
-            mHalt = true;
-            mProgramCounter--;
-        }
-    }
-    else mProgramCounter--;
-}
-
 // NOTE: All instruction implementations have been verified using test ROMs
-// except for STOP. It is also unknown if the CPU timings are correct.
+// except for STOP.
 int CPU::executeInstruction(byte opcode)
 {
     switch (opcode)
@@ -1352,3 +817,513 @@ int CPU::executeExtendedInstruction()
         }
     }
 }
+
+// ---- BEGIN CPU INSTRUCTION IMPLEMENTATIONS ---- //
+
+void CPU::CPU_LDHL()
+{
+    signedByte n  = (signedByte) getImmediateByte();
+    mRegisters.hl = mStackPointer.reg + n;
+    mRegisters.f  = 0x0;
+    
+    // Set carry based on the bottom byte (immediate answer must be interpreted as unsigned)
+    int a = mStackPointer.reg & 0x00FF;
+    int b = ((byte) n) & 0xFF;
+    if (a + b > 0xFF)
+        setFlag(FLAG_CARRY);
+    else clearFlag(FLAG_CARRY);
+    
+    // Set half carry based on the bottom nibble (immediate answer must be interpreted as unsigned)
+    a = a & 0x000F;
+    b = b & 0x000F;
+    if (a + b > 0x0F)
+        setFlag(FLAG_HALF);
+    else clearFlag(FLAG_HALF);
+}
+
+// Add either the next byte in the instructions or the given byte (toAdd) and
+// place the result in 'reg'.
+void CPU::CPU_8BIT_ADD(byte& reg, byte toAdd, bool useImmediate, bool addCarry)
+{
+    byte before = reg;
+    byte other  = toAdd;
+    byte carry  = 0;
+    
+    // Are we adding immediate data or the second param?
+    if (useImmediate)
+        other = getImmediateByte();
+     
+    // Are we also adding the carry flag?
+    if (addCarry && testFlag(FLAG_CARRY))
+        carry = 0x01;
+    
+    reg += (other + carry);
+    
+    // Set the flags
+    mRegisters.f = 0;
+    if (reg == 0)
+        setFlag(FLAG_ZERO);
+    
+    // Half carry
+    word a = (word) (before & 0x0F);
+    word b = (word) (other  & 0x0F);
+    if (a + b + carry > 0x0F)
+        setFlag(FLAG_HALF);
+    
+    // Full carry
+    if ((unsigned int) before + (unsigned int) other + (unsigned int) carry > 0xFF)
+        setFlag(FLAG_CARRY);
+}
+
+void CPU::CPU_8BIT_SUB(byte& reg, byte toSubtract, bool useImmediate, bool subCarry)
+{
+    byte before = reg;
+    byte other  = toSubtract;
+    byte carry  = 0;
+    
+    if (useImmediate)
+        other = getImmediateByte();
+    
+    if (subCarry && testFlag(FLAG_CARRY))
+        carry = 0x01;
+    
+    reg -= (other + carry);
+    
+    // Set flags
+    mRegisters.f = 0x0;
+    if (reg == 0)
+        setFlag(FLAG_ZERO);
+    setFlag(FLAG_NEG);
+    
+    if (before < (other + carry))
+        setFlag(FLAG_CARRY);
+    
+    signedWord hTest = (before & 0x0F);
+    hTest -= (other & 0x0F);
+    hTest -= carry;
+    if (hTest < 0)
+        setFlag(FLAG_HALF);
+}
+
+void CPU::CPU_8BIT_AND(byte& reg, byte toAnd, bool useImmediate)
+{
+    byte other = toAnd;
+    if (useImmediate)
+        other = getImmediateByte();
+    
+    reg &= other;
+    
+    mRegisters.f = 0x0;
+    setFlag(FLAG_HALF);
+    if (reg == 0)
+        setFlag(FLAG_ZERO);
+}
+
+void CPU::CPU_8BIT_OR(byte& reg, byte toOr, bool useImmediate)
+{
+    byte other = toOr;
+    if (useImmediate)
+        other = getImmediateByte();
+    
+    reg |= other;
+    mRegisters.f = 0x0;
+    if (reg == 0)
+        setFlag(FLAG_ZERO);
+}
+
+void CPU::CPU_8BIT_XOR(byte& reg, byte toXor, bool useImmediate)
+{
+    byte other = toXor;
+    if (useImmediate)
+        other = getImmediateByte();
+    
+    reg ^= other;
+    mRegisters.f = 0x0;
+    if (reg == 0)
+        setFlag(FLAG_ZERO);
+}
+
+void CPU::CPU_8BIT_INC(byte& reg)
+{
+    byte oldVal = reg;
+    reg++;
+    
+    // Set flags
+    if (reg == 0)
+        setFlag(FLAG_ZERO);
+    else clearFlag(FLAG_ZERO);
+    
+    clearFlag(FLAG_NEG);
+    
+    // If the low 4 bits were originally 1111, we have a half carry
+    if ((oldVal & 0x0F) == 0x0F)
+        setFlag(FLAG_HALF);
+    else clearFlag(FLAG_HALF);
+}
+
+void CPU::CPU_8BIT_INC(word address)
+{
+    byte oldVal = readByte(address);
+    
+    // If the low 4 bits were originally 1111, we have a half carry
+    if ((oldVal & 0x0F) == 0x0F)
+        setFlag(FLAG_HALF);
+        
+    else clearFlag(FLAG_HALF);
+    
+    // Do the increment
+    oldVal++;
+    
+    // Set flags
+    if (oldVal == 0)
+        setFlag(FLAG_ZERO);
+    else clearFlag(FLAG_ZERO);
+    
+    clearFlag(FLAG_NEG);
+    
+    // Save the result back to the original address
+    writeByte(address, oldVal);
+}
+
+void CPU::CPU_8BIT_DEC(byte& reg)
+{
+    byte oldVal = reg;
+    reg--;
+    
+    // Set flags
+    if (reg == 0)
+        setFlag(FLAG_ZERO);
+    else clearFlag(FLAG_ZERO);
+    
+    setFlag(FLAG_NEG);
+    
+    if ((oldVal & 0x0F) == 0)
+        setFlag(FLAG_HALF);
+    else clearFlag(FLAG_HALF);
+}
+
+void CPU::CPU_8BIT_DEC(word address)
+{
+    byte oldVal = readByte(address);
+    
+    if ((oldVal & 0x0F) == 0)
+        setFlag(FLAG_HALF);
+    else clearFlag(FLAG_HALF);
+    
+    oldVal--;
+    
+    // Set flags
+    if (oldVal == 0)
+        setFlag(FLAG_ZERO);
+    else clearFlag(FLAG_ZERO);
+    
+    setFlag(FLAG_NEG);
+    
+    // Save the result back to the original address
+    writeByte(address, oldVal);
+}
+
+void CPU::CPU_16BIT_ADD(word source, word& dest)
+{
+    word orig = dest;
+    dest += source;
+    
+    clearFlag(FLAG_NEG);
+    int sum = (((int) orig) + source);
+    if (sum > 0xFFFF)
+        setFlag(FLAG_CARRY);
+    else clearFlag(FLAG_CARRY);
+    
+    // To calculate the half carry, first figure out if there was
+    // a carry between bits 7 and 8
+    word c = 0;
+    if ((int)(orig & 0xFF) + (int)(source & 0xFF) > 0xFF)
+        c = 1;
+
+    word a = (source & 0x0F00) >> 8;
+    word b = (orig   & 0x0F00) >> 8;
+    
+    // If the sum of the bytes and the carry is larger than 1 byte, 
+    // there was a half carry
+    if (a + b + c > 0x0F)
+        setFlag(FLAG_HALF);
+    else clearFlag(FLAG_HALF);
+}
+
+void CPU::CPU_16BIT_ADD(word& dest)
+{
+    word orig        = dest;
+    signedByte toAdd = (signedByte) getImmediateByte();
+    dest            += toAdd;
+    mRegisters.f     = 0x0;
+    
+    // Set carry based on the bottom byte (immediate answer must be interpreted as unsigned)
+    int a = orig & 0x00FF;
+    int b = ((byte) toAdd) & 0xFF;
+    if (a + b > 0xFF)
+        setFlag(FLAG_CARRY);
+    else clearFlag(FLAG_CARRY);
+    
+    // Set half carry based on the bottom nibble (immediate answer must be interpreted as unsigned)
+    a = a & 0x000F;
+    b = b & 0x000F;
+    if (a + b > 0x0F)
+        setFlag(FLAG_HALF);
+    else clearFlag(FLAG_HALF);
+}
+
+int CPU::CPU_JUMP_IMMEDIATE(bool useCondition, int flag, bool condition)
+{
+    signedByte n = (signedByte) getImmediateByte();
+    if (!useCondition || (testFlag(flag) == condition))
+    {
+        mProgramCounter += n;
+        return 4;
+    }
+    else return 0;
+}
+
+int CPU::CPU_JUMP(bool useCondition, int flag, bool condition)
+{
+    word address = getImmediateWord();
+    if (!useCondition || (testFlag(flag) == condition))
+    {
+        mProgramCounter = address;
+        return 4;
+    }
+    else return 0;
+}
+
+int CPU::CPU_CALL(bool useCondition, int flag, bool condition)
+{
+    word nn = getImmediateWord();
+   
+    if (!useCondition || (testFlag(flag) == condition))
+    {
+        pushWordOntoStack(mProgramCounter);
+        mProgramCounter = nn;
+        return 12;
+    }
+    else return 0;
+}
+
+int CPU::CPU_RETURN(bool useCondition, int flag, bool condition)
+{
+    if (!useCondition || (testFlag(flag) == condition))
+    {
+        mProgramCounter = popWordOffStack();
+        return 12;
+    }
+    else return 0;
+}
+
+void CPU::CPU_RESTART(byte n)
+{
+    pushWordOntoStack(mProgramCounter);
+    mProgramCounter = n;
+}
+
+void CPU::CPU_RLC(byte& reg)
+{
+    // Correct for RLC, fails for RLCA
+    mRegisters.f = 0x0;
+    reg = (reg << 1) | (reg >> 7);
+    
+    // Set flags
+    if (testBit(reg, 0))
+        setFlag(FLAG_CARRY);
+    
+    if (reg == 0)
+        setFlag(FLAG_ZERO);
+}
+
+void CPU::CPU_RL(byte& reg)
+{
+    bool carry   = testFlag(FLAG_CARRY);
+    mRegisters.f = 0x0;
+    
+    // Copy b7 to carry
+    if (testBit(reg, 7)) setFlag(FLAG_CARRY);
+    
+    reg <<= 1;
+    reg = clearBit(reg, 0);
+    
+    // Copy carry into b0
+    if (carry)    reg = setBit(reg, 0);
+    if (reg == 0) setFlag(FLAG_ZERO);
+}
+
+void CPU::CPU_SLA(byte& reg)
+{
+    // Copy b7 into carry
+    mRegisters.f = 0x0;
+    if (testBit(reg, 7)) setFlag(FLAG_CARRY);
+    
+    reg <<= 1;
+    clearBit(reg, 0);
+    
+    if (reg == 0)
+        setFlag(FLAG_ZERO);
+}
+ 
+// Rotate right through carry
+void CPU::CPU_RRC(byte& reg)
+{
+    bool isLSBSet = testBit(reg, 0);
+    mRegisters.f  = 0x0;
+    reg >>= 1;
+    
+    // Set flags
+    if (isLSBSet)
+    {
+        setFlag(FLAG_CARRY);
+        reg = setBit(reg, 7);
+    }
+    
+    if (reg == 0)
+        setFlag(FLAG_ZERO);
+}
+
+void CPU::CPU_RR(byte& reg)
+{
+    bool carry   = testFlag(FLAG_CARRY);
+    mRegisters.f = 0x0;
+    
+    // Copy b0 to carry
+    if (testBit(reg, 0)) setFlag(FLAG_CARRY);
+    
+    reg >>= 1;
+    
+    // Copy carry into b7
+    if (carry)    reg = setBit(reg, 7);
+    if (reg == 0) setFlag(FLAG_ZERO);
+}
+
+void CPU::CPU_SRA(byte& reg)
+{
+    // Save MSB
+    bool msb = testBit(reg, 7);
+    
+    // Copy b0 into carry
+    mRegisters.f = 0x0;
+    if (testBit(reg, 0)) setFlag(FLAG_CARRY);
+    
+    reg >>= 1;
+    reg = clearBit(reg, 7);
+    
+    // Copy MSB back into reg
+    if (msb) reg = setBit(reg, 7);
+    
+    if (reg == 0)
+        setFlag(FLAG_ZERO);
+}
+
+void CPU::CPU_SRL(byte& reg)
+{
+    // Copy b0 into carry
+    mRegisters.f = 0x0;
+    if (testBit(reg, 0)) setFlag(FLAG_CARRY);
+    
+    reg >>= 1;
+    reg = clearBit(reg, 7);
+    
+    if (reg == 0)
+        setFlag(FLAG_ZERO);
+}
+
+// Sets the flags for a given byte
+void CPU::CPU_TEST_BIT(byte reg, int bit)
+{
+    if (testBit(reg, bit))
+        clearFlag(FLAG_ZERO);
+    else setFlag(FLAG_ZERO);
+    
+    clearFlag(FLAG_NEG);
+    setFlag(FLAG_HALF);
+}
+    
+void CPU::CPU_CPL()
+{
+    mRegisters.a ^= 0xFF;
+    setFlag(FLAG_NEG);
+    setFlag(FLAG_HALF);
+}
+
+void CPU::CPU_CCF()
+{
+    clearFlag(FLAG_NEG);
+    clearFlag(FLAG_HALF);
+    mRegisters.f = toggleBit(mRegisters.f, FLAG_CARRY);
+}
+
+void CPU::CPU_SCF()
+{
+    clearFlag(FLAG_NEG);
+    clearFlag(FLAG_HALF);
+    setFlag(FLAG_CARRY);
+}
+
+void CPU::CPU_SWAP(byte& reg)
+{
+    byte lo = reg & 0x0F;
+    byte hi = (reg & 0xF0) >> 4;
+    reg     = lo << 4 | hi;
+    
+    mRegisters.f = 0x0;
+    if (reg == 0)
+        setFlag(FLAG_ZERO);
+}
+
+void CPU::CPU_DECIMAL_ADJUST()
+{
+    int a = mRegisters.a;
+    if (!testFlag(FLAG_NEG))
+    {
+        if (testFlag(FLAG_HALF) || (a & 0xF) > 9)
+            a += 0x06;
+        
+        if (testFlag(FLAG_CARRY) || a > 0x9F)
+            a += 0x60;
+    }
+    else
+    {
+        if (testFlag(FLAG_HALF))
+            a = (a - 6) & 0xFF;
+        
+        if (testFlag(FLAG_CARRY))
+            a -= 0x60;
+    }
+    
+    clearFlag(FLAG_HALF);
+    clearFlag(FLAG_ZERO);
+    
+    if ((a & 0x100) == 0x100)
+        setFlag(FLAG_CARRY);
+    a &= 0xFF;
+    
+    if (a == 0)
+        setFlag(FLAG_ZERO);
+    mRegisters.a = (byte) a;
+}
+
+void CPU::CPU_HALT()
+{
+    if (!mHalt)
+    {
+        if (!mInterruptMaster && (mMemory->read(INTERRUPT_ENABLED_REGISTER) & mMemory->read(INTERRUPT_REQUEST_REGISTER) & 0x1F))
+        {
+            // if GCB, return 4 clock cycles
+            
+            // if GB...
+            mHaltBug = true;
+        }
+        else
+        {
+            mHalt = true;
+            mProgramCounter--;
+        }
+    }
+    else mProgramCounter--;
+}
+
+// ---- END CPU INSTRUCTION IMPLEMENTATIONS ---- //

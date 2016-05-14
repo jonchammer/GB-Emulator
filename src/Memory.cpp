@@ -32,6 +32,7 @@ const byte MAIN_MEMORY_INIT_VALUES[] =
     0x00
 };
 
+// The Gameboy BIOS
 const byte BIOS[] = 
 {
     0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB, 0x21, 0x26, 0xFF, 0x0E,
@@ -113,8 +114,6 @@ void Memory::reset(bool skipBIOS)
 
 byte Memory::read(word address) const
 {
-    //cout << "Read from: "; printHex(cout, address); cout << " = "; printHex(cout, mMainMemory[address]); cout << endl;
-    
     // Read from the correct ROM memory bank
     if ( (address >= 0x4000) && (address <= 0x7FFF) )
     {
@@ -132,13 +131,14 @@ byte Memory::read(word address) const
     // Trap to hook in to joypad
     else if (address == JOYPAD_STATUS_ADDRESS)
     {
-        byte state = mEmulator->getInput()->getJoypadState();
-        return state;
+        return mEmulator->getInput()->getJoypadState();;
     }
     
     // Sound access
     else if (address >= 0xFF10 && address < 0xFF40)
+    {
         return mEmulator->getSound()->read(address);
+    }
     
     // Read from BIOS memory
     else if (mInBIOS && address < 0x100)
@@ -559,6 +559,3 @@ bool Memory::saveGame(const string& filename)
     dout.close();
     return true;
 }
-    
-
-

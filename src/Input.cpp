@@ -22,37 +22,6 @@ void Input::reset()
     mJoypadState = 0xFF;
 }
 
-//void Input::keyPressed(int key)
-//{
-//    bool previouslyUnset = false;
-//    
-//    // If setting from 1 to 0, we may have to request an interrupt
-//    if (!testBit(mJoypadState, key))
-//        previouslyUnset = true;
-//    
-//    // Remember if a key pressed its bit is 0, not 1
-//    mJoypadState = clearBit(mJoypadState, key);
-//    
-//    // Is this a standard button or a directional button?
-//    bool button = (key > 3);
-//
-//    byte keyReq = mMemory->readNaive(JOYPAD_STATUS_ADDRESS);
-//    bool requestInterrupt = false;
-//    
-//    // Only request an interrupt if the button just pressed is the
-//    // type of button the game is interested in
-//    if (button && !testBit(keyReq, 5))
-//        requestInterrupt = true;
-//    
-//    // Same as above, but for directional buttons
-//    else if (!button && !testBit(keyReq, 4))
-//        requestInterrupt = true;
-//    
-//    // Request interrupt
-//    if (requestInterrupt && !previouslyUnset)
-//        mEmulator->requestInterrupt(4);
-//}
-
 void Input::keyPressed(int key)
 {
     // This key is already pressed. We don't have to do anything else.
@@ -81,32 +50,6 @@ void Input::keyReleased(int key)
 {
     mJoypadState = setBit(mJoypadState, key);
 }
-
-//byte Input::getJoypadState() const
-//{
-//    byte result = mMemory->readNaive(JOYPAD_STATUS_ADDRESS);
-//    
-//    // Flip all the bits
-//    result ^= 0xFF;
-//    
-//    // Are we interested in the standard buttons?
-//    if (!testBit(result, 4))
-//    {
-//        byte topJoypad = mJoypadState >> 4;
-//        topJoypad |= 0xF0;   // Turn the top 4 bits on
-//        result &= topJoypad; // Show which buttons are pressed
-//    }
-//    
-//    // Directional buttons
-//    else if (!testBit(result, 5))
-//    {
-//        byte bottomJoypad = mJoypadState & 0xF;
-//        bottomJoypad |= 0xF0;
-//        result &= bottomJoypad;
-//    }
-//    
-//    return result;
-//}
 
 byte Input::getJoypadState() const
 {

@@ -50,14 +50,14 @@ public:
      * component is one (unsigned) byte. The size is SCREEN_WIDTH_PIXELS *
      * SCREEN_HEIGHT_PIXELS * 4.
      */
-    byte* getScreenData() {return mScreenData;}
+    byte* getScreenData() { return mScreenData; }
     
 private:
-    Memory* mMemory;
-    
+    Memory* mMemory;      // A pointer to the main memory unit.
     byte* mScreenData;    // Screen buffer (RGBA). Size is SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4.
     int mScanlineCounter; // Keeps track of when to move to the next scanline
     
+    // Helper functions
     void setLCDStatus(Emulator* emulator);
     bool isLCDEnabled();
     void drawScanLine();

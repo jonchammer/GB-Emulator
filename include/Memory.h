@@ -107,6 +107,7 @@ public:
     
     // TODO: this whole process is hacky. See if there's a better alternative.
     void updateSave() {if (mUpdateSave) {saveGame(mSaveName); mUpdateSave = false;}}
+    
 private:
     Emulator* mEmulator;
     
