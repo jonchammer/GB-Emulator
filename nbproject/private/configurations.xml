@@ -24,7 +24,6 @@
       <in>Graphics.h</in>
       <in>Input.h</in>
       <in>Memory.h</in>
-      <in>Render.h</in>
       <in>Sound.h</in>
     </df>
     <df root="src" name="1">
@@ -40,7 +39,7 @@
       <in>Graphics.cpp</in>
       <in>Input.cpp</in>
       <in>Memory.cpp</in>
-      <in>SDL_Render.cpp</in>
+      <in>SDL_Environment.cpp</in>
       <in>Sound.cpp</in>
       <in>main.cpp</in>
     </df>

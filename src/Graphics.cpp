@@ -45,7 +45,7 @@ void Graphics::update(Emulator* emulator, int cycles)
         
         // We have entered the vertical blank period. Send off the interrupt.
         if (currentLine == SCREEN_HEIGHT_PIXELS)
-            emulator->requestInterrupt(0);
+            mMemory->requestInterrupt(INTERRUPT_VBLANK);
         
         // There are 8 vitual scanlines. This gives the game a chance to access
         // the video memory.
@@ -131,14 +131,14 @@ void Graphics::setLCDStatus(Emulator* emulator)
     // When we enter a new mode, we can request an interrupt
     // to let the client know about the mode change
     if (requestInterrupt && (mode != currentMode))
-        emulator->requestInterrupt(1);
+        mMemory->requestInterrupt(INTERRUPT_LCD);
     
     // Set the coincidence flag, if applicable
     if (currentLine == mMemory->read(COINCIDENCE_ADDRESS))
     {
         status = setBit(status, 2);
         if (testBit(status, 6))
-            emulator->requestInterrupt(1);
+            mMemory->requestInterrupt(INTERRUPT_LCD);
     }
     else status = clearBit(status, 2);
     
@@ -364,18 +364,6 @@ void Graphics::renderSprites()
 
 int Graphics::getColor(byte colorNum, word address) const
 {
-    /*
-    if (address != BACKGROUND_PALETTE_ADDRESS)
-    {
-        switch (colorNum)
-        {
-            case 0x00: return WHITE;
-            case 0x01: return BLACK;
-            case 0x02: return DARK_GRAY;
-            case 0x03: return LIGHT_GRAY;
-        }
-    }*/
-    
     int result   = WHITE;
     byte palette = mMemory->read(address);
     int hi       = 0;

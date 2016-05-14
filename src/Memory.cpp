@@ -227,6 +227,13 @@ void Memory::writeNaive(word address, byte data)
     mMainMemory[address] = data;
 }
 
+void Memory::requestInterrupt(int id)
+{
+    byte req = read(INTERRUPT_REQUEST_REGISTER);
+    req      = setBit(req, id);
+    write(INTERRUPT_REQUEST_REGISTER, req);
+}
+
 void Memory::updateTimers(int cycles)
 {
     handleDividerRegister(cycles);
@@ -248,7 +255,7 @@ void Memory::updateTimers(int cycles)
             if (TIMAVal + passedPeriods >= 255)
             {
                 write(TIMA, TIMAVal + passedPeriods + read(TMA));
-                mEmulator->requestInterrupt(2);
+                requestInterrupt(INTERRUPT_TIMER);
             }
             
             // Otherwise update the timer

@@ -28,6 +28,13 @@ const int FLAG_NEG   = 6; // Set when op is a subtraction
 const int FLAG_HALF  = 5; // Set when overflow from lower nibble to upper nibble
 const int FLAG_CARRY = 4; // Set when overflow occurs
 
+// Interrupt bit definitions
+const int INTERRUPT_VBLANK = 0; // Signals when the emulator reaches the Vertical Blank period
+const int INTERRUPT_LCD    = 1; // Signals an LCD status change
+const int INTERRUPT_TIMER  = 2; // Signals a TIMA overflow
+const int INTERRUPT_SERIAL = 3; // Signals a serial transfer completion
+const int INTERRUPT_JOYPAD = 4; // Signals a change in the joypad state (button pressed/released)
+
 // Locations of important sections in memory
 const word DIVIDER_REGISTER = 0xFF04; // Location of the divider register in memory
 const word TIMA             = 0xFF05; // Location of timer in memory

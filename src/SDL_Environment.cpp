@@ -33,6 +33,7 @@ bool handleEvents()
             {
                 switch (event.key.keysym.sym)
                 {
+                    // Standard controls
                     case SDLK_UP:     em->getInput()->keyPressed(BUTTON_UP);     break;
                     case SDLK_DOWN:   em->getInput()->keyPressed(BUTTON_DOWN);   break;
                     case SDLK_LEFT:   em->getInput()->keyPressed(BUTTON_LEFT);   break;
@@ -42,10 +43,14 @@ bool handleEvents()
                     case SDLK_s:      em->getInput()->keyPressed(BUTTON_A);      break;
                     case SDLK_a:      em->getInput()->keyPressed(BUTTON_B);      break;
                     
+                    // Sound channels
                     case SDLK_F1: em->getSound()->toggleSound1(); break;
                     case SDLK_F2: em->getSound()->toggleSound2(); break;
                     case SDLK_F3: em->getSound()->toggleSound3(); break;
                     case SDLK_F4: em->getSound()->toggleSound4(); break;
+                    
+                    // Misc.
+                    case SDLK_p: em->togglePaused(); break;
                 }
                 break;
             }
@@ -148,7 +153,11 @@ void soundFunc(void* udata, short* buffer, int length)
         queue->append(buffer, length);
 }
 
-void initializeRenderer(int argc, char** argv, Emulator* emulator)
+/**
+ * This function is defined in Emulator.h and called in the main function.
+ * It is the interface between the host platform and the emulator.
+ */
+void startEmulation(int argc, char** argv, Emulator* emulator)
 {
     em    = emulator;
     title = em->getMemory()->getCartridgeName();

@@ -7,7 +7,7 @@
 
 #include "Emulator.h"
 
-Emulator::Emulator(bool skipBIOS)
+Emulator::Emulator(bool skipBIOS) : mPaused(false)
 {
     // Create the Memory and CPU
     mMemory   = new Memory(this, skipBIOS);
@@ -38,6 +38,9 @@ void Emulator::reset(bool skipBIOS)
 // Should be called 60x / second
 void Emulator::update()
 {
+    // Respect the user's desire to pause emulation
+    if (mPaused) return;
+    
     const int MAX_CYCLES = 69905; // Or 70221?
     int cyclesThisUpdate = 0;
     
@@ -52,11 +55,4 @@ void Emulator::update()
         
         cyclesThisUpdate += mCPU->handleInterrupts();
     }
-}
-
-void Emulator::requestInterrupt(int id)
-{
-    byte req = mMemory->read(INTERRUPT_REQUEST_REGISTER);
-    req      = setBit(req, id);
-    mMemory->write(INTERRUPT_REQUEST_REGISTER, req);
 }

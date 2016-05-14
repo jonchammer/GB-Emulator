@@ -70,7 +70,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	"/c/Program Files (x86)/CMake/bin/cmake.exe" -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	"/C/Program Files (x86)/CMake/bin/cmake.exe" -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -258,32 +258,32 @@ src/Memory.cpp.s:
 	$(MAKE) -f CMakeFiles/gb_emulator.dir/build.make CMakeFiles/gb_emulator.dir/src/Memory.cpp.s
 .PHONY : src/Memory.cpp.s
 
-src/SDL_Render.obj: src/SDL_Render.cpp.obj
+src/SDL_Environment.obj: src/SDL_Environment.cpp.obj
 
-.PHONY : src/SDL_Render.obj
+.PHONY : src/SDL_Environment.obj
 
 # target to build an object file
-src/SDL_Render.cpp.obj:
-	$(MAKE) -f CMakeFiles/gb_emulator.dir/build.make CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj
-.PHONY : src/SDL_Render.cpp.obj
+src/SDL_Environment.cpp.obj:
+	$(MAKE) -f CMakeFiles/gb_emulator.dir/build.make CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj
+.PHONY : src/SDL_Environment.cpp.obj
 
-src/SDL_Render.i: src/SDL_Render.cpp.i
+src/SDL_Environment.i: src/SDL_Environment.cpp.i
 
-.PHONY : src/SDL_Render.i
+.PHONY : src/SDL_Environment.i
 
 # target to preprocess a source file
-src/SDL_Render.cpp.i:
-	$(MAKE) -f CMakeFiles/gb_emulator.dir/build.make CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.i
-.PHONY : src/SDL_Render.cpp.i
+src/SDL_Environment.cpp.i:
+	$(MAKE) -f CMakeFiles/gb_emulator.dir/build.make CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.i
+.PHONY : src/SDL_Environment.cpp.i
 
-src/SDL_Render.s: src/SDL_Render.cpp.s
+src/SDL_Environment.s: src/SDL_Environment.cpp.s
 
-.PHONY : src/SDL_Render.s
+.PHONY : src/SDL_Environment.s
 
 # target to generate assembly for a file
-src/SDL_Render.cpp.s:
-	$(MAKE) -f CMakeFiles/gb_emulator.dir/build.make CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.s
-.PHONY : src/SDL_Render.cpp.s
+src/SDL_Environment.cpp.s:
+	$(MAKE) -f CMakeFiles/gb_emulator.dir/build.make CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.s
+.PHONY : src/SDL_Environment.cpp.s
 
 src/Sound.obj: src/Sound.cpp.obj
 
@@ -471,9 +471,9 @@ help:
 	@echo "... src/Memory.obj"
 	@echo "... src/Memory.i"
 	@echo "... src/Memory.s"
-	@echo "... src/SDL_Render.obj"
-	@echo "... src/SDL_Render.i"
-	@echo "... src/SDL_Render.s"
+	@echo "... src/SDL_Environment.obj"
+	@echo "... src/SDL_Environment.i"
+	@echo "... src/SDL_Environment.s"
 	@echo "... src/Sound.obj"
 	@echo "... src/Sound.i"
 	@echo "... src/Sound.s"

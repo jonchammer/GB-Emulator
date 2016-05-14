@@ -54,8 +54,6 @@ fstream
 Common.h
 ../include/Common.h
 
-../include/Render.h
-
 ../include/Sound.h
 Sound/SoundUnit1.h
 ../include/Sound/SoundUnit1.h
@@ -722,7 +720,7 @@ D:/My Documents/NetBeansProjects/GB_Emulator/src/Memory.cpp
 Memory.h
 D:/My Documents/NetBeansProjects/GB_Emulator/src/Memory.h
 
-D:/My Documents/NetBeansProjects/GB_Emulator/src/SDL_Render.cpp
+D:/My Documents/NetBeansProjects/GB_Emulator/src/SDL_Environment.cpp
 Common.h
 D:/My Documents/NetBeansProjects/GB_Emulator/src/Common.h
 SDL.h
@@ -761,6 +759,4 @@ Memory.h
 D:/My Documents/NetBeansProjects/GB_Emulator/src/Memory.h
 Emulator.h
 D:/My Documents/NetBeansProjects/GB_Emulator/src/Emulator.h
-Render.h
-D:/My Documents/NetBeansProjects/GB_Emulator/src/Render.h
 

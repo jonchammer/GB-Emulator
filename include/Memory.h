@@ -61,6 +61,13 @@ public:
     void writeNaive(word address, byte data);
     
     /**
+     * Used by other components when an interrupt is needed.
+     * @param id. One of the INTERRUPT_XXX constants defined
+     *            in Common.h.
+     */
+    void requestInterrupt(int id);
+    
+    /**
      * Called once per instruction. Updates the clock timer and the divider register.
      */
     void updateTimers(int cycles);

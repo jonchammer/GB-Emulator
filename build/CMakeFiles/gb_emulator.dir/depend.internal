@@ -101,7 +101,7 @@ CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj
  ../include/Sound/SoundUnit4.h
  ../include/Sound/SweepUnit.h
  D:/My Documents/NetBeansProjects/GB_Emulator/src/Memory.cpp
-CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj
+CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj
  ../include/CPU.h
  ../include/Common.h
  ../include/Emulator.h
@@ -165,7 +165,7 @@ CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj
  C:/SDL/SDL2-2.0.4/x86_64-w64-mingw32/include/SDL2/SDL_video.h
  C:/SDL/SDL2-2.0.4/x86_64-w64-mingw32/include/SDL2/begin_code.h
  C:/SDL/SDL2-2.0.4/x86_64-w64-mingw32/include/SDL2/close_code.h
- D:/My Documents/NetBeansProjects/GB_Emulator/src/SDL_Render.cpp
+ D:/My Documents/NetBeansProjects/GB_Emulator/src/SDL_Environment.cpp
 CMakeFiles/gb_emulator.dir/src/Sound.cpp.obj
  ../include/CPU.h
  ../include/Common.h
@@ -273,7 +273,6 @@ CMakeFiles/gb_emulator.dir/src/main.cpp.obj
  ../include/Graphics.h
  ../include/Input.h
  ../include/Memory.h
- ../include/Render.h
  ../include/Sound.h
  ../include/Sound/DutyUnit.h
  ../include/Sound/EnvelopeUnit.h

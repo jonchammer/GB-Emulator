@@ -38,12 +38,12 @@ void Input::keyPressed(int key)
     // If the game has asked for direction information and we have a direction
     // button that has been pressed, issue the joypad interrupt.
     if (testBit(keyReq, 4) && direction)
-        mEmulator->requestInterrupt(4);
+        mMemory->requestInterrupt(INTERRUPT_JOYPAD);
     
     // If the game has asked for button information and we have a normal
     // button that has been pressed, also issue the joypad interrupt.
     else if (testBit(keyReq, 5) && !direction)
-        mEmulator->requestInterrupt(4);        
+        mMemory->requestInterrupt(INTERRUPT_JOYPAD);        
 }
 
 void Input::keyReleased(int key)

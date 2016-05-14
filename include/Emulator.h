@@ -16,6 +16,20 @@ class Memory;
 class Graphics;
 class Input;
 class Sound;
+class Emulator;
+
+/**
+ * The emulator is written such that the host environment is abstracted away.
+ * SDL2, for example, can be used for rendering/sound/input on desktops, but
+ * platform-specific modules can be used for mobile devices. The main function
+ * will use this function as an entry point for those systems. Any system-specific
+ * logic will go here.
+ * 
+ * @param argc.     From main.
+ * @param argv.     From main.
+ * @param emulator. A pointer to the emulator.
+ */
+void startEmulation(int argc, char** argv, Emulator* emulator);
 
 class Emulator 
 {
@@ -27,12 +41,19 @@ public:
      *                  necessary for some games (if the Nintendo logo is
      *                  invalid, for example).
      */
-    
     Emulator(bool skipBIOS = false);
+    
+    /**
+     * Destructor.
+     */
     ~Emulator();
     
+    /**
+     * This function should be called by the host environment approximately 60x
+     * per second. It executes a single update of the emulator, which allows it
+     * to function properly.
+     */
     void update();    
-    void requestInterrupt(int id);
 
     /**
      * Reset the emulator to its default state. Any games that are currently
@@ -41,6 +62,11 @@ public:
      * @param skipBIOS. When true, the BIOS will be skipped.
      */
     void reset(bool skipBIOS = false);
+    
+    // Adjust 'paused' state
+    void togglePaused()         { mPaused = !mPaused; }
+    void setPaused(bool paused) { mPaused = paused;   }
+    bool isPaused()             { return mPaused;     }
     
     // Getters
     CPU* getCPU()           { return mCPU;      }
@@ -55,6 +81,7 @@ private:
     Graphics* mGraphics; // Handles the scanline rendering
     Input* mInput;       // Handles user input
     Sound* mSound;       // Handles sound processing
+    bool mPaused;        // True if emulation should be frozen
 };
 
 #endif /* EMULATOR_H */

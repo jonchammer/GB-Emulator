@@ -207,29 +207,29 @@ CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj.provides: CMakeFiles/gb_emulator.d
 CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj.provides.build: CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj
 
 
-CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj: CMakeFiles/gb_emulator.dir/flags.make
-CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj: CMakeFiles/gb_emulator.dir/includes_CXX.rsp
-CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj: ../src/SDL_Render.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj"
-	/C/MinGW64/mingw64/bin/g++.exe   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj -c "/D/My Documents/NetBeansProjects/GB_Emulator/src/SDL_Render.cpp"
+CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj: CMakeFiles/gb_emulator.dir/flags.make
+CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj: CMakeFiles/gb_emulator.dir/includes_CXX.rsp
+CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj: ../src/SDL_Environment.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj"
+	/C/MinGW64/mingw64/bin/g++.exe   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj -c "/D/My Documents/NetBeansProjects/GB_Emulator/src/SDL_Environment.cpp"
 
-CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.i"
-	/C/MinGW64/mingw64/bin/g++.exe  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/D/My Documents/NetBeansProjects/GB_Emulator/src/SDL_Render.cpp" > CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.i
+CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.i"
+	/C/MinGW64/mingw64/bin/g++.exe  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/D/My Documents/NetBeansProjects/GB_Emulator/src/SDL_Environment.cpp" > CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.i
 
-CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.s"
-	/C/MinGW64/mingw64/bin/g++.exe  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/D/My Documents/NetBeansProjects/GB_Emulator/src/SDL_Render.cpp" -o CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.s
+CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.s"
+	/C/MinGW64/mingw64/bin/g++.exe  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/D/My Documents/NetBeansProjects/GB_Emulator/src/SDL_Environment.cpp" -o CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.s
 
-CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj.requires:
+CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj.requires:
 
-.PHONY : CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj.requires
+.PHONY : CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj.requires
 
-CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj.provides: CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj.requires
-	$(MAKE) -f CMakeFiles/gb_emulator.dir/build.make CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj.provides.build
-.PHONY : CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj.provides
+CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj.provides: CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj.requires
+	$(MAKE) -f CMakeFiles/gb_emulator.dir/build.make CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj.provides.build
+.PHONY : CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj.provides
 
-CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj.provides.build: CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj
+CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj.provides.build: CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj
 
 
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj: CMakeFiles/gb_emulator.dir/flags.make
@@ -365,7 +365,7 @@ gb_emulator_OBJECTS = \
 "CMakeFiles/gb_emulator.dir/src/Input.cpp.obj" \
 "CMakeFiles/gb_emulator.dir/src/main.cpp.obj" \
 "CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj" \
-"CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj" \
+"CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj" \
 "CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj" \
 "CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit2.cpp.obj" \
 "CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit3.cpp.obj" \
@@ -381,7 +381,7 @@ gb_emulator.exe: CMakeFiles/gb_emulator.dir/src/Graphics.cpp.obj
 gb_emulator.exe: CMakeFiles/gb_emulator.dir/src/Input.cpp.obj
 gb_emulator.exe: CMakeFiles/gb_emulator.dir/src/main.cpp.obj
 gb_emulator.exe: CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj
-gb_emulator.exe: CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj
+gb_emulator.exe: CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj
 gb_emulator.exe: CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj
 gb_emulator.exe: CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit2.cpp.obj
 gb_emulator.exe: CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit3.cpp.obj
@@ -396,7 +396,7 @@ gb_emulator.exe: CMakeFiles/gb_emulator.dir/objects1.rsp
 	"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/gb_emulator.dir/objects.a
 	/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/gb_emulator.dir/objects.a @CMakeFiles/gb_emulator.dir/objects1.rsp
 	/C/MinGW64/mingw64/bin/g++.exe     -Wl,--whole-archive CMakeFiles/gb_emulator.dir/objects.a -Wl,--no-whole-archive  -o gb_emulator.exe -Wl,--out-implib,libgb_emulator.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/gb_emulator.dir/linklibs.rsp
-	"/c/Program Files (x86)/CMake/bin/cmake.exe" -E copy_if_different "D:/My Documents/NetBeansProjects/GB_Emulator/libs/SDL2.dll" "D:/My Documents/NetBeansProjects/GB_Emulator/build"
+	"/C/Program Files (x86)/CMake/bin/cmake.exe" -E copy_if_different "D:/My Documents/NetBeansProjects/GB_Emulator/libs/SDL2.dll" "D:/My Documents/NetBeansProjects/GB_Emulator/build"
 
 # Rule to build all files generated by this target.
 CMakeFiles/gb_emulator.dir/build: gb_emulator.exe
@@ -409,7 +409,7 @@ CMakeFiles/gb_emulator.dir/requires: CMakeFiles/gb_emulator.dir/src/Graphics.cpp
 CMakeFiles/gb_emulator.dir/requires: CMakeFiles/gb_emulator.dir/src/Input.cpp.obj.requires
 CMakeFiles/gb_emulator.dir/requires: CMakeFiles/gb_emulator.dir/src/main.cpp.obj.requires
 CMakeFiles/gb_emulator.dir/requires: CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj.requires
-CMakeFiles/gb_emulator.dir/requires: CMakeFiles/gb_emulator.dir/src/SDL_Render.cpp.obj.requires
+CMakeFiles/gb_emulator.dir/requires: CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj.requires
 CMakeFiles/gb_emulator.dir/requires: CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj.requires
 CMakeFiles/gb_emulator.dir/requires: CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit2.cpp.obj.requires
 CMakeFiles/gb_emulator.dir/requires: CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit3.cpp.obj.requires

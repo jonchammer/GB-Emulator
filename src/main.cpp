@@ -10,7 +10,6 @@
 
 #include "Memory.h"
 #include "Emulator.h"
-#include "Render.h"
 using namespace std;
 
 int main(int argc, char** argv)
@@ -42,7 +41,7 @@ int main(int argc, char** argv)
 //    }
     
     // Start the emulation
-    initializeRenderer(argc, argv, &emulator);
+    startEmulation(argc, argv, &emulator);
     
     return 0;
 }
