@@ -147,19 +147,17 @@ void MBC5::write(word address, byte data)
             mEnableRAM = false;
     }
     
-    // Low 8 bits of ROM bank number
+    // The entire contents of the data (all 8 bits) are the low 8
+    // bits of the rom bank. The remaining bit is in the high rom bank.
     else if (address >= 0x2000 && address < 0x3000)
     {
-        // The entire contents of the data (all 8 bits) are the low 8
-        // bits of the rom bank. The remaining bit is in the high rom bank.
         mCurrentROMBank &= 0xFF00;
         mCurrentROMBank |= data;
     }
     
-    // Top 1 bit of ROM bank number
+    // The low bit of 'data' corresponds to the 9th bit of the current ROM bank.
     else if (address >= 0x3000 && address < 0x4000)
-    {
-        // The low bit of 'data' corresponds to the 9th bit of the current ROM bank.
+    {  
         mCurrentROMBank &= 0xFEFF;
         data &= 0x01;
         mCurrentROMBank |= (data << 8);
@@ -168,6 +166,6 @@ void MBC5::write(word address, byte data)
     // RAM bank switch
     else if (address >= 0x4000 && address < 0x6000)
     {
-        mCurrentRAMBank = data & 0x0F;
+        mCurrentRAMBank = (data & 0x0F);
     }
 }
