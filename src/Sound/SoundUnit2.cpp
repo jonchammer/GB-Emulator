@@ -1,9 +1,9 @@
 #include "SoundUnit2.h"
 
 SoundUnit2::SoundUnit2(const bool &_CGB, const bool skipBIOS, Sound &soundController):
-mCGB(_CGB),
-mSoundController(soundController),
-mLengthCounter(0x3F, mStatusBit)
+    mCGB(_CGB),
+    mSoundController(soundController),
+    mLengthCounter(0x3F, mStatusBit)
 {
 	reset(skipBIOS);
 }

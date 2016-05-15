@@ -316,20 +316,24 @@ bool Memory::loadCartridge(const string& filename)
     // Figure out which sort of ROM banking is used (if any)
     switch (mCartridgeMemory[0x147])
     {
-        case 0x0 : mMBC = new MBC0(); break; //No banking is used (e.g. Tetris)
-        case 0x1 : mMBC = new MBC1(); break;
-        case 0x2 : mMBC = new MBC1(); break;
-        case 0x3 : mMBC = new MBC1(); break;
-        case 0x5 : mMBC = new MBC2(); break;
-        case 0x6 : mMBC = new MBC2(); break;
-        case 0x12: mMBC = new MBC3(); break;
-        case 0x13: mMBC = new MBC3(); break;
-        case 0x19: mMBC = new MBC5(); break;
-        case 0x1A: mMBC = new MBC5(); break;
-        case 0x1B: mMBC = new MBC5(); break;
-        case 0x1C: mMBC = new MBC5(); break;
-        case 0x1D: mMBC = new MBC5(); break;
-        case 0x1E: mMBC = new MBC5(); break;
+        //No banking is used (e.g. Tetris)
+        case 0x0: mMBC = new MBC0(); break; 
+        
+        // MBC 1
+        case 0x1: case 0x2: case 0x3:
+            mMBC = new MBC1(); break;
+            
+        // MBC 2
+        case 0x5: case 0x6:
+            mMBC = new MBC2(); break;
+
+        // MBC 3
+        case 0x12: case 0x13: case 0xF: case 0x10: case 0x11:
+            mMBC = new MBC3(); break;
+
+        // MBC 5
+        case 0x19: case 0x1A: case 0x1B: case 0x1C: case 0x1D: case 0x1E:
+            mMBC = new MBC5(); break;
         
         default: 
         {
