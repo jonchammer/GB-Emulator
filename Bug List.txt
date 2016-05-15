@@ -14,4 +14,3 @@
   + Double speed
   + Color rendering
   + GBC-specific initializations
-- Set up gitignore to ignore the contents of the build folder.
