@@ -1,3 +1,0 @@
-D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/gb_emulator.dir
-D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/edit_cache.dir
-D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/rebuild_cache.dir
