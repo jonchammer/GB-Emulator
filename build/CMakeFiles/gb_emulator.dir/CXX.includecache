@@ -46,6 +46,10 @@ Common.h
 Memory.h
 ../include/Memory.h
 
+../include/MBC.h
+Common.h
+../include/Common.h
+
 ../include/Memory.h
 iostream
 -
@@ -53,6 +57,8 @@ fstream
 -
 Common.h
 ../include/Common.h
+MBC.h
+../include/MBC.h
 
 ../include/Sound.h
 Sound/SoundUnit1.h
@@ -145,6 +151,8 @@ fstream
 -
 Common.h
 ../include/Common.h
+MBC.h
+../include/MBC.h
 
 C:/SDL/SDL2-2.0.4/x86_64-w64-mingw32/include/SDL2/SDL.h
 SDL_main.h
@@ -715,6 +723,10 @@ cstdlib
 D:/My Documents/NetBeansProjects/GB_Emulator/src/Input.cpp
 Input.h
 D:/My Documents/NetBeansProjects/GB_Emulator/src/Input.h
+
+D:/My Documents/NetBeansProjects/GB_Emulator/src/MBC.cpp
+MBC.h
+D:/My Documents/NetBeansProjects/GB_Emulator/src/MBC.h
 
 D:/My Documents/NetBeansProjects/GB_Emulator/src/Memory.cpp
 Memory.h

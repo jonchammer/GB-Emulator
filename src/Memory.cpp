@@ -80,6 +80,7 @@ Memory::~Memory()
     delete[] mMainMemory;
     delete[] mRAMBanks;
     delete[] mRTCRegister;
+    if (mMBC != NULL) delete mMBC;
 }
 
 void Memory::reset(bool skipBIOS)
@@ -89,15 +90,7 @@ void Memory::reset(bool skipBIOS)
         mMainMemory[MAIN_MEMORY_INIT_INDICES[i]] = MAIN_MEMORY_INIT_VALUES[i];
     
     // Initialize the ROM banking information
-    mCurrentROMBank = 1;
-    mMBC1           = false;
-    mMBC2           = false;
-    mMBC3           = false;
-    mROMBanking     = true;
-    
-    // Initialize the RAM banking information
-    mCurrentRAMBank = 0;
-    mEnableRAM      = false;
+    mMBC = NULL;
     
     // Initialize timing information
     mDividerCounter  = 0;
@@ -118,14 +111,14 @@ byte Memory::read(word address) const
     if ( (address >= 0x4000) && (address <= 0x7FFF) )
     {
         word newAddress = address - 0x4000;
-        return mCartridgeMemory[newAddress + (mCurrentROMBank * 0x4000)];
+        return mCartridgeMemory[newAddress + (mMBC->getCurrentROMBank() * 0x4000)];
     }
     
     // Read from the correct RAM memory bank
     else if ( (address >= 0xA000) && (address <= 0xBFFF) )
     {
         word newAddress = address - 0xA000;
-        return mRAMBanks[newAddress + (mCurrentRAMBank * 0x2000)];
+        return mRAMBanks[newAddress + (mMBC->getCurrentRAMBank() * 0x2000)];
     }
     
     // Trap to hook in to joypad
@@ -159,15 +152,15 @@ void Memory::write(word address, byte data)
 {
     // An attempt to write to ROM means that we're dealing with
     // a bank issue. We need to handle it.
-    if (address < 0x8000) handleBanking(address, data);
-    
+    if (address < 0x8000) mMBC->write(address, data);
+
     // Write to the current RAM Bank, but only if RAM banking has been enabled.
     else if ( (address >= 0xA000) && (address < 0xC000) )
     {
-        if (mEnableRAM)
+        if (mMBC->isRAMEnabled())
         {
             word newAddress = address - 0xA000;
-            mRAMBanks[newAddress + (mCurrentRAMBank * 0x2000)] = data;
+            mRAMBanks[newAddress + (mMBC->getCurrentRAMBank() * 0x2000)] = data;
         }
         
         // Writing here is a signal the game should be saved.
@@ -287,189 +280,6 @@ void Memory::handleDividerRegister(int cycles)
     }
 }
  
-void Memory::handleBanking(word address, byte data)
-{
-    // Enable writing to RAM
-    if (address < 0x2000)
-        enableRAMWriting(address, data);
-    
-    // Do ROM Bank change
-    else if ( (address >= 0x2000) && (address < 0x4000) )
-        changeLoROMBank(data);
-    
-    // Do ROM or RAM bank change
-    else if ( (address >= 0x4000) && (address < 0x6000) )
-    {
-        if (mROMBanking)
-            changeHiROMBank(data);
-
-        else changeRAMBank(data);
-    }
-    
-    // This will change whether we are doing ROM banking or RAM banking
-    else if ( (address >= 0x6000) && (address < 0x8000) )
-        changeROMRAMMode(data);
-}
-
-void Memory::enableRAMWriting(word address, byte data)
-{
-    if (mMBC1)
-    {
-        // Isolate the low nibble. 'A' means enable RAM banking, '0' means disable it.
-        byte testData = data & 0xF;
-        if (testData == 0xA)
-            mEnableRAM = true;
-        else if (testData == 0x0)
-            mEnableRAM = false;
-    }
-    
-    else if (mMBC2)
-    {
-        // Bit 4 of the address must be 0.
-        if (testBit(address, 4) == 1) return;
-        
-        // Isolate the low nibble. 'A' means enable RAM banking, '0' means disable it.
-        byte testData = data & 0xF;
-        if (testData == 0xA)
-            mEnableRAM = true;
-        else if (testData == 0x0)
-            mEnableRAM = false;
-    }
-    
-    else if (mMBC3)
-    {
-        // Isolate the low nibble. 'A' means enable RAM banking, '0' means disable it.
-        byte testData = data & 0xF;
-        if (testData == 0xA)
-            mEnableRAM = true;
-        else if (testData == 0x0)
-            mEnableRAM = false;
-    }
-}
-
-void Memory::changeLoROMBank(byte data)
-{
-    if (mMBC1)
-    {
-        // Put the lower 5 bits into the current ROM Bank.
-        // The next 2 bits (5,6) can be set in changeHiROMBank
-        byte lower5 = data & 0x1F; // Isolate the lower 5 bits
-        mCurrentROMBank &= 0xE0;   // Disable the lower 5 bits
-        mCurrentROMBank |= lower5;
-        
-        // Any access to these banks is invalid. The next bank is the one that should
-        // be used
-        if (mCurrentROMBank == 0x0 || mCurrentROMBank == 0x20 || mCurrentROMBank == 0x40 || mCurrentROMBank == 0x60) 
-            mCurrentROMBank++;
-    }
-    
-    else if (mMBC2)
-    {
-        // The lower 4 bits are the desired ROM Bank (only 16 ROM banks can be used)
-        mCurrentROMBank = data & 0xF;
-        if (mCurrentROMBank == 0) mCurrentROMBank++;
-    }
-    
-    else if (mMBC3)
-    {
-        // Put the lower 7 bits into the current ROM Bank.
-        byte lower7 = data & 0x7F; // Isolate the lower 7 bits
-        mCurrentROMBank &= 0x80;   // Disable the lower 7 bits
-        mCurrentROMBank |= lower7;
-        
-        // All banks can be accessed, except for 0, which is always present
-        if (mCurrentROMBank == 0x0)
-            mCurrentROMBank++;
-    }
-}
-
-void Memory::changeHiROMBank(byte data)
-{
-    if (mMBC1)
-    {
-        // Disable the upper 3 bits of the current ROM bank
-        mCurrentROMBank &= 0x1F;
-
-        // Disable the lower 5 bits of the data (leaving the upper 3 bits))
-        data &= 0xE0;
-        mCurrentROMBank |= data;
-        
-        // Any access to these banks is invalid. The next bank is the one that should
-        // be used
-        if (mCurrentROMBank == 0x0 || mCurrentROMBank == 0x20 || mCurrentROMBank == 0x40 || mCurrentROMBank == 0x60) 
-            mCurrentROMBank++;
-    }
-    
-    else if (mMBC2)
-    {
-        // Do nothing. This call has no effect.
-    }
-    
-    else if (mMBC3)
-    {
-        // Disable the upper 3 bits of the current ROM bank
-        mCurrentROMBank &= 0x1F;
-
-        // Disable the lower 5 bits of the data (leaving the upper 3 bits))
-        data &= 0xE0;
-        mCurrentROMBank |= data;
-        
-        // Any access to these banks is invalid. The next bank is the one that should
-        // be used
-        if (mCurrentROMBank == 0x0 || mCurrentROMBank == 0x20 || mCurrentROMBank == 0x40 || mCurrentROMBank == 0x60) 
-            mCurrentROMBank++;
-        
-        // Map the corresponding RTC register into memory at A000 - BFFF.
-        // TODO
-    }
-}
-
-void Memory::changeRAMBank(byte data)
-{
-    if (mMBC1)
-    {
-        // Isolate the lower 2 bits (there are only 4 RAM banks total)
-        mCurrentRAMBank = data & 0x3;
-    }
-    
-    else if (mMBC2)
-    {
-        // There is no RAM bank in MBC2, so we always use RAM bank 0
-    }
-    
-    else if (mMBC3)
-    {
-        // Isolate the lower 2 bits (there are only 4 RAM banks total)
-        mCurrentRAMBank = data & 0x3;
-    }
-}
-
-void Memory::changeROMRAMMode(byte data)
-{
-    if (mMBC1)
-    {
-        // The last bit determines if we enter ROM mode or RAM mode.
-        // 0 == ROM mode, 1 == RAM mode
-        byte newData = data & 0x1;
-        mROMBanking  = (newData == 0);
-        
-        // When in ROM Mode, the gameboy can only use RAM bank 0
-        if (mROMBanking)
-            mCurrentRAMBank = 0;
-    }
-    
-    else if (mMBC2)
-    {
-        // There is no RAM bank in MBC2, so we always use RAM bank 0.
-        // Therefore, there cannot be a ROM/RAM switch
-    }
-    
-    else if (mMBC3)
-    {
-        // TODO
-    }
-}
-
 void Memory::handleDMATransfer(byte data)
 {
     word address = data << 8; // Multiply by 0x100
@@ -501,21 +311,25 @@ bool Memory::loadCartridge(const string& filename)
     din.read( (char*) mCartridgeMemory, length);
     din.close();
     
-    mMBC1 = false;
-    mMBC2 = false;
-    mMBC3 = false;
+    if (mMBC != NULL) delete mMBC;
     
     // Figure out which sort of ROM banking is used (if any)
     switch (mCartridgeMemory[0x147])
     {
-        case 0x0 : break;                //No banking is used (e.g. Tetris)
-        case 0x1 : mMBC1 = true; break;
-        case 0x2 : mMBC1 = true; break;
-        case 0x3 : mMBC1 = true; break;
-        case 0x5 : mMBC2 = true; break;
-        case 0x6 : mMBC2 = true; break;
-        case 0x12: mMBC3 = true; break;
-        case 0x13: mMBC3 = true; break;
+        case 0x0 : mMBC = new MBC0(); break; //No banking is used (e.g. Tetris)
+        case 0x1 : mMBC = new MBC1(); break;
+        case 0x2 : mMBC = new MBC1(); break;
+        case 0x3 : mMBC = new MBC1(); break;
+        case 0x5 : mMBC = new MBC2(); break;
+        case 0x6 : mMBC = new MBC2(); break;
+        case 0x12: mMBC = new MBC3(); break;
+        case 0x13: mMBC = new MBC3(); break;
+        case 0x19: mMBC = new MBC5(); break;
+        case 0x1A: mMBC = new MBC5(); break;
+        case 0x1B: mMBC = new MBC5(); break;
+        case 0x1C: mMBC = new MBC5(); break;
+        case 0x1D: mMBC = new MBC5(); break;
+        case 0x1E: mMBC = new MBC5(); break;
         
         default: 
         {

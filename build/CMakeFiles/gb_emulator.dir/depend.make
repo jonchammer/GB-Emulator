@@ -6,6 +6,7 @@ CMakeFiles/gb_emulator.dir/src/CPU.cpp.obj: ../include/Common.h
 CMakeFiles/gb_emulator.dir/src/CPU.cpp.obj: ../include/Emulator.h
 CMakeFiles/gb_emulator.dir/src/CPU.cpp.obj: ../include/Graphics.h
 CMakeFiles/gb_emulator.dir/src/CPU.cpp.obj: ../include/Input.h
+CMakeFiles/gb_emulator.dir/src/CPU.cpp.obj: ../include/MBC.h
 CMakeFiles/gb_emulator.dir/src/CPU.cpp.obj: ../include/Memory.h
 CMakeFiles/gb_emulator.dir/src/CPU.cpp.obj: ../include/Sound.h
 CMakeFiles/gb_emulator.dir/src/CPU.cpp.obj: ../include/Sound/DutyUnit.h
@@ -26,6 +27,7 @@ CMakeFiles/gb_emulator.dir/src/Emulator.cpp.obj: ../include/Common.h
 CMakeFiles/gb_emulator.dir/src/Emulator.cpp.obj: ../include/Emulator.h
 CMakeFiles/gb_emulator.dir/src/Emulator.cpp.obj: ../include/Graphics.h
 CMakeFiles/gb_emulator.dir/src/Emulator.cpp.obj: ../include/Input.h
+CMakeFiles/gb_emulator.dir/src/Emulator.cpp.obj: ../include/MBC.h
 CMakeFiles/gb_emulator.dir/src/Emulator.cpp.obj: ../include/Memory.h
 CMakeFiles/gb_emulator.dir/src/Emulator.cpp.obj: ../include/Sound.h
 CMakeFiles/gb_emulator.dir/src/Emulator.cpp.obj: ../include/Sound/DutyUnit.h
@@ -46,6 +48,7 @@ CMakeFiles/gb_emulator.dir/src/Graphics.cpp.obj: ../include/Common.h
 CMakeFiles/gb_emulator.dir/src/Graphics.cpp.obj: ../include/Emulator.h
 CMakeFiles/gb_emulator.dir/src/Graphics.cpp.obj: ../include/Graphics.h
 CMakeFiles/gb_emulator.dir/src/Graphics.cpp.obj: ../include/Input.h
+CMakeFiles/gb_emulator.dir/src/Graphics.cpp.obj: ../include/MBC.h
 CMakeFiles/gb_emulator.dir/src/Graphics.cpp.obj: ../include/Memory.h
 CMakeFiles/gb_emulator.dir/src/Graphics.cpp.obj: ../include/Sound.h
 CMakeFiles/gb_emulator.dir/src/Graphics.cpp.obj: ../include/Sound/DutyUnit.h
@@ -66,6 +69,7 @@ CMakeFiles/gb_emulator.dir/src/Input.cpp.obj: ../include/Common.h
 CMakeFiles/gb_emulator.dir/src/Input.cpp.obj: ../include/Emulator.h
 CMakeFiles/gb_emulator.dir/src/Input.cpp.obj: ../include/Graphics.h
 CMakeFiles/gb_emulator.dir/src/Input.cpp.obj: ../include/Input.h
+CMakeFiles/gb_emulator.dir/src/Input.cpp.obj: ../include/MBC.h
 CMakeFiles/gb_emulator.dir/src/Input.cpp.obj: ../include/Memory.h
 CMakeFiles/gb_emulator.dir/src/Input.cpp.obj: ../include/Sound.h
 CMakeFiles/gb_emulator.dir/src/Input.cpp.obj: ../include/Sound/DutyUnit.h
@@ -81,11 +85,33 @@ CMakeFiles/gb_emulator.dir/src/Input.cpp.obj: ../include/Sound/SoundUnit4.h
 CMakeFiles/gb_emulator.dir/src/Input.cpp.obj: ../include/Sound/SweepUnit.h
 CMakeFiles/gb_emulator.dir/src/Input.cpp.obj: ../src/Input.cpp
 
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/CPU.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Common.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Emulator.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Graphics.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Input.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/MBC.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Memory.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Sound.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Sound/DutyUnit.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Sound/EnvelopeUnit.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Sound/LFSR.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Sound/LFSR15.inc
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Sound/LFSR7.inc
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Sound/LengthCounter.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Sound/SoundUnit1.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Sound/SoundUnit2.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Sound/SoundUnit3.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Sound/SoundUnit4.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../include/Sound/SweepUnit.h
+CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj: ../src/MBC.cpp
+
 CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj: ../include/CPU.h
 CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj: ../include/Common.h
 CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj: ../include/Emulator.h
 CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj: ../include/Graphics.h
 CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj: ../include/Input.h
+CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj: ../include/MBC.h
 CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj: ../include/Memory.h
 CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj: ../include/Sound.h
 CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj: ../include/Sound/DutyUnit.h
@@ -106,6 +132,7 @@ CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj: ../include/Common.h
 CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj: ../include/Emulator.h
 CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj: ../include/Graphics.h
 CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj: ../include/Input.h
+CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj: ../include/MBC.h
 CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj: ../include/Memory.h
 CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj: ../include/Sound.h
 CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj: ../include/Sound/DutyUnit.h
@@ -171,6 +198,7 @@ CMakeFiles/gb_emulator.dir/src/Sound.cpp.obj: ../include/Common.h
 CMakeFiles/gb_emulator.dir/src/Sound.cpp.obj: ../include/Emulator.h
 CMakeFiles/gb_emulator.dir/src/Sound.cpp.obj: ../include/Graphics.h
 CMakeFiles/gb_emulator.dir/src/Sound.cpp.obj: ../include/Input.h
+CMakeFiles/gb_emulator.dir/src/Sound.cpp.obj: ../include/MBC.h
 CMakeFiles/gb_emulator.dir/src/Sound.cpp.obj: ../include/Memory.h
 CMakeFiles/gb_emulator.dir/src/Sound.cpp.obj: ../include/Sound.h
 CMakeFiles/gb_emulator.dir/src/Sound.cpp.obj: ../include/Sound/DutyUnit.h
@@ -191,6 +219,7 @@ CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj: ../include/Common.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj: ../include/Emulator.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj: ../include/Graphics.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj: ../include/Input.h
+CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj: ../include/MBC.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj: ../include/Memory.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj: ../include/Sound.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj: ../include/Sound/DutyUnit.h
@@ -211,6 +240,7 @@ CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit2.cpp.obj: ../include/Common.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit2.cpp.obj: ../include/Emulator.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit2.cpp.obj: ../include/Graphics.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit2.cpp.obj: ../include/Input.h
+CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit2.cpp.obj: ../include/MBC.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit2.cpp.obj: ../include/Memory.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit2.cpp.obj: ../include/Sound.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit2.cpp.obj: ../include/Sound/DutyUnit.h
@@ -231,6 +261,7 @@ CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit3.cpp.obj: ../include/Common.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit3.cpp.obj: ../include/Emulator.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit3.cpp.obj: ../include/Graphics.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit3.cpp.obj: ../include/Input.h
+CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit3.cpp.obj: ../include/MBC.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit3.cpp.obj: ../include/Memory.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit3.cpp.obj: ../include/Sound.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit3.cpp.obj: ../include/Sound/DutyUnit.h
@@ -251,6 +282,7 @@ CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit4.cpp.obj: ../include/Common.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit4.cpp.obj: ../include/Emulator.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit4.cpp.obj: ../include/Graphics.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit4.cpp.obj: ../include/Input.h
+CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit4.cpp.obj: ../include/MBC.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit4.cpp.obj: ../include/Memory.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit4.cpp.obj: ../include/Sound.h
 CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit4.cpp.obj: ../include/Sound/DutyUnit.h
@@ -271,6 +303,7 @@ CMakeFiles/gb_emulator.dir/src/main.cpp.obj: ../include/Common.h
 CMakeFiles/gb_emulator.dir/src/main.cpp.obj: ../include/Emulator.h
 CMakeFiles/gb_emulator.dir/src/main.cpp.obj: ../include/Graphics.h
 CMakeFiles/gb_emulator.dir/src/main.cpp.obj: ../include/Input.h
+CMakeFiles/gb_emulator.dir/src/main.cpp.obj: ../include/MBC.h
 CMakeFiles/gb_emulator.dir/src/main.cpp.obj: ../include/Memory.h
 CMakeFiles/gb_emulator.dir/src/main.cpp.obj: ../include/Sound.h
 CMakeFiles/gb_emulator.dir/src/main.cpp.obj: ../include/Sound/DutyUnit.h

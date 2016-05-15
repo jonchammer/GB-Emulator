@@ -11,11 +11,13 @@
 #include <iostream>
 #include <fstream>
 #include "Common.h"
+#include "MBC.h"
 
 using namespace std;
 
 // Forward declaration of necessary classes
 class Emulator;
+class MBC;
 
 class Memory 
 {
@@ -124,15 +126,8 @@ private:
     byte* mRTCRegister;     // Size is 5 bytes. Only used for MBC3.
     
     bool mInBIOS;           // True if we are in the BIOS.
-    byte mCurrentROMBank;   // Which ROM Bank is currently being used. (Should always be >= 1)
-    bool mMBC1;             // True if MBC1 ROM banking is being used
-    bool mMBC2;             // True if MBC2 ROM banking is being used
-    bool mMBC3;             // True if MBC3 ROM banking is being used
-    bool mROMBanking;       // Flag that controls the behavior when writing to [0x4000 - 0x5FFF]
-    
-    bool mEnableRAM;        // True if RAM banking is enabled
-    byte mCurrentRAMBank;   // Which RAM bank is currently being used. Range is [0, 3]
-    
+    MBC* mMBC;              // A pointer to the current MBC unit (varies based on cartridge type)
+
     int mTimerPeriod;       // Keeps track of the rate at which the timer updates
     int mTimerCounter;      // Current state of the timer
     int mDividerCounter;    // Keeps track of the rate at which the divider register updates

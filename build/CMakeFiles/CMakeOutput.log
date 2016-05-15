@@ -28,30 +28,30 @@ The CXX compiler identification is GNU, found in "D:/My Documents/NetBeansProjec
 Determining if the C compiler works passed with the following output:
 Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_76fbb/fast"
-/usr/bin/make -f CMakeFiles/cmTC_76fbb.dir/build.make CMakeFiles/cmTC_76fbb.dir/build
+Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_36f78/fast"
+/usr/bin/make -f CMakeFiles/cmTC_36f78.dir/build.make CMakeFiles/cmTC_36f78.dir/build
 make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_76fbb.dir/testCCompiler.c.obj
-/C/MinGW64/mingw64/bin/gcc.exe     -o CMakeFiles/cmTC_76fbb.dir/testCCompiler.c.obj   -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp/testCCompiler.c"
-Linking C executable cmTC_76fbb.exe
-"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_76fbb.dir/objects.a
-/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_76fbb.dir/objects.a @CMakeFiles/cmTC_76fbb.dir/objects1.rsp
-/C/MinGW64/mingw64/bin/gcc.exe       -Wl,--whole-archive CMakeFiles/cmTC_76fbb.dir/objects.a -Wl,--no-whole-archive  -o cmTC_76fbb.exe -Wl,--out-implib,libcmTC_76fbb.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_76fbb.dir/linklibs.rsp
+Building C object CMakeFiles/cmTC_36f78.dir/testCCompiler.c.obj
+/C/MinGW64/mingw64/bin/gcc.exe     -o CMakeFiles/cmTC_36f78.dir/testCCompiler.c.obj   -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp/testCCompiler.c"
+Linking C executable cmTC_36f78.exe
+"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_36f78.dir/objects.a
+/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_36f78.dir/objects.a @CMakeFiles/cmTC_36f78.dir/objects1.rsp
+/C/MinGW64/mingw64/bin/gcc.exe       -Wl,--whole-archive CMakeFiles/cmTC_36f78.dir/objects.a -Wl,--no-whole-archive  -o cmTC_36f78.exe -Wl,--out-implib,libcmTC_36f78.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_36f78.dir/linklibs.rsp
 make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
 
 
 Detecting C compiler ABI info compiled with the following output:
 Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_4ab95/fast"
-/usr/bin/make -f CMakeFiles/cmTC_4ab95.dir/build.make CMakeFiles/cmTC_4ab95.dir/build
+Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_5a064/fast"
+/usr/bin/make -f CMakeFiles/cmTC_5a064.dir/build.make CMakeFiles/cmTC_5a064.dir/build
 make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_4ab95.dir/CMakeCCompilerABI.c.obj
-/C/MinGW64/mingw64/bin/gcc.exe     -o CMakeFiles/cmTC_4ab95.dir/CMakeCCompilerABI.c.obj   -c "/C/Program Files (x86)/CMake/share/cmake-3.5/Modules/CMakeCCompilerABI.c"
-Linking C executable cmTC_4ab95.exe
-"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_4ab95.dir/objects.a
-/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_4ab95.dir/objects.a @CMakeFiles/cmTC_4ab95.dir/objects1.rsp
-/C/MinGW64/mingw64/bin/gcc.exe      -v -Wl,--whole-archive CMakeFiles/cmTC_4ab95.dir/objects.a -Wl,--no-whole-archive  -o cmTC_4ab95.exe -Wl,--out-implib,libcmTC_4ab95.dll.a -Wl,--major-image-version,0,--minor-image-version,0   
+Building C object CMakeFiles/cmTC_5a064.dir/CMakeCCompilerABI.c.obj
+/C/MinGW64/mingw64/bin/gcc.exe     -o CMakeFiles/cmTC_5a064.dir/CMakeCCompilerABI.c.obj   -c "/C/Program Files (x86)/CMake/share/cmake-3.5/Modules/CMakeCCompilerABI.c"
+Linking C executable cmTC_5a064.exe
+"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_5a064.dir/objects.a
+/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_5a064.dir/objects.a @CMakeFiles/cmTC_5a064.dir/objects1.rsp
+/C/MinGW64/mingw64/bin/gcc.exe      -v -Wl,--whole-archive CMakeFiles/cmTC_5a064.dir/objects.a -Wl,--no-whole-archive  -o cmTC_5a064.exe -Wl,--out-implib,libcmTC_5a064.dll.a -Wl,--major-image-version,0,--minor-image-version,0   
 Using built-in specs.
 COLLECT_GCC=c:\MinGW64\mingw64\bin\gcc.exe
 COLLECT_LTO_WRAPPER=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe
@@ -61,8 +61,8 @@ Thread model: posix
 gcc version 5.3.0 (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 
 COMPILER_PATH=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/;c:/MinGW64/mingw64/bin/../libexec/gcc/;c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/bin/
 LIBRARY_PATH=c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/;c:/MinGW64/mingw64/bin/../lib/gcc/;c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib/;c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../lib/;c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/;c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_4ab95.exe' '-mtune=core2' '-march=nocona'
- c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/collect2.exe -plugin c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/liblto_plugin-0.dll -plugin-opt=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\Users\Jon\AppData\Local\Temp\cclVZnI5.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-liconv -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt --sysroot=C:/mingw530/x86_64-530-posix-seh-rt_v4-rev0/mingw64 -m i386pep -Bdynamic -o cmTC_4ab95.exe c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtbegin.o -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0 -Lc:/MinGW64/mingw64/bin/../lib/gcc -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../.. --whole-archive CMakeFiles/cmTC_4ab95.dir/objects.a --no-whole-archive --out-implib libcmTC_4ab95.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtend.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_5a064.exe' '-mtune=core2' '-march=nocona'
+ c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/collect2.exe -plugin c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/liblto_plugin-0.dll -plugin-opt=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\Users\Jon\AppData\Local\Temp\cc24pxXe.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-liconv -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt --sysroot=C:/mingw530/x86_64-530-posix-seh-rt_v4-rev0/mingw64 -m i386pep -Bdynamic -o cmTC_5a064.exe c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtbegin.o -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0 -Lc:/MinGW64/mingw64/bin/../lib/gcc -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../.. --whole-archive CMakeFiles/cmTC_5a064.dir/objects.a --no-whole-archive --out-implib libcmTC_5a064.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtend.o
 make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
 
 
@@ -70,15 +70,15 @@ Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld\.exe|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_4ab95/fast"]
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_4ab95.dir/build.make CMakeFiles/cmTC_4ab95.dir/build]
+  ignore line: [Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_5a064/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_5a064.dir/build.make CMakeFiles/cmTC_5a064.dir/build]
   ignore line: [make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp']
-  ignore line: [Building C object CMakeFiles/cmTC_4ab95.dir/CMakeCCompilerABI.c.obj]
-  ignore line: [/C/MinGW64/mingw64/bin/gcc.exe     -o CMakeFiles/cmTC_4ab95.dir/CMakeCCompilerABI.c.obj   -c "/C/Program Files (x86)/CMake/share/cmake-3.5/Modules/CMakeCCompilerABI.c"]
-  ignore line: [Linking C executable cmTC_4ab95.exe]
-  ignore line: ["/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_4ab95.dir/objects.a]
-  ignore line: [/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_4ab95.dir/objects.a @CMakeFiles/cmTC_4ab95.dir/objects1.rsp]
-  ignore line: [/C/MinGW64/mingw64/bin/gcc.exe      -v -Wl,--whole-archive CMakeFiles/cmTC_4ab95.dir/objects.a -Wl,--no-whole-archive  -o cmTC_4ab95.exe -Wl,--out-implib,libcmTC_4ab95.dll.a -Wl,--major-image-version,0,--minor-image-version,0   ]
+  ignore line: [Building C object CMakeFiles/cmTC_5a064.dir/CMakeCCompilerABI.c.obj]
+  ignore line: [/C/MinGW64/mingw64/bin/gcc.exe     -o CMakeFiles/cmTC_5a064.dir/CMakeCCompilerABI.c.obj   -c "/C/Program Files (x86)/CMake/share/cmake-3.5/Modules/CMakeCCompilerABI.c"]
+  ignore line: [Linking C executable cmTC_5a064.exe]
+  ignore line: ["/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_5a064.dir/objects.a]
+  ignore line: [/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_5a064.dir/objects.a @CMakeFiles/cmTC_5a064.dir/objects1.rsp]
+  ignore line: [/C/MinGW64/mingw64/bin/gcc.exe      -v -Wl,--whole-archive CMakeFiles/cmTC_5a064.dir/objects.a -Wl,--no-whole-archive  -o cmTC_5a064.exe -Wl,--out-implib,libcmTC_5a064.dll.a -Wl,--major-image-version,0,--minor-image-version,0   ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=c:\MinGW64\mingw64\bin\gcc.exe]
   ignore line: [COLLECT_LTO_WRAPPER=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe]
@@ -95,13 +95,13 @@ Parsed C implicit link information from above output:
   ignore line: [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../lib/]
   ignore line: [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/]
   ignore line: [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_4ab95.exe' '-mtune=core2' '-march=nocona']
-  link line: [ c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/collect2.exe -plugin c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/liblto_plugin-0.dll -plugin-opt=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\Users\Jon\AppData\Local\Temp\cclVZnI5.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-liconv -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt --sysroot=C:/mingw530/x86_64-530-posix-seh-rt_v4-rev0/mingw64 -m i386pep -Bdynamic -o cmTC_4ab95.exe c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtbegin.o -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0 -Lc:/MinGW64/mingw64/bin/../lib/gcc -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../.. --whole-archive CMakeFiles/cmTC_4ab95.dir/objects.a --no-whole-archive --out-implib libcmTC_4ab95.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtend.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_5a064.exe' '-mtune=core2' '-march=nocona']
+  link line: [ c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/collect2.exe -plugin c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/liblto_plugin-0.dll -plugin-opt=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\Users\Jon\AppData\Local\Temp\cc24pxXe.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-liconv -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_eh -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt --sysroot=C:/mingw530/x86_64-530-posix-seh-rt_v4-rev0/mingw64 -m i386pep -Bdynamic -o cmTC_5a064.exe c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtbegin.o -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0 -Lc:/MinGW64/mingw64/bin/../lib/gcc -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../.. --whole-archive CMakeFiles/cmTC_5a064.dir/objects.a --no-whole-archive --out-implib libcmTC_5a064.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtend.o]
     arg [c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/collect2.exe] ==> ignore
     arg [-plugin] ==> ignore
     arg [c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/liblto_plugin-0.dll] ==> ignore
     arg [-plugin-opt=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe] ==> ignore
-    arg [-plugin-opt=-fresolution=C:\Users\Jon\AppData\Local\Temp\cclVZnI5.res] ==> ignore
+    arg [-plugin-opt=-fresolution=C:\Users\Jon\AppData\Local\Temp\cc24pxXe.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lmingw32] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_eh] ==> ignore
@@ -125,7 +125,7 @@ Parsed C implicit link information from above output:
     arg [i386pep] ==> ignore
     arg [-Bdynamic] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_4ab95.exe] ==> ignore
+    arg [cmTC_5a064.exe] ==> ignore
     arg [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o] ==> ignore
     arg [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtbegin.o] ==> ignore
     arg [-Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0] ==> dir [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0]
@@ -135,10 +135,10 @@ Parsed C implicit link information from above output:
     arg [-Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib] ==> dir [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib]
     arg [-Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../..] ==> dir [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../..]
     arg [--whole-archive] ==> ignore
-    arg [CMakeFiles/cmTC_4ab95.dir/objects.a] ==> ignore
+    arg [CMakeFiles/cmTC_5a064.dir/objects.a] ==> ignore
     arg [--no-whole-archive] ==> ignore
     arg [--out-implib] ==> ignore
-    arg [libcmTC_4ab95.dll.a] ==> ignore
+    arg [libcmTC_5a064.dll.a] ==> ignore
     arg [--major-image-version] ==> ignore
     arg [0] ==> ignore
     arg [--minor-image-version] ==> ignore
@@ -182,15 +182,15 @@ Parsed C implicit link information from above output:
 Detecting C [-std=c11] compiler features compiled with the following output:
 Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_b84c2/fast"
-/usr/bin/make -f CMakeFiles/cmTC_b84c2.dir/build.make CMakeFiles/cmTC_b84c2.dir/build
+Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_11030/fast"
+/usr/bin/make -f CMakeFiles/cmTC_11030.dir/build.make CMakeFiles/cmTC_11030.dir/build
 make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_b84c2.dir/feature_tests.c.obj
-/C/MinGW64/mingw64/bin/gcc.exe    -std=c11 -o CMakeFiles/cmTC_b84c2.dir/feature_tests.c.obj   -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/feature_tests.c"
-Linking C executable cmTC_b84c2.exe
-"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_b84c2.dir/objects.a
-/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_b84c2.dir/objects.a @CMakeFiles/cmTC_b84c2.dir/objects1.rsp
-/C/MinGW64/mingw64/bin/gcc.exe       -Wl,--whole-archive CMakeFiles/cmTC_b84c2.dir/objects.a -Wl,--no-whole-archive  -o cmTC_b84c2.exe -Wl,--out-implib,libcmTC_b84c2.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_b84c2.dir/linklibs.rsp
+Building C object CMakeFiles/cmTC_11030.dir/feature_tests.c.obj
+/C/MinGW64/mingw64/bin/gcc.exe    -std=c11 -o CMakeFiles/cmTC_11030.dir/feature_tests.c.obj   -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/feature_tests.c"
+Linking C executable cmTC_11030.exe
+"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_11030.dir/objects.a
+/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_11030.dir/objects.a @CMakeFiles/cmTC_11030.dir/objects1.rsp
+/C/MinGW64/mingw64/bin/gcc.exe       -Wl,--whole-archive CMakeFiles/cmTC_11030.dir/objects.a -Wl,--no-whole-archive  -o cmTC_11030.exe -Wl,--out-implib,libcmTC_11030.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_11030.dir/linklibs.rsp
 make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
 
 
@@ -203,15 +203,15 @@ make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/C
 Detecting C [-std=c99] compiler features compiled with the following output:
 Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_48143/fast"
-/usr/bin/make -f CMakeFiles/cmTC_48143.dir/build.make CMakeFiles/cmTC_48143.dir/build
+Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_93aa9/fast"
+/usr/bin/make -f CMakeFiles/cmTC_93aa9.dir/build.make CMakeFiles/cmTC_93aa9.dir/build
 make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_48143.dir/feature_tests.c.obj
-/C/MinGW64/mingw64/bin/gcc.exe    -std=c99 -o CMakeFiles/cmTC_48143.dir/feature_tests.c.obj   -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/feature_tests.c"
-Linking C executable cmTC_48143.exe
-"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_48143.dir/objects.a
-/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_48143.dir/objects.a @CMakeFiles/cmTC_48143.dir/objects1.rsp
-/C/MinGW64/mingw64/bin/gcc.exe       -Wl,--whole-archive CMakeFiles/cmTC_48143.dir/objects.a -Wl,--no-whole-archive  -o cmTC_48143.exe -Wl,--out-implib,libcmTC_48143.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_48143.dir/linklibs.rsp
+Building C object CMakeFiles/cmTC_93aa9.dir/feature_tests.c.obj
+/C/MinGW64/mingw64/bin/gcc.exe    -std=c99 -o CMakeFiles/cmTC_93aa9.dir/feature_tests.c.obj   -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/feature_tests.c"
+Linking C executable cmTC_93aa9.exe
+"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_93aa9.dir/objects.a
+/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_93aa9.dir/objects.a @CMakeFiles/cmTC_93aa9.dir/objects1.rsp
+/C/MinGW64/mingw64/bin/gcc.exe       -Wl,--whole-archive CMakeFiles/cmTC_93aa9.dir/objects.a -Wl,--no-whole-archive  -o cmTC_93aa9.exe -Wl,--out-implib,libcmTC_93aa9.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_93aa9.dir/linklibs.rsp
 make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
 
 
@@ -224,15 +224,15 @@ make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/C
 Detecting C [-std=c90] compiler features compiled with the following output:
 Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_93ba1/fast"
-/usr/bin/make -f CMakeFiles/cmTC_93ba1.dir/build.make CMakeFiles/cmTC_93ba1.dir/build
+Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_e26ac/fast"
+/usr/bin/make -f CMakeFiles/cmTC_e26ac.dir/build.make CMakeFiles/cmTC_e26ac.dir/build
 make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_93ba1.dir/feature_tests.c.obj
-/C/MinGW64/mingw64/bin/gcc.exe    -std=c90 -o CMakeFiles/cmTC_93ba1.dir/feature_tests.c.obj   -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/feature_tests.c"
-Linking C executable cmTC_93ba1.exe
-"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_93ba1.dir/objects.a
-/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_93ba1.dir/objects.a @CMakeFiles/cmTC_93ba1.dir/objects1.rsp
-/C/MinGW64/mingw64/bin/gcc.exe       -Wl,--whole-archive CMakeFiles/cmTC_93ba1.dir/objects.a -Wl,--no-whole-archive  -o cmTC_93ba1.exe -Wl,--out-implib,libcmTC_93ba1.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_93ba1.dir/linklibs.rsp
+Building C object CMakeFiles/cmTC_e26ac.dir/feature_tests.c.obj
+/C/MinGW64/mingw64/bin/gcc.exe    -std=c90 -o CMakeFiles/cmTC_e26ac.dir/feature_tests.c.obj   -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/feature_tests.c"
+Linking C executable cmTC_e26ac.exe
+"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_e26ac.dir/objects.a
+/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_e26ac.dir/objects.a @CMakeFiles/cmTC_e26ac.dir/objects1.rsp
+/C/MinGW64/mingw64/bin/gcc.exe       -Wl,--whole-archive CMakeFiles/cmTC_e26ac.dir/objects.a -Wl,--no-whole-archive  -o cmTC_e26ac.exe -Wl,--out-implib,libcmTC_e26ac.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_e26ac.dir/linklibs.rsp
 make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
 
 
@@ -243,30 +243,30 @@ make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/C
 Determining if the CXX compiler works passed with the following output:
 Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_dc2d3/fast"
-/usr/bin/make -f CMakeFiles/cmTC_dc2d3.dir/build.make CMakeFiles/cmTC_dc2d3.dir/build
+Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_c9e53/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c9e53.dir/build.make CMakeFiles/cmTC_c9e53.dir/build
 make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_dc2d3.dir/testCXXCompiler.cxx.obj
-/C/MinGW64/mingw64/bin/g++.exe      -o CMakeFiles/cmTC_dc2d3.dir/testCXXCompiler.cxx.obj -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx"
-Linking CXX executable cmTC_dc2d3.exe
-"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_dc2d3.dir/objects.a
-/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_dc2d3.dir/objects.a @CMakeFiles/cmTC_dc2d3.dir/objects1.rsp
-/C/MinGW64/mingw64/bin/g++.exe       -Wl,--whole-archive CMakeFiles/cmTC_dc2d3.dir/objects.a -Wl,--no-whole-archive  -o cmTC_dc2d3.exe -Wl,--out-implib,libcmTC_dc2d3.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_dc2d3.dir/linklibs.rsp
+Building CXX object CMakeFiles/cmTC_c9e53.dir/testCXXCompiler.cxx.obj
+/C/MinGW64/mingw64/bin/g++.exe      -o CMakeFiles/cmTC_c9e53.dir/testCXXCompiler.cxx.obj -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx"
+Linking CXX executable cmTC_c9e53.exe
+"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_c9e53.dir/objects.a
+/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_c9e53.dir/objects.a @CMakeFiles/cmTC_c9e53.dir/objects1.rsp
+/C/MinGW64/mingw64/bin/g++.exe       -Wl,--whole-archive CMakeFiles/cmTC_c9e53.dir/objects.a -Wl,--no-whole-archive  -o cmTC_c9e53.exe -Wl,--out-implib,libcmTC_c9e53.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_c9e53.dir/linklibs.rsp
 make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
 
 
 Detecting CXX compiler ABI info compiled with the following output:
 Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_dc1b7/fast"
-/usr/bin/make -f CMakeFiles/cmTC_dc1b7.dir/build.make CMakeFiles/cmTC_dc1b7.dir/build
+Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_e331a/fast"
+/usr/bin/make -f CMakeFiles/cmTC_e331a.dir/build.make CMakeFiles/cmTC_e331a.dir/build
 make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_dc1b7.dir/CMakeCXXCompilerABI.cpp.obj
-/C/MinGW64/mingw64/bin/g++.exe      -o CMakeFiles/cmTC_dc1b7.dir/CMakeCXXCompilerABI.cpp.obj -c "/C/Program Files (x86)/CMake/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp"
-Linking CXX executable cmTC_dc1b7.exe
-"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_dc1b7.dir/objects.a
-/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_dc1b7.dir/objects.a @CMakeFiles/cmTC_dc1b7.dir/objects1.rsp
-/C/MinGW64/mingw64/bin/g++.exe      -v -Wl,--whole-archive CMakeFiles/cmTC_dc1b7.dir/objects.a -Wl,--no-whole-archive  -o cmTC_dc1b7.exe -Wl,--out-implib,libcmTC_dc1b7.dll.a -Wl,--major-image-version,0,--minor-image-version,0   
+Building CXX object CMakeFiles/cmTC_e331a.dir/CMakeCXXCompilerABI.cpp.obj
+/C/MinGW64/mingw64/bin/g++.exe      -o CMakeFiles/cmTC_e331a.dir/CMakeCXXCompilerABI.cpp.obj -c "/C/Program Files (x86)/CMake/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp"
+Linking CXX executable cmTC_e331a.exe
+"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_e331a.dir/objects.a
+/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_e331a.dir/objects.a @CMakeFiles/cmTC_e331a.dir/objects1.rsp
+/C/MinGW64/mingw64/bin/g++.exe      -v -Wl,--whole-archive CMakeFiles/cmTC_e331a.dir/objects.a -Wl,--no-whole-archive  -o cmTC_e331a.exe -Wl,--out-implib,libcmTC_e331a.dll.a -Wl,--major-image-version,0,--minor-image-version,0   
 Using built-in specs.
 COLLECT_GCC=c:\MinGW64\mingw64\bin\g++.exe
 COLLECT_LTO_WRAPPER=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe
@@ -276,8 +276,8 @@ Thread model: posix
 gcc version 5.3.0 (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 
 COMPILER_PATH=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/;c:/MinGW64/mingw64/bin/../libexec/gcc/;c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/bin/
 LIBRARY_PATH=c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/;c:/MinGW64/mingw64/bin/../lib/gcc/;c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib/;c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../lib/;c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/;c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_dc1b7.exe' '-shared-libgcc' '-mtune=core2' '-march=nocona'
- c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/collect2.exe -plugin c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/liblto_plugin-0.dll -plugin-opt=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\Users\Jon\AppData\Local\Temp\ccQrPItu.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-liconv -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt --sysroot=C:/mingw530/x86_64-530-posix-seh-rt_v4-rev0/mingw64 -m i386pep -Bdynamic -o cmTC_dc1b7.exe c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtbegin.o -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0 -Lc:/MinGW64/mingw64/bin/../lib/gcc -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../.. --whole-archive CMakeFiles/cmTC_dc1b7.dir/objects.a --no-whole-archive --out-implib libcmTC_dc1b7.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtend.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_e331a.exe' '-shared-libgcc' '-mtune=core2' '-march=nocona'
+ c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/collect2.exe -plugin c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/liblto_plugin-0.dll -plugin-opt=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\Users\Jon\AppData\Local\Temp\ccGW1y8Q.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-liconv -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt --sysroot=C:/mingw530/x86_64-530-posix-seh-rt_v4-rev0/mingw64 -m i386pep -Bdynamic -o cmTC_e331a.exe c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtbegin.o -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0 -Lc:/MinGW64/mingw64/bin/../lib/gcc -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../.. --whole-archive CMakeFiles/cmTC_e331a.dir/objects.a --no-whole-archive --out-implib libcmTC_e331a.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtend.o
 make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
 
 
@@ -285,15 +285,15 @@ Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld\.exe|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_dc1b7/fast"]
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_dc1b7.dir/build.make CMakeFiles/cmTC_dc1b7.dir/build]
+  ignore line: [Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_e331a/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_e331a.dir/build.make CMakeFiles/cmTC_e331a.dir/build]
   ignore line: [make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp']
-  ignore line: [Building CXX object CMakeFiles/cmTC_dc1b7.dir/CMakeCXXCompilerABI.cpp.obj]
-  ignore line: [/C/MinGW64/mingw64/bin/g++.exe      -o CMakeFiles/cmTC_dc1b7.dir/CMakeCXXCompilerABI.cpp.obj -c "/C/Program Files (x86)/CMake/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp"]
-  ignore line: [Linking CXX executable cmTC_dc1b7.exe]
-  ignore line: ["/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_dc1b7.dir/objects.a]
-  ignore line: [/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_dc1b7.dir/objects.a @CMakeFiles/cmTC_dc1b7.dir/objects1.rsp]
-  ignore line: [/C/MinGW64/mingw64/bin/g++.exe      -v -Wl,--whole-archive CMakeFiles/cmTC_dc1b7.dir/objects.a -Wl,--no-whole-archive  -o cmTC_dc1b7.exe -Wl,--out-implib,libcmTC_dc1b7.dll.a -Wl,--major-image-version,0,--minor-image-version,0   ]
+  ignore line: [Building CXX object CMakeFiles/cmTC_e331a.dir/CMakeCXXCompilerABI.cpp.obj]
+  ignore line: [/C/MinGW64/mingw64/bin/g++.exe      -o CMakeFiles/cmTC_e331a.dir/CMakeCXXCompilerABI.cpp.obj -c "/C/Program Files (x86)/CMake/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp"]
+  ignore line: [Linking CXX executable cmTC_e331a.exe]
+  ignore line: ["/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_e331a.dir/objects.a]
+  ignore line: [/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_e331a.dir/objects.a @CMakeFiles/cmTC_e331a.dir/objects1.rsp]
+  ignore line: [/C/MinGW64/mingw64/bin/g++.exe      -v -Wl,--whole-archive CMakeFiles/cmTC_e331a.dir/objects.a -Wl,--no-whole-archive  -o cmTC_e331a.exe -Wl,--out-implib,libcmTC_e331a.dll.a -Wl,--major-image-version,0,--minor-image-version,0   ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=c:\MinGW64\mingw64\bin\g++.exe]
   ignore line: [COLLECT_LTO_WRAPPER=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe]
@@ -310,13 +310,13 @@ Parsed CXX implicit link information from above output:
   ignore line: [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../lib/]
   ignore line: [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/]
   ignore line: [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_dc1b7.exe' '-shared-libgcc' '-mtune=core2' '-march=nocona']
-  link line: [ c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/collect2.exe -plugin c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/liblto_plugin-0.dll -plugin-opt=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\Users\Jon\AppData\Local\Temp\ccQrPItu.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-liconv -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt --sysroot=C:/mingw530/x86_64-530-posix-seh-rt_v4-rev0/mingw64 -m i386pep -Bdynamic -o cmTC_dc1b7.exe c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtbegin.o -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0 -Lc:/MinGW64/mingw64/bin/../lib/gcc -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../.. --whole-archive CMakeFiles/cmTC_dc1b7.dir/objects.a --no-whole-archive --out-implib libcmTC_dc1b7.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtend.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_e331a.exe' '-shared-libgcc' '-mtune=core2' '-march=nocona']
+  link line: [ c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/collect2.exe -plugin c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/liblto_plugin-0.dll -plugin-opt=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\Users\Jon\AppData\Local\Temp\ccGW1y8Q.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-liconv -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmoldname -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt --sysroot=C:/mingw530/x86_64-530-posix-seh-rt_v4-rev0/mingw64 -m i386pep -Bdynamic -o cmTC_e331a.exe c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtbegin.o -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0 -Lc:/MinGW64/mingw64/bin/../lib/gcc -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib -Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../.. --whole-archive CMakeFiles/cmTC_e331a.dir/objects.a --no-whole-archive --out-implib libcmTC_e331a.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtend.o]
     arg [c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/collect2.exe] ==> ignore
     arg [-plugin] ==> ignore
     arg [c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/liblto_plugin-0.dll] ==> ignore
     arg [-plugin-opt=c:/MinGW64/mingw64/bin/../libexec/gcc/x86_64-w64-mingw32/5.3.0/lto-wrapper.exe] ==> ignore
-    arg [-plugin-opt=-fresolution=C:\Users\Jon\AppData\Local\Temp\ccQrPItu.res] ==> ignore
+    arg [-plugin-opt=-fresolution=C:\Users\Jon\AppData\Local\Temp\ccGW1y8Q.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lmingw32] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
@@ -340,7 +340,7 @@ Parsed CXX implicit link information from above output:
     arg [i386pep] ==> ignore
     arg [-Bdynamic] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_dc1b7.exe] ==> ignore
+    arg [cmTC_e331a.exe] ==> ignore
     arg [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o] ==> ignore
     arg [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/crtbegin.o] ==> ignore
     arg [-Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0] ==> dir [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0]
@@ -350,10 +350,10 @@ Parsed CXX implicit link information from above output:
     arg [-Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib] ==> dir [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../../../x86_64-w64-mingw32/lib]
     arg [-Lc:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../..] ==> dir [c:/MinGW64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/5.3.0/../../..]
     arg [--whole-archive] ==> ignore
-    arg [CMakeFiles/cmTC_dc1b7.dir/objects.a] ==> ignore
+    arg [CMakeFiles/cmTC_e331a.dir/objects.a] ==> ignore
     arg [--no-whole-archive] ==> ignore
     arg [--out-implib] ==> ignore
-    arg [libcmTC_dc1b7.dll.a] ==> ignore
+    arg [libcmTC_e331a.dll.a] ==> ignore
     arg [--major-image-version] ==> ignore
     arg [0] ==> ignore
     arg [--minor-image-version] ==> ignore
@@ -398,15 +398,15 @@ Parsed CXX implicit link information from above output:
 Detecting CXX [-std=c++14] compiler features compiled with the following output:
 Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_3b4b7/fast"
-/usr/bin/make -f CMakeFiles/cmTC_3b4b7.dir/build.make CMakeFiles/cmTC_3b4b7.dir/build
+Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_07271/fast"
+/usr/bin/make -f CMakeFiles/cmTC_07271.dir/build.make CMakeFiles/cmTC_07271.dir/build
 make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_3b4b7.dir/feature_tests.cxx.obj
-/C/MinGW64/mingw64/bin/g++.exe     -std=c++14 -o CMakeFiles/cmTC_3b4b7.dir/feature_tests.cxx.obj -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/feature_tests.cxx"
-Linking CXX executable cmTC_3b4b7.exe
-"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_3b4b7.dir/objects.a
-/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_3b4b7.dir/objects.a @CMakeFiles/cmTC_3b4b7.dir/objects1.rsp
-/C/MinGW64/mingw64/bin/g++.exe       -Wl,--whole-archive CMakeFiles/cmTC_3b4b7.dir/objects.a -Wl,--no-whole-archive  -o cmTC_3b4b7.exe -Wl,--out-implib,libcmTC_3b4b7.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_3b4b7.dir/linklibs.rsp
+Building CXX object CMakeFiles/cmTC_07271.dir/feature_tests.cxx.obj
+/C/MinGW64/mingw64/bin/g++.exe     -std=c++14 -o CMakeFiles/cmTC_07271.dir/feature_tests.cxx.obj -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/feature_tests.cxx"
+Linking CXX executable cmTC_07271.exe
+"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_07271.dir/objects.a
+/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_07271.dir/objects.a @CMakeFiles/cmTC_07271.dir/objects1.rsp
+/C/MinGW64/mingw64/bin/g++.exe       -Wl,--whole-archive CMakeFiles/cmTC_07271.dir/objects.a -Wl,--no-whole-archive  -o cmTC_07271.exe -Wl,--out-implib,libcmTC_07271.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_07271.dir/linklibs.rsp
 make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
 
 
@@ -472,15 +472,15 @@ make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/C
 Detecting CXX [-std=c++11] compiler features compiled with the following output:
 Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_09be4/fast"
-/usr/bin/make -f CMakeFiles/cmTC_09be4.dir/build.make CMakeFiles/cmTC_09be4.dir/build
+Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_171d7/fast"
+/usr/bin/make -f CMakeFiles/cmTC_171d7.dir/build.make CMakeFiles/cmTC_171d7.dir/build
 make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_09be4.dir/feature_tests.cxx.obj
-/C/MinGW64/mingw64/bin/g++.exe     -std=c++11 -o CMakeFiles/cmTC_09be4.dir/feature_tests.cxx.obj -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/feature_tests.cxx"
-Linking CXX executable cmTC_09be4.exe
-"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_09be4.dir/objects.a
-/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_09be4.dir/objects.a @CMakeFiles/cmTC_09be4.dir/objects1.rsp
-/C/MinGW64/mingw64/bin/g++.exe       -Wl,--whole-archive CMakeFiles/cmTC_09be4.dir/objects.a -Wl,--no-whole-archive  -o cmTC_09be4.exe -Wl,--out-implib,libcmTC_09be4.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_09be4.dir/linklibs.rsp
+Building CXX object CMakeFiles/cmTC_171d7.dir/feature_tests.cxx.obj
+/C/MinGW64/mingw64/bin/g++.exe     -std=c++11 -o CMakeFiles/cmTC_171d7.dir/feature_tests.cxx.obj -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/feature_tests.cxx"
+Linking CXX executable cmTC_171d7.exe
+"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_171d7.dir/objects.a
+/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_171d7.dir/objects.a @CMakeFiles/cmTC_171d7.dir/objects1.rsp
+/C/MinGW64/mingw64/bin/g++.exe       -Wl,--whole-archive CMakeFiles/cmTC_171d7.dir/objects.a -Wl,--no-whole-archive  -o cmTC_171d7.exe -Wl,--out-implib,libcmTC_171d7.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_171d7.dir/linklibs.rsp
 make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
 
 
@@ -546,15 +546,15 @@ make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/C
 Detecting CXX [-std=c++98] compiler features compiled with the following output:
 Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_c2fd6/fast"
-/usr/bin/make -f CMakeFiles/cmTC_c2fd6.dir/build.make CMakeFiles/cmTC_c2fd6.dir/build
+Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_92a78/fast"
+/usr/bin/make -f CMakeFiles/cmTC_92a78.dir/build.make CMakeFiles/cmTC_92a78.dir/build
 make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_c2fd6.dir/feature_tests.cxx.obj
-/C/MinGW64/mingw64/bin/g++.exe     -std=c++98 -o CMakeFiles/cmTC_c2fd6.dir/feature_tests.cxx.obj -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/feature_tests.cxx"
-Linking CXX executable cmTC_c2fd6.exe
-"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_c2fd6.dir/objects.a
-/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_c2fd6.dir/objects.a @CMakeFiles/cmTC_c2fd6.dir/objects1.rsp
-/C/MinGW64/mingw64/bin/g++.exe       -Wl,--whole-archive CMakeFiles/cmTC_c2fd6.dir/objects.a -Wl,--no-whole-archive  -o cmTC_c2fd6.exe -Wl,--out-implib,libcmTC_c2fd6.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_c2fd6.dir/linklibs.rsp
+Building CXX object CMakeFiles/cmTC_92a78.dir/feature_tests.cxx.obj
+/C/MinGW64/mingw64/bin/g++.exe     -std=c++98 -o CMakeFiles/cmTC_92a78.dir/feature_tests.cxx.obj -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/feature_tests.cxx"
+Linking CXX executable cmTC_92a78.exe
+"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_92a78.dir/objects.a
+/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_92a78.dir/objects.a @CMakeFiles/cmTC_92a78.dir/objects1.rsp
+/C/MinGW64/mingw64/bin/g++.exe       -Wl,--whole-archive CMakeFiles/cmTC_92a78.dir/objects.a -Wl,--no-whole-archive  -o cmTC_92a78.exe -Wl,--out-implib,libcmTC_92a78.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_92a78.dir/linklibs.rsp
 make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
 
 
@@ -618,30 +618,30 @@ make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/C
 Determining if the include file pthread.h exists passed with the following output:
 Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_c995e/fast"
-/usr/bin/make -f CMakeFiles/cmTC_c995e.dir/build.make CMakeFiles/cmTC_c995e.dir/build
+Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_be31d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_be31d.dir/build.make CMakeFiles/cmTC_be31d.dir/build
 make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_c995e.dir/CheckIncludeFile.c.obj
-/C/MinGW64/mingw64/bin/gcc.exe     -o CMakeFiles/cmTC_c995e.dir/CheckIncludeFile.c.obj   -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c"
-Linking C executable cmTC_c995e.exe
-"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_c995e.dir/objects.a
-/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_c995e.dir/objects.a @CMakeFiles/cmTC_c995e.dir/objects1.rsp
-/C/MinGW64/mingw64/bin/gcc.exe       -Wl,--whole-archive CMakeFiles/cmTC_c995e.dir/objects.a -Wl,--no-whole-archive  -o cmTC_c995e.exe -Wl,--out-implib,libcmTC_c995e.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_c995e.dir/linklibs.rsp
+Building C object CMakeFiles/cmTC_be31d.dir/CheckIncludeFile.c.obj
+/C/MinGW64/mingw64/bin/gcc.exe     -o CMakeFiles/cmTC_be31d.dir/CheckIncludeFile.c.obj   -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c"
+Linking C executable cmTC_be31d.exe
+"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_be31d.dir/objects.a
+/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_be31d.dir/objects.a @CMakeFiles/cmTC_be31d.dir/objects1.rsp
+/C/MinGW64/mingw64/bin/gcc.exe       -Wl,--whole-archive CMakeFiles/cmTC_be31d.dir/objects.a -Wl,--no-whole-archive  -o cmTC_be31d.exe -Wl,--out-implib,libcmTC_be31d.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_be31d.dir/linklibs.rsp
 make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
 
 
 Determining if the pthread_create exist passed with the following output:
 Change Dir: D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_b02a5/fast"
-/usr/bin/make -f CMakeFiles/cmTC_b02a5.dir/build.make CMakeFiles/cmTC_b02a5.dir/build
+Run Build Command:"C:/msys/1.0/bin/make.exe" "cmTC_70a0b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_70a0b.dir/build.make CMakeFiles/cmTC_70a0b.dir/build
 make[1]: Entering directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_b02a5.dir/CheckSymbolExists.c.obj
-/C/MinGW64/mingw64/bin/gcc.exe     -o CMakeFiles/cmTC_b02a5.dir/CheckSymbolExists.c.obj   -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c"
-Linking C executable cmTC_b02a5.exe
-"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_b02a5.dir/objects.a
-/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_b02a5.dir/objects.a @CMakeFiles/cmTC_b02a5.dir/objects1.rsp
-/C/MinGW64/mingw64/bin/gcc.exe       -Wl,--whole-archive CMakeFiles/cmTC_b02a5.dir/objects.a -Wl,--no-whole-archive  -o cmTC_b02a5.exe -Wl,--out-implib,libcmTC_b02a5.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_b02a5.dir/linklibs.rsp
+Building C object CMakeFiles/cmTC_70a0b.dir/CheckSymbolExists.c.obj
+/C/MinGW64/mingw64/bin/gcc.exe     -o CMakeFiles/cmTC_70a0b.dir/CheckSymbolExists.c.obj   -c "/D/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c"
+Linking C executable cmTC_70a0b.exe
+"/C/Program Files (x86)/CMake/bin/cmake.exe" -E remove -f CMakeFiles/cmTC_70a0b.dir/objects.a
+/C/MinGW64/mingw64/bin/ar.exe cr CMakeFiles/cmTC_70a0b.dir/objects.a @CMakeFiles/cmTC_70a0b.dir/objects1.rsp
+/C/MinGW64/mingw64/bin/gcc.exe       -Wl,--whole-archive CMakeFiles/cmTC_70a0b.dir/objects.a -Wl,--no-whole-archive  -o cmTC_70a0b.exe -Wl,--out-implib,libcmTC_70a0b.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_70a0b.dir/linklibs.rsp
 make[1]: Leaving directory `/d/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp'
 
 File D:/My Documents/NetBeansProjects/GB_Emulator/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:

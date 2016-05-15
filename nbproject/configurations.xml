@@ -5,6 +5,7 @@
       <df name="Sound">
         <in>StreamingAudioQueue.h</in>
       </df>
+      <in>MBC.h</in>
     </df>
     <df root="src" name="1">
       <df name="Sound">
@@ -17,6 +18,7 @@
       <in>Emulator.cpp</in>
       <in>Graphics.cpp</in>
       <in>Input.cpp</in>
+      <in>MBC.cpp</in>
       <in>Memory.cpp</in>
       <in>SDL_Environment.cpp</in>
       <in>Sound.cpp</in>
@@ -62,6 +64,8 @@
           <preBuildCommand>cmake -G "MSYS Makefiles" ..</preBuildCommand>
         </preBuild>
       </makefileType>
+      <item path="include/MBC.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/Sound/StreamingAudioQueue.h"
             ex="false"
             tool="3"
@@ -74,6 +78,8 @@
       <item path="src/Graphics.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Input.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/MBC.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Memory.cpp" ex="false" tool="1" flavor2="0">
       </item>

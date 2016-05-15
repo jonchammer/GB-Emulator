@@ -23,6 +23,7 @@
       <in>Emulator.h</in>
       <in>Graphics.h</in>
       <in>Input.h</in>
+      <in>MBC.h</in>
       <in>Memory.h</in>
       <in>Sound.h</in>
     </df>
@@ -38,6 +39,7 @@
       <in>GL_Render.cpp</in>
       <in>Graphics.cpp</in>
       <in>Input.cpp</in>
+      <in>MBC.cpp</in>
       <in>Memory.cpp</in>
       <in>SDL_Environment.cpp</in>
       <in>Sound.cpp</in>

@@ -6,5 +6,12 @@
 - Sound during BIOS.
 - Link's Awakening crash after 1st dungeon searching for BowWow.
 - Pokemon Red title screen - background is 1 pixel off. Part of text moves with the pokemon sprite.
-- Move all emulator updates / rendering to another thread. Only handle events on the main thread.
+- Finish adding RTC support for MBC3.
+- Consider putting ROM/RAM read stuff in MBC classes.
 - Move timer code from Memory to its own unit.
+- Move all emulator updates / rendering to another thread. Only handle events on the main thread.
+- GBC Improvements. GBC games can be run, but it is not well tested.
+  + Double speed
+  + Color rendering
+  + GBC-specific initializations
+- Set up gitignore to ignore the contents of the build folder.

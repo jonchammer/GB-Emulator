@@ -4,6 +4,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/gb_emulator.dir/src/Graphics.cpp.obj"
   "CMakeFiles/gb_emulator.dir/src/Input.cpp.obj"
   "CMakeFiles/gb_emulator.dir/src/main.cpp.obj"
+  "CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj"
   "CMakeFiles/gb_emulator.dir/src/Memory.cpp.obj"
   "CMakeFiles/gb_emulator.dir/src/SDL_Environment.cpp.obj"
   "CMakeFiles/gb_emulator.dir/src/Sound/SoundUnit1.cpp.obj"

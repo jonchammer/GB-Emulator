@@ -231,6 +231,33 @@ src/Input.cpp.s:
 	$(MAKE) -f CMakeFiles/gb_emulator.dir/build.make CMakeFiles/gb_emulator.dir/src/Input.cpp.s
 .PHONY : src/Input.cpp.s
 
+src/MBC.obj: src/MBC.cpp.obj
+
+.PHONY : src/MBC.obj
+
+# target to build an object file
+src/MBC.cpp.obj:
+	$(MAKE) -f CMakeFiles/gb_emulator.dir/build.make CMakeFiles/gb_emulator.dir/src/MBC.cpp.obj
+.PHONY : src/MBC.cpp.obj
+
+src/MBC.i: src/MBC.cpp.i
+
+.PHONY : src/MBC.i
+
+# target to preprocess a source file
+src/MBC.cpp.i:
+	$(MAKE) -f CMakeFiles/gb_emulator.dir/build.make CMakeFiles/gb_emulator.dir/src/MBC.cpp.i
+.PHONY : src/MBC.cpp.i
+
+src/MBC.s: src/MBC.cpp.s
+
+.PHONY : src/MBC.s
+
+# target to generate assembly for a file
+src/MBC.cpp.s:
+	$(MAKE) -f CMakeFiles/gb_emulator.dir/build.make CMakeFiles/gb_emulator.dir/src/MBC.cpp.s
+.PHONY : src/MBC.cpp.s
+
 src/Memory.obj: src/Memory.cpp.obj
 
 .PHONY : src/Memory.obj
@@ -468,6 +495,9 @@ help:
 	@echo "... src/Input.obj"
 	@echo "... src/Input.i"
 	@echo "... src/Input.s"
+	@echo "... src/MBC.obj"
+	@echo "... src/MBC.i"
+	@echo "... src/MBC.s"
 	@echo "... src/Memory.obj"
 	@echo "... src/Memory.i"
 	@echo "... src/Memory.s"
