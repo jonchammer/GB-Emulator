@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    string game = "../roms/tests/MemoryTiming2/mem_timing.gb";
+    string game = "../roms/tests/Sound1/dmg_sound.gb";
     //string game = "../roms/Pokemon_Red.gb";
 
     // The save file has the same name with a .sav extension.

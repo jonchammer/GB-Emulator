@@ -339,15 +339,19 @@ void CPU::executeInstruction(byte opcode)
         case 0x22: writeByte(mRegisters.hl, mRegisters.a); mRegisters.hl++; return;
         
         // 16-bit loads
-        case 0x01: mRegisters.bc     = getImmediateWord(); return;
-        case 0x11: mRegisters.de     = getImmediateWord(); return;
-        case 0x21: mRegisters.hl     = getImmediateWord(); return;
-        case 0x31: mStackPointer.reg = getImmediateWord(); return;
+        case 0x01: mRegisters.bc     = getImmediateWord();                return;
+        case 0x11: mRegisters.de     = getImmediateWord();                return;
+        case 0x21: mRegisters.hl     = getImmediateWord();                return;
+        case 0x31: mStackPointer.reg = getImmediateWord();                return;
         case 0xF9: mStackPointer.reg = mRegisters.hl; mEmulator->sync(4); return;
-        case 0xF8: CPU_LDHL();                             return;
-        case 0x08:{ word nn = getImmediateWord(); 
-                   writeByte(nn, mStackPointer.lo); 
-                   writeByte(nn + 1, mStackPointer.hi);    return;}
+        case 0xF8: CPU_LDHL();                                            return;
+        case 0x08:
+        { 
+            word nn = getImmediateWord(); 
+            writeByte(nn, mStackPointer.lo); 
+            writeByte(nn + 1, mStackPointer.hi);    
+            return;
+        }
         
         // Stack Push/Pop
         case 0xF5: pushWordOntoStack(mRegisters.af);  return;
