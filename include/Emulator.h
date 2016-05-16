@@ -63,6 +63,8 @@ public:
      */
     void reset(bool skipBIOS = false);
     
+    void sync(int cycles);
+    
     // Adjust 'paused' state
     void togglePaused()         { mPaused = !mPaused; }
     void setPaused(bool paused) { mPaused = paused;   }
@@ -82,6 +84,8 @@ private:
     Input* mInput;       // Handles user input
     Sound* mSound;       // Handles sound processing
     bool mPaused;        // True if emulation should be frozen
+    
+    int mCycleCount;
 };
 
 #endif /* EMULATOR_H */

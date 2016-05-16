@@ -15,6 +15,7 @@ using namespace std;
 
 // Forward declaration of necessary classes
 class Memory;
+class Emulator;
 
 // Definition of the register file that contains each of the 8 registers
 struct Registers
@@ -82,23 +83,16 @@ public:
     /**
      * Create a new CPU.
      * 
-     * @param memory. A pointer to the memory unit for the emulated gameboy.
+     * @param emulator. A pointer to the hosting emulator.
+     * @param memory.   A pointer to the memory unit for the emulated gameboy.
      * @param skipBIOS. When true, the BIOS will be skipped.
      */
-    CPU(Memory* memory, bool skipBIOS);
+    CPU(Emulator* emulator, Memory* memory, bool skipBIOS);
     
     /**
      * Called during the emulation loop. Executes a single instruction.
-     * @return The number of cycles this instruction took.
      */
-    int executeNextOpcode();
-    
-    /**
-     * Called during the emulation loop. Gives the CPU a chance to handle
-     * any interrupts that were requested since the last time they were handled.
-     * Returns the number of cycles required to handle the interrupt service routine.
-     */
-    int handleInterrupts();
+    void executeNextOpcode();
     
     /**
      * Resets the registers, program counter, and stack pointer to their
@@ -111,6 +105,7 @@ public:
     void setLogging(bool log) {mLogging = log;}
     
 private:
+    Emulator* mEmulator;            // A pointer to the hosting emulator
     Memory* mMemory;                // A pointer to main memory
     Registers mRegisters;           // The registers for the CPU
     word mProgramCounter;           // Range is [0, 0xFFFF]
@@ -124,13 +119,19 @@ private:
     
     bool mLogging;
     
+    /**
+     * Called during the emulation loop. Gives the CPU a chance to handle
+     * any interrupts that were requested since the last time they were handled.
+     */
+    void handleInterrupts();
+    
     // Stack helper functions
     void pushWordOntoStack(word word);
     word popWordOffStack();
     
     // Instruction helpers
-    int executeInstruction(byte opcode);
-    int executeExtendedInstruction();
+    void executeInstruction(byte opcode);
+    void executeExtendedInstruction();
     byte getImmediateByte();
     word getImmediateWord();
     inline byte readByte(const word address);
@@ -154,10 +155,11 @@ private:
     void CPU_16BIT_ADD(word source, word& dest);
     void CPU_16BIT_ADD(word& dest);
     
-    int CPU_JUMP_IMMEDIATE(bool useCondition, int flag, bool condition);
-    int CPU_JUMP(bool useCondition, int flag, bool condition);
-    int CPU_CALL(bool useCondition, int flag, bool condition);
-    int CPU_RETURN(bool useCondition, int flag, bool condition);
+    void CPU_JUMP_IMMEDIATE(bool useCondition, int flag, bool condition);
+    void CPU_JUMP(bool useCondition, int flag, bool condition);
+    void CPU_CALL(bool useCondition, int flag, bool condition);
+    void CPU_RETURN_CC(bool condition);
+    void CPU_RETURN();
     void CPU_RESTART(byte n);
     
     void CPU_CPL();
