@@ -92,7 +92,7 @@ public:
     /**
      * Called during the emulation loop. Executes a single instruction.
      */
-    void executeNextOpcode();
+    void update();
     
     /**
      * Resets the registers, program counter, and stack pointer to their

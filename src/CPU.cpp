@@ -38,7 +38,7 @@ void CPU::reset(bool skipBIOS)
     mLogging = false;   
 }
 
-void CPU::executeNextOpcode()
+void CPU::update()
 {
     // When the program counter gets to 0x100, it's a sign that the BIOS has
     // completed. Tell the memory unit so it knows what to do.

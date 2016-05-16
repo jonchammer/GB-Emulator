@@ -41,31 +41,15 @@ void Emulator::update()
     // Respect the user's desire to pause emulation
     if (mPaused) return;
     
-//    const int MAX_CYCLES = 69905; // Or 70221?
-//    int cyclesThisUpdate = 0;
-//    
-//    while (cyclesThisUpdate < MAX_CYCLES)
-//    {
-//        int cycles = mCPU->executeNextOpcode();
-//        cyclesThisUpdate += cycles;
-//        
-//        mMemory->updateTimers(cycles);
-//        mGraphics->update(cycles);
-//        mSound->update(cycles);
-//        
-//        cyclesThisUpdate += mCPU->handleInterrupts();
-//    }
-    
     // The gameboy can execute 4194304 cycles in one second. At 60 fps,
     // we need to execute exactly 69905 cycles per frame.
     const int MAX_CYCLES = 69905;
     
+    // The cycle count is updated by the 'sync' function, which is called by
+    // the CPU one or more times during an update step.
     mCycleCount = 0;
-    
     while (mCycleCount < MAX_CYCLES)
-    {
-        mCPU->executeNextOpcode();
-    }
+        mCPU->update();
 }
 
 void Emulator::sync(int cycles)

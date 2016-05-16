@@ -63,8 +63,6 @@ public:
      */
     void reset(bool skipBIOS = false);
     
-    void sync(int cycles);
-    
     // Adjust 'paused' state
     void togglePaused()         { mPaused = !mPaused; }
     void setPaused(bool paused) { mPaused = paused;   }
@@ -85,7 +83,13 @@ private:
     Sound* mSound;       // Handles sound processing
     bool mPaused;        // True if emulation should be frozen
     
+    // Keeps track of how many cycles have been processed this second
     int mCycleCount;
+    
+    // This function is called by the CPU for each part of an instruction.
+    // We forward the information to each of the other components.
+    friend class CPU;
+    void sync(int cycles);
 };
 
 #endif /* EMULATOR_H */
