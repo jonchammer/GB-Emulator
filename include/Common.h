@@ -79,8 +79,8 @@ const int BUTTON_START  = 7;
 
 // Colors (ARGB)
 const int WHITE      = 0xFFFFFFFF;
-const int LIGHT_GRAY = 0xFFCCCCCC;
-const int DARK_GRAY  = 0xFF777777;
+const int LIGHT_GRAY = 0xFFAAAAAA;
+const int DARK_GRAY  = 0xFF555555;
 const int BLACK      = 0xFF000000;
 
 // Bit twiddling routines

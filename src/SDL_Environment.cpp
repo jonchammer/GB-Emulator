@@ -9,8 +9,8 @@
 #include "SDL.h"
 #include "Sound/StreamingAudioQueue.h"
 
-const int DEFAULT_WINDOW_WIDTH  = 640;
-const int DEFAULT_WINDOW_HEIGHT = 480;
+const int DEFAULT_WINDOW_WIDTH  = SCREEN_WIDTH_PIXELS  * 4;
+const int DEFAULT_WINDOW_HEIGHT = SCREEN_HEIGHT_PIXELS * 4;
 
 // Globals
 Emulator* em;  // The emulator that is being used
@@ -51,6 +51,7 @@ bool handleEvents()
                     
                     // Misc.
                     case SDLK_p: em->togglePaused(); break;
+                    case SDLK_g: em->getGraphics()->toggleGrid(); break;
                 }
                 break;
             }

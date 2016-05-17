@@ -11,6 +11,7 @@
 Graphics::Graphics(Memory* memory) : mMemory(memory), mScanlineCounter(0)
 {
     mScreenData = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4];
+    reset();
 }
 
 Graphics::~Graphics()
@@ -157,7 +158,7 @@ void Graphics::drawScanLine()
     if (testBit(control, 0))
         renderTiles();
     
-    if (testBit(control, 1))
+    if (testBit(control, 1));
         renderSprites();
 }
 
@@ -274,6 +275,14 @@ void Graphics::renderTiles()
         mScreenData[index + 1] = (color >>  8) & 0xFF; // Green
         mScreenData[index + 2] = (color      ) & 0xFF; // Blue
         mScreenData[index + 3] = 0xFF;                 // Alpha
+        
+//        if (mShowGrid && (pixel % 8 == 0 || yCoord % 8 == 0))
+//        {
+//            mScreenData[index]     = 0x00;
+//            mScreenData[index + 1] = 0x00;
+//            mScreenData[index + 2] = 0x00;
+//            mScreenData[index + 3] = 0xFF;
+//        }
     }
 }
 
@@ -284,10 +293,14 @@ void Graphics::renderSprites()
     if (testBit(mMemory->read(LCD_CONTROL_REGISTER), 2))
         ySize = 16;
     
-    int scanline = mMemory->read(SCANLINE_ADDRESS);
+    int scanline    = mMemory->read(SCANLINE_ADDRESS);
+    int spriteCount = 0;
     
     for (int sprite = 0; sprite < 40; ++sprite)
     {
+        // The gameboy can only render 10 sprites on one scanline
+        if (spriteCount >= 10) break;
+        
         // Sprite occupies 4 bytes in the sprite attributes table
         byte index        = sprite * 4;
         int yPos          = mMemory->read(0xFE00 + index) - 16;
@@ -301,6 +314,7 @@ void Graphics::renderSprites()
         // Is this sprite drawn on this scanline?
         if ((scanline >= yPos) && (scanline < (yPos + ySize)))
         {
+            spriteCount++;
             int line = scanline - yPos;
             
             // Read the sprite in backwards in the y axis

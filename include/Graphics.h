@@ -51,10 +51,13 @@ public:
      */
     byte* getScreenData() { return mScreenData; }
     
+    void toggleGrid() {mShowGrid = !mShowGrid;}
+    
 private:
     Memory* mMemory;      // A pointer to the main memory unit.
     byte* mScreenData;    // Screen buffer (RGBA). Size is SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4.
     int mScanlineCounter; // Keeps track of when to move to the next scanline
+    bool mShowGrid;
     
     // Helper functions
     void setLCDStatus();
