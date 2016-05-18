@@ -86,7 +86,6 @@ void Graphics::update(int clockDelta)
 			for (int i = 0; i < 144; i++)
 				memset(mBackBuffer[i], 0x0, sizeof(mBackBuffer[0][0]) * 160);
 			mNewFrameReady = true;
-            //cout << "LCD OFF" << endl;
 			continue;
 		}
 		

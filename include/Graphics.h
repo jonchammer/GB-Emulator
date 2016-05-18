@@ -19,11 +19,11 @@ class Graphics
 {
 public:
 
-    // Memory locations
+    // Important memory locations
     const static word VRAM_START = 0x8000;
     const static word VRAM_END   = 0x9FFF;
     const static word OAM_START  = 0xFE00;
-    const static word OAM_END    = 0xFEFF;
+    const static word OAM_END    = 0xFE9F;
     const static word LCDC       = 0xFF40;
     const static word STAT       = 0xFF41;
     const static word SCY        = 0xFF42;
@@ -50,7 +50,7 @@ public:
     // LCD controller modes in the STAT register
     enum GameboyLCDModes
     {
-        GBLCDMODE_OAM = 2,    // OAM is being used ($FE00-$FE9F). CPU cannot access the OAM during this period
+        GBLCDMODE_OAM    = 2, // OAM is being used ($FE00-$FE9F). CPU cannot access the OAM during this period
 
         GBLCDMODE_OAMRAM = 3, // Both the OAM and VRAM are being used. The CPU cannot access either during this period
                               // This is where all rendering is done. Lasts for (172 + (SCX % 8) + Sprites) cycles
