@@ -120,7 +120,16 @@ byte Memory::read(word address) const
         word newAddress = address - 0xA000;
         return mRAMBanks[newAddress + (mMBC->getCurrentRAMBank() * 0x2000)];
     }
-    
+        
+    // Graphics access
+    else if (((address >= Graphics::VRAM_START) && (address <= Graphics::VRAM_END)) ||
+             ((address >= Graphics::OAM_START)  && (address <= Graphics::OAM_END))  ||
+             ((address >= Graphics::LCDC)       && (address <= Graphics::WX))       ||
+             ((address == Graphics::VBK))                                           ||
+             ((address >= Graphics::HDMA1)      && (address <= Graphics::HDMA5))    ||
+             ((address >= Graphics::BGPI)       && (address <= Graphics::OBPD)))       
+        return mEmulator->getGraphics()->read(address);
+        
     // Trap to hook in to joypad
     else if (address == JOYPAD_STATUS_ADDRESS)
     {
@@ -166,7 +175,16 @@ void Memory::write(word address, byte data)
         // Writing here is a signal the game should be saved.
         mUpdateSave = true;
     }
-    
+
+    // Graphics access
+    else if (((address >= Graphics::VRAM_START) && (address <= Graphics::VRAM_END)) ||
+             ((address >= Graphics::OAM_START)  && (address <= Graphics::OAM_END))  ||
+             ((address >= Graphics::LCDC)       && (address <= Graphics::WX))       ||
+             ((address == Graphics::VBK))                                           ||
+             ((address >= Graphics::HDMA1)      && (address <= Graphics::HDMA5))    ||
+             ((address >= Graphics::BGPI)       && (address <= Graphics::OBPD))) 
+        mEmulator->getGraphics()->write(address, data);
+
     // Writing to ECHO ram also writes to normal RAM
     else if ( (address >= 0xE000) && (address < 0xFE00) )
     {
@@ -195,14 +213,6 @@ void Memory::write(word address, byte data)
     // Trap divider register
     else if (address == DIVIDER_REGISTER)
         mMainMemory[DIVIDER_REGISTER] = 0;
-    
-    // Writing to the scanline register resets it
-    else if (address == SCANLINE_ADDRESS)
-        mMainMemory[address] = 0;
-    
-    // Take care of direct memory access
-    else if (address == DMA_TRANSFER_ADDRESS)
-        handleDMATransfer(data);
     
     // Sound access
     else if (address >= 0xFF10 && address < 0xFF40)
@@ -278,19 +288,6 @@ void Memory::handleDividerRegister(int cycles)
         mDividerCounter = 0;
         mMainMemory[DIVIDER_REGISTER]++;
     }
-}
- 
-void Memory::handleDMATransfer(byte data)
-{
-    word address = data << 8; // Multiply by 0x100
-    
-    // Copy the data from 0xFE00 to the location given by address
-    // We should use the read()/write() mechanism, but directly
-    // manipulating the memory array will save a lot of overhead,
-    // especially because there will be no special behavior for
-    // this section of memory.
-    for (int i = 0; i < 0xA0; ++i)
-        mMainMemory[0xFE00 + i] = mMainMemory[address + i];
 }
 
 bool Memory::loadCartridge(const string& filename)

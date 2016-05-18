@@ -146,9 +146,6 @@ private:
     // Private functions to handle timing updates
     void handleDividerRegister(int cycles);
     void setClockFrequency();
-    
-    // Private functions to handle Direct Memory Access
-    void handleDMATransfer(byte data);
 };
 
 #endif /* MEMORY_H */

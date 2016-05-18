@@ -51,7 +51,7 @@ bool handleEvents()
                     
                     // Misc.
                     case SDLK_p: em->togglePaused(); break;
-                    case SDLK_g: em->getGraphics()->toggleGrid(); break;
+                    //case SDLK_g: em->getGraphics()->toggleGrid(); break;
                 }
                 break;
             }

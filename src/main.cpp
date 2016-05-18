@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 {
     //string game = "../roms/tests/sprite_test_01/sprite_test_01.gb";
     string game = "../roms/Links_Awakening.gb";
-
+    
     // The save file has the same name with a .sav extension.
     int dot = game.find_last_of('.');
     string save = game.substr(0, dot) + ".sav";

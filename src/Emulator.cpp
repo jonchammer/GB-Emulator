@@ -12,7 +12,7 @@ Emulator::Emulator(bool skipBIOS) : mPaused(false)
     // Create the Memory and CPU
     mMemory   = new Memory(this, skipBIOS);
     mCPU      = new CPU(this, mMemory, skipBIOS); 
-    mGraphics = new Graphics(mMemory);
+    mGraphics = new Graphics(mMemory, false, false, RGBPALETTE_BLACKWHITE);
     mInput    = new Input(mMemory);
     mSound    = new Sound(mMemory, skipBIOS, 44100, 1024);
 }
@@ -41,9 +41,9 @@ void Emulator::update()
     // Respect the user's desire to pause emulation
     if (mPaused) return;
     
-    // The gameboy can execute 4194304 cycles in one second. At 60 fps,
-    // we need to execute exactly 69905 cycles per frame.
-    const int MAX_CYCLES = 69905;
+    // The gameboy can execute 4194304 cycles in one second. At ~59.73 fps,
+    // we need to execute 70224 cycles per frame.
+    const int MAX_CYCLES = 70224;
     
     // The cycle count is updated by the 'sync' function, which is called by
     // the CPU one or more times during an update step.
