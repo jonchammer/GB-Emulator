@@ -14,8 +14,8 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    //string game = "../roms/tests/sprite_test_01/sprite_test_01.gb";
-    string game = "../roms/Pokemon_Gold.gbc";
+    //string game = "../roms/c.gb";
+    string game = "../roms/Links_Awakening.gb";
     
     // The save file has the same name with a .sav extension.
     int dot = game.find_last_of('.');
@@ -33,7 +33,8 @@ int main(int argc, char** argv)
 
     // Try to load the save file too.
     emulator.getMemory()->loadSave(save);
-        
+     
+//    emulator.getInput()->keyPressed(BUTTON_START);
 //    emulator.getCPU()->setLogging(true);
 //    while (true)
 //    {

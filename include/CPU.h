@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 #include "Common.h"
 using namespace std;
 
@@ -102,7 +103,14 @@ public:
      */
     void reset(bool skipBIOS);
     
-    void setLogging(bool log) {mLogging = log;}
+    void setLogging(bool log) 
+    {
+        mLogging = log;
+        
+        if (mLogging)
+            mLogOut.open("log.txt");
+        else mLogOut.close();
+    }
     
 private:
     Emulator* mEmulator;            // A pointer to the hosting emulator
@@ -118,6 +126,7 @@ private:
     int mPendingInterruptDisabled;  // We have received an instruction to disable interrupts soon.
     
     bool mLogging;
+    ofstream mLogOut;
     
     /**
      * Called during the emulation loop. Gives the CPU a chance to handle

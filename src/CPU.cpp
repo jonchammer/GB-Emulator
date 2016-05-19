@@ -49,17 +49,17 @@ void CPU::update()
     if (mLogging)
     {
         cin.get();
-        cout << "PC: "; printHex(cout, mProgramCounter); cout << endl;
-        cout << "Op: "; printHex(cout, opcode); cout << endl;
-        cout << "AF: "; printHex(cout, mRegisters.af); cout << endl;
-        cout << "BC: "; printHex(cout, mRegisters.bc); cout << endl;
-        cout << "DE: "; printHex(cout, mRegisters.de); cout << endl;
-        cout << "HL: "; printHex(cout, mRegisters.hl); cout << endl;
-        cout << "SP: "; printHex(cout, mStackPointer.reg); cout << endl;
+        mLogOut << "PC: "; printHex(mLogOut, mProgramCounter);
+        mLogOut << " Op: "; printHex(mLogOut, opcode);
+        mLogOut << " AF: "; printHex(mLogOut, mRegisters.af);
+        mLogOut << " BC: "; printHex(mLogOut, mRegisters.bc);
+        mLogOut << " DE: "; printHex(mLogOut, mRegisters.de);
+        mLogOut << " HL: "; printHex(mLogOut, mRegisters.hl);
+        mLogOut << " SP: "; printHex(mLogOut, mStackPointer.reg);
         
-        cout << "p1: "; printHex(cout, mMemory->read(mProgramCounter + 1)); cout << endl;
-        cout << "p2: "; printHex(cout, mMemory->read(mProgramCounter + 2)); cout << endl;
-        cout << endl;
+        mLogOut << " p1: "; printHex(mLogOut, mMemory->read(mProgramCounter + 1));
+        mLogOut << " p2: "; printHex(mLogOut, mMemory->read(mProgramCounter + 2));
+        mLogOut << endl;
     }
 
     if (!mHalt)
@@ -67,6 +67,15 @@ void CPU::update()
         //cout << "Executing: "; printOpcode(cout, opcode); cout << endl;
         mProgramCounter++;
         executeInstruction(opcode);
+        
+        // Emulation of the halt bug in the original gameboy. When a halt occurs
+        // while interrupts are disabled, the following byte is repeated. For example,
+        // HALT 0x2 0x4 will execute as HALT 0x2 0x2 0x4.
+        if (mHaltBug)
+        {
+            mHaltBug = false;
+            mProgramCounter--;
+        }
     }
     
     // If we executed instruction 0xF3 or 0xFB, the program wants to enable
@@ -244,7 +253,7 @@ void CPU::executeInstruction(byte opcode)
     switch (opcode)
     {
         case 0x00: return;               // No-OP
-        case 0x76: mHalt = true; return; // HALT
+        case 0x76: CPU_HALT(); return;   // HALT
         case 0x10: return;               // STOP
         
         // Simple 8-bit loads
@@ -543,6 +552,8 @@ void CPU::executeInstruction(byte opcode)
         {
             cerr << "Opcode not recognized: ";
             printHex(cerr, opcode);
+            cerr << ", Program Counter: ";
+            printHex(cerr, mProgramCounter - 1);
             cerr << endl;
         }
     }
@@ -1341,20 +1352,19 @@ void CPU::CPU_HALT()
 {
     if (!mHalt)
     {
+        mHalt = true;
+        
+        // Check for the halt bug. Interrupts must be disabled and there must be at least one pending interrupt.
         if (!mInterruptMaster && (mMemory->read(INTERRUPT_ENABLED_REGISTER) & mMemory->read(INTERRUPT_REQUEST_REGISTER) & 0x1F))
         {
-            // if GCB, return 4 clock cycles
+            // if GCB, the halt bug was fixed. All HALTS are followed by NOPs automatically.
+            //if (mGBC)
+            //    mEmulator->sync(4);
             
-            // if GB...
-            mHaltBug = true;
-        }
-        else
-        {
-            mHalt = true;
-            mProgramCounter--;
+            //else
+                mHaltBug = true;
         }
     }
-    else mProgramCounter--;
 }
 
 // ---- END CPU INSTRUCTION IMPLEMENTATIONS ---- //
