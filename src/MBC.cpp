@@ -6,11 +6,7 @@ void MBC1::write(word address, byte data)
     if (address < 0x2000)
     {
         // Isolate the low nibble. 'A' means enable RAM banking, '0' means disable it.
-        byte testData = data & 0xF;
-        if (testData == 0xA)
-            mEnableRAM = true;
-        else if (testData == 0x0)
-            mEnableRAM = false;
+        mEnableRAM = ((data & 0x0F) == 0x0A);
     }
     
     // Do ROM Bank change
@@ -51,7 +47,7 @@ void MBC1::write(word address, byte data)
         else 
         {
             // Isolate the lower 2 bits (there are only 4 RAM banks total)
-            mCurrentRAMBank = data & 0x3;
+            mCurrentRAMBank = data & 0x3;  
         }
     }
     
@@ -60,8 +56,7 @@ void MBC1::write(word address, byte data)
     {
         // The last bit determines if we enter ROM mode or RAM mode.
         // 0 == ROM mode, 1 == RAM mode
-        byte newData = data & 0x1;
-        mROMBanking  = (newData == 0);
+        mROMBanking  = (data & 0x1 == 0);
         
         // When in ROM Mode, the gameboy can only use RAM bank 0
         if (mROMBanking)

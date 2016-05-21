@@ -100,6 +100,8 @@ public:
      */
     string getCartridgeName();
     
+    void printCartridgeInfo();
+    
     /**
      * Called by the CPU to inform us that we've reached the end of the BIOS.
      */

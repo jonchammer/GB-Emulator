@@ -14,8 +14,8 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    //string game = "../roms/c.gb";
-    string game = "../roms/Links_Awakening.gb";
+    //string game = "../roms/tests/OAMBug/2-causes.gb";
+    string game = "../roms/Kirby.gb";
     
     // The save file has the same name with a .sav extension.
     int dot = game.find_last_of('.');
@@ -29,8 +29,13 @@ int main(int argc, char** argv)
         cout << "Unable to load game." << endl;
         return 1;
     }
-    else cout << "Game loaded: " << emulator.getMemory()->getCartridgeName() << endl;
-
+    else 
+    {
+        cout << "Game loaded: " << emulator.getMemory()->getCartridgeName() << endl;
+        
+        emulator.getMemory()->printCartridgeInfo();
+    }
+    
     // Try to load the save file too.
     emulator.getMemory()->loadSave(save);
      

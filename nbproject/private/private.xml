@@ -12,11 +12,11 @@
         <group>
             <file>file:/D:/My%20Documents/NetBeansProjects/GB_Emulator/include/Common.h</file>
             <file>file:/D:/My%20Documents/NetBeansProjects/GB_Emulator/src/main.cpp</file>
+            <file>file:/D:/My%20Documents/NetBeansProjects/GB_Emulator/src/SDL_Environment.cpp</file>
             <file>file:/D:/My%20Documents/NetBeansProjects/GB_Emulator/include/CPU.h</file>
             <file>file:/D:/My%20Documents/NetBeansProjects/GB_Emulator/src/Memory.cpp</file>
-            <file>file:/D:/My%20Documents/NetBeansProjects/GB_Emulator/include/Memory.h</file>
+            <file>file:/D:/My%20Documents/NetBeansProjects/GB_Emulator/include/Graphics.h</file>
             <file>file:/D:/My%20Documents/NetBeansProjects/GB_Emulator/src/CPU.cpp</file>
-            <file>file:/D:/My%20Documents/NetBeansProjects/GB_Emulator/src/Emulator.cpp</file>
         </group>
     </open-files>
 </project-private>

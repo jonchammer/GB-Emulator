@@ -46,8 +46,88 @@ void CPU::update()
     
     byte opcode = readByte(mProgramCounter);
     
-    if (mLogging)
+    if (mLogging && !mTestLog.eof())
     {
+        static long line = 0;
+       // static bool mainSeen = false;
+        
+        line++;
+        string tmp;
+        
+        // Registers
+        mTestLog >> tmp; mTestLog >> tmp;
+        word pc = (word) strtol(tmp.substr(2, 4).c_str(), NULL, 16);
+        mTestLog >> tmp; mTestLog >> tmp;
+        word sp = (word) strtol(tmp.substr(2, 4).c_str(), NULL, 16);
+        mTestLog >> tmp; mTestLog >> tmp;
+        byte a = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
+        mTestLog >> tmp; mTestLog >> tmp;
+        byte b = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
+        mTestLog >> tmp; mTestLog >> tmp;
+        byte c = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
+        mTestLog >> tmp; mTestLog >> tmp;
+        byte d = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
+        mTestLog >> tmp; mTestLog >> tmp;
+        byte e = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
+        mTestLog >> tmp; mTestLog >> tmp;
+        byte h = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
+        mTestLog >> tmp; mTestLog >> tmp;
+        byte l = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
+        
+        // Flags
+        byte flags = 0x0;
+        mTestLog >> tmp;
+        if (tmp[0] == 'Z')
+            flags = setBit(flags, FLAG_ZERO);
+        if (tmp[1] == 'N')
+            flags = setBit(flags, FLAG_NEG);
+        if (tmp[2] == 'H')
+            flags = setBit(flags, FLAG_HALF);
+        if (tmp[3] == 'C')
+            flags = setBit(flags, FLAG_CARRY);
+        
+        // Op code
+        mTestLog >> tmp;
+        byte op = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
+        
+        // Ignore the rest of the line
+        getline(mTestLog, tmp);
+        
+        word af = a << 8 | flags;
+        word bc = b << 8 | c;
+        word de = d << 8 | e;
+        word hl = h << 8 | l;
+        
+        //if (pc == 0x0297) mainSeen = true;
+        
+        //if (mainSeen)
+       // {
+            //if (mProgramCounter != pc /*|| opcode != op || mRegisters.af != af || mRegisters.bc != bc || mRegisters.de != de || mRegisters.hl != hl*/ || mStackPointer.reg != sp)
+        if (line >= 142116)    
+        {
+                printf("LINE: %d\n", line);
+                cout << "EXPECTED: ";
+                cout << "PC: "; printHex(cout, pc); 
+                cout << " Op: "; printHex(cout, op); 
+                cout << " AF: "; printHex(cout, af);
+                cout << " BC: "; printHex(cout, bc);
+                cout << " DE: "; printHex(cout, de); 
+                cout << " HL: "; printHex(cout, hl);
+                cout << " SP: "; printHex(cout, sp); cout << endl;
+
+                cout << "GOT:      ";
+                cout << "PC: "; printHex(cout, mProgramCounter); 
+                cout << " Op: "; printHex(cout, opcode); 
+                cout << " AF: "; printHex(cout, mRegisters.af);
+                cout << " BC: "; printHex(cout, mRegisters.bc);
+                cout << " DE: "; printHex(cout, mRegisters.de); 
+                cout << " HL: "; printHex(cout, mRegisters.hl);
+                cout << " SP: "; printHex(cout, mStackPointer.reg); cout << endl;
+                cout << endl;
+            }
+        //}
+                
+        /*
         cin.get();
         mLogOut << "PC: "; printHex(mLogOut, mProgramCounter);
         mLogOut << " Op: "; printHex(mLogOut, opcode);
@@ -59,7 +139,7 @@ void CPU::update()
         
         mLogOut << " p1: "; printHex(mLogOut, mMemory->read(mProgramCounter + 1));
         mLogOut << " p2: "; printHex(mLogOut, mMemory->read(mProgramCounter + 2));
-        mLogOut << endl;
+        mLogOut << endl;*/
     }
 
     if (!mHalt)

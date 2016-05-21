@@ -107,8 +107,14 @@ void Memory::reset(bool skipBIOS)
 
 byte Memory::read(word address) const
 {
+    // Read from BIOS memory
+    if (mInBIOS && address < 0x100)
+    {
+        return BIOS[address];
+    }
+    
     // Read from the correct ROM memory bank
-    if ( (address >= 0x4000) && (address <= 0x7FFF) )
+    else if ( (address >= 0x4000) && (address <= 0x7FFF) )
     {
         word newAddress = address - 0x4000;
         return mCartridgeMemory[newAddress + (mMBC->getCurrentROMBank() * 0x4000)];
@@ -117,8 +123,12 @@ byte Memory::read(word address) const
     // Read from the correct RAM memory bank
     else if ( (address >= 0xA000) && (address <= 0xBFFF) )
     {
-        word newAddress = address - 0xA000;
-        return mRAMBanks[newAddress + (mMBC->getCurrentRAMBank() * 0x2000)];
+        if (mMBC->isRAMEnabled())
+        {
+            word newAddress = address - 0xA000;
+            return mRAMBanks[newAddress + (mMBC->getCurrentRAMBank() * 0x2000)];
+        }
+        else return 0x00;
     }
         
     // Graphics access
@@ -133,19 +143,13 @@ byte Memory::read(word address) const
     // Trap to hook in to joypad
     else if (address == JOYPAD_STATUS_ADDRESS)
     {
-        return mEmulator->getInput()->getJoypadState();;
+        return mEmulator->getInput()->getJoypadState();
     }
     
     // Sound access
     else if (address >= 0xFF10 && address < 0xFF40)
     {
         return mEmulator->getSound()->read(address);
-    }
-    
-    // Read from BIOS memory
-    else if (mInBIOS && address < 0x100)
-    {
-        return BIOS[address];
     }
     
     // Read from main memory
@@ -163,6 +167,15 @@ void Memory::write(word address, byte data)
     // a bank issue. We need to handle it.
     if (address < 0x8000) mMBC->write(address, data);
 
+    // Graphics access
+    else if (((address >= Graphics::VRAM_START) && (address <= Graphics::VRAM_END)) ||
+             ((address >= Graphics::OAM_START)  && (address <= Graphics::OAM_END))  ||
+             ((address >= Graphics::LCDC)       && (address <= Graphics::WX))       ||
+             ((address == Graphics::VBK))                                           ||
+             ((address >= Graphics::HDMA1)      && (address <= Graphics::HDMA5))    ||
+             ((address >= Graphics::BGPI)       && (address <= Graphics::OBPD))) 
+        mEmulator->getGraphics()->write(address, data);
+    
     // Write to the current RAM Bank, but only if RAM banking has been enabled.
     else if ( (address >= 0xA000) && (address < 0xC000) )
     {
@@ -176,20 +189,19 @@ void Memory::write(word address, byte data)
         mUpdateSave = true;
     }
 
-    // Graphics access
-    else if (((address >= Graphics::VRAM_START) && (address <= Graphics::VRAM_END)) ||
-             ((address >= Graphics::OAM_START)  && (address <= Graphics::OAM_END))  ||
-             ((address >= Graphics::LCDC)       && (address <= Graphics::WX))       ||
-             ((address == Graphics::VBK))                                           ||
-             ((address >= Graphics::HDMA1)      && (address <= Graphics::HDMA5))    ||
-             ((address >= Graphics::BGPI)       && (address <= Graphics::OBPD))) 
-        mEmulator->getGraphics()->write(address, data);
+    // Writing to working RAM also writes to ECHO RAM
+    else if ((address >= 0xC000) && (address < 0xE000))
+    {
+        mMainMemory[address] = data;
+        if (address >= 0xC000 && address <= 0xDDFF)
+            mMainMemory[address + 0x2000] = data;
+    }
 
     // Writing to ECHO ram also writes to normal RAM
     else if ( (address >= 0xE000) && (address < 0xFE00) )
     {
         mMainMemory[address] = data;
-        write(address - 0x2000, data);
+        mMainMemory[address - 0x2000] = data;
     }
     
     // This area is restricted
@@ -213,7 +225,7 @@ void Memory::write(word address, byte data)
     // Trap divider register
     else if (address == DIVIDER_REGISTER)
         mMainMemory[DIVIDER_REGISTER] = 0;
-    
+
     // Sound access
     else if (address >= 0xFF10 && address < 0xFF40)
         mEmulator->getSound()->write(address, data);
@@ -314,27 +326,43 @@ bool Memory::loadCartridge(const string& filename)
     switch (mCartridgeMemory[0x147])
     {
         //No banking is used (e.g. Tetris)
-        case 0x0: mMBC = new MBC0(); break; 
+        case 0x0: 
+        {
+            mMBC = new MBC0(); 
+            break; 
+        }
         
         // MBC 1
         case 0x1: case 0x2: case 0x3:
-            mMBC = new MBC1(); break;
+        {
+            mMBC = new MBC1(); 
+            break;
+        }
             
         // MBC 2
         case 0x5: case 0x6:
-            mMBC = new MBC2(); break;
+        {
+            mMBC = new MBC2(); 
+            break;
+        }
 
         // MBC 3
         case 0x12: case 0x13: case 0xF: case 0x10: case 0x11:
-            mMBC = new MBC3(); break;
-
+        {
+            mMBC = new MBC3(); 
+            break;
+        }
+        
         // MBC 5
         case 0x19: case 0x1A: case 0x1B: case 0x1C: case 0x1D: case 0x1E:
-            mMBC = new MBC5(); break;
+        {
+            mMBC = new MBC5(); 
+            break;
+        }
         
         default: 
         {
-            cerr << "Unknown ROM Banking method: ";
+            cerr << "Cartridge Type: UNKOWN";
             printHex(cerr, mCartridgeMemory[0x147]);
             cerr << endl;
         }
@@ -344,6 +372,65 @@ bool Memory::loadCartridge(const string& filename)
     memcpy(&mMainMemory[0x0], &mCartridgeMemory[0x0], 0x8000);
     
     return true;
+}
+
+void Memory::printCartridgeInfo()
+{
+    string name     = getCartridgeName();
+    string type     = "UNKNOWN";
+    int numROMBanks = 0;
+    int numRAMBanks = 0;
+    string ROMSize  = "";
+    string RAMSize  = "";
+    bool gbcGame    = false;
+    
+    // Cartridge type
+    switch (mCartridgeMemory[0x147])
+    {
+        case 0x0:                                                         type = "ROM Only"; break; 
+        case 0x1:  case 0x2: case 0x3:                                    type = "MBC1";     break;
+        case 0x5:  case 0x6:                                              type = "MBC2";     break;
+        case 0x12: case 0x13: case 0xF: case 0x10: case 0x11:             type = "MBC3";     break;
+        case 0x19: case 0x1A: case 0x1B: case 0x1C: case 0x1D: case 0x1E: type = "MBC5";     break;
+    }
+    
+    // ROM Banks
+    switch(mCartridgeMemory[0x148])
+    {
+        case 0x00: numROMBanks = 2;   ROMSize = "32 KB";  break;
+        case 0x01: numROMBanks = 4;   ROMSize = "64 KB";  break;
+        case 0x02: numROMBanks = 8;   ROMSize = "128 KB"; break;
+        case 0x03: numROMBanks = 16;  ROMSize = "256 KB"; break;
+        case 0x04: numROMBanks = 32;  ROMSize = "512 KB"; break;
+        case 0x05: numROMBanks = 64;  ROMSize = "1 MB";   break;
+        case 0x06: numROMBanks = 128; ROMSize = "2 MB";   break;
+        case 0x52: numROMBanks = 72;  ROMSize = "1.1 MB"; break;
+        case 0x53: numROMBanks = 80;  ROMSize = "1.2 MB"; break;
+        case 0x54: numROMBanks = 96;  ROMSize = "1.5 MB"; break;
+    }
+    
+    // RAM Banks
+    switch(mCartridgeMemory[0x149])
+    {
+        case 0x00: numRAMBanks = 0;  RAMSize = "None";   break;
+        case 0x01: numRAMBanks = 1;  RAMSize = "2 KB";   break;
+        case 0x02: numRAMBanks = 1;  RAMSize = "8 KB";   break;
+        case 0x03: numRAMBanks = 4;  RAMSize = "32 KB";  break;
+        case 0x04: numRAMBanks = 16; RAMSize = "128 KB"; break;
+    }
+    
+    if ((mCartridgeMemory[0x143] == 0x80) || (mCartridgeMemory[0x143] == 0xC0))
+        gbcGame = true;
+        
+    cout << "----------------------------------------" << endl;
+    cout << "Cartridge Name: " << name << endl;
+    cout << "Cartridge Type: " << type << endl;
+    cout << "ROM Banks:      " << numROMBanks << endl;
+    cout << "ROM Size:       " << ROMSize     << endl;
+    cout << "RAM Banks:      " << numRAMBanks << endl;
+    cout << "RAM Size:       " << RAMSize     << endl;
+    cout << "GBC Support:    " << (gbcGame ? "true" : "false") << endl;
+    cout << "----------------------------------------" << endl;
 }
 
 string Memory::getCartridgeName()

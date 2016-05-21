@@ -11,6 +11,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <cstdlib>
 #include "Common.h"
 using namespace std;
 
@@ -108,8 +109,10 @@ public:
         mLogging = log;
         
         if (mLogging)
-            mLogOut.open("log.txt");
-        else mLogOut.close();
+            mTestLog.open("log.txt");//mLogOut.open("log.txt");
+        else mTestLog.close();//mLogOut.close();
+        
+        
     }
     
 private:
@@ -127,6 +130,7 @@ private:
     
     bool mLogging;
     ofstream mLogOut;
+    ifstream mTestLog;
     
     /**
      * Called during the emulation loop. Gives the CPU a chance to handle
