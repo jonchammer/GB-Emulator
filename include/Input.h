@@ -42,20 +42,19 @@ public:
      */
     void keyReleased(int key);
     
-    /**
-     * Returns a packed representation of the current button states. (Used by
-     * the memory unit).
-     */
-    byte getJoypadState() const;
-    
+    // Memory Access
+    void write(const word address, const byte data);
+    byte read(const word address) const;
+        
     /**
      * Resets the current state of the Input component to its original value.
      */
     void reset();
     
 private:
-    byte mJoypadState;    // Contains the current state of each button (1 per bit). 0 is pressed.
     Memory* mMemory;      // Pointer to the main memory unit.
+    byte mJoypadState;    // Contains the current state of each button (1 per bit). 0 is pressed.
+    byte mJoypadReg;      // The register that contains the information sent to the game
 };
 
 #endif /* INPUT_H */

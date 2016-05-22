@@ -20,6 +20,7 @@ Input::~Input()
 void Input::reset()
 {
     mJoypadState = 0xFF;
+    mJoypadReg   = 0x00;
 }
 
 void Input::keyPressed(int key)
@@ -33,7 +34,7 @@ void Input::keyPressed(int key)
     
     // Is this a standard button or a directional button?
     bool direction = (key <= 3);
-    byte keyReq    = mMemory->readNaive(JOYPAD_STATUS_ADDRESS);
+    byte keyReq    = mJoypadReg;
     
     // If the game has asked for direction information and we have a direction
     // button that has been pressed, issue the joypad interrupt.
@@ -51,25 +52,39 @@ void Input::keyReleased(int key)
     mJoypadState = setBit(mJoypadState, key);
 }
 
-byte Input::getJoypadState() const
+void Input::write(const word address, const byte data)
 {
-    byte result = mMemory->readNaive(JOYPAD_STATUS_ADDRESS);
-    
-    // Set the upper 2 bits
-    result |= 0xC0;
-    
-    // Directions - These are in the lower nibble
-    if (testBit(result, 4))
-    {
-        byte topHalf = mJoypadState >> 4;
-        result |= (topHalf & 0x0F);
-    }
-    
-    // Standard buttons - we have to shift them from the top nibble first
-    else if (testBit(result, 5))
-    {
-        result |= (mJoypadState & 0x0F);        
-    }
+    if (address == JOYPAD_STATUS_ADDRESS)
+        mJoypadReg = data;
+}
 
-    return result;
+byte Input::read(const word address) const
+{
+    if (address == JOYPAD_STATUS_ADDRESS)
+    {
+        byte result = mJoypadReg;
+
+        // Set the upper 2 bits
+        result |= 0xC0;
+
+        // Directions - These are in the lower nibble
+        if (testBit(result, 4))
+        {
+            byte topHalf = mJoypadState >> 4;
+            result |= (topHalf & 0x0F);
+        }
+
+        // Standard buttons - we have to shift them from the top nibble first
+        else if (testBit(result, 5))
+            result |= (mJoypadState & 0x0F);        
+
+        return result;
+    }
+    
+    else 
+    {
+        cerr << "Address "; printHex(cerr, address); 
+        cerr << " does not belong to Joypad." << endl;
+        return 0x00;
+    }
 }

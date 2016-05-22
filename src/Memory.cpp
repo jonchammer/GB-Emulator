@@ -104,10 +104,10 @@ byte Memory::read(word address) const
              ((address >= Graphics::BGPI)       && (address <= Graphics::OBPD)))       
         return mEmulator->getGraphics()->read(address);
         
-    // Trap to hook in to joypad
+    // Joypad I/O
     else if (address == JOYPAD_STATUS_ADDRESS)
     {
-        return mEmulator->getInput()->getJoypadState();
+        return mEmulator->getInput()->read(address);
     }
     
     // Sound access
@@ -184,11 +184,13 @@ void Memory::write(word address, byte data)
     {
         mEmulator->getTimers()->write(address, data);
     }
-    
-    // Trap divider register
-    else if (address == DIVIDER_REGISTER)
-        mMainMemory[DIVIDER_REGISTER] = 0;
 
+    // Joypad I/O
+    else if (address == JOYPAD_STATUS_ADDRESS)
+    {
+        mEmulator->getInput()->write(address, data);
+    }
+    
     // Sound access
     else if (address >= 0xFF10 && address < 0xFF40)
         mEmulator->getSound()->write(address, data);
@@ -198,11 +200,6 @@ void Memory::write(word address, byte data)
     {
         mMainMemory[address] = data;
     }
-}
-
-void Memory::writeNaive(word address, byte data)
-{
-    mMainMemory[address] = data;
 }
 
 void Memory::requestInterrupt(int id)

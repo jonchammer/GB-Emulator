@@ -55,14 +55,6 @@ public:
     void write(word address, byte data);
     
     /**
-     * Write the given data to the given address in memory.
-     * No questions asked. Don't use unless you're sure you
-     * need it. The address must be contained within the
-     * main memory.
-     */
-    void writeNaive(word address, byte data);
-    
-    /**
      * Used by other components when an interrupt is needed.
      * @param id. One of the INTERRUPT_XXX constants defined
      *            in Common.h.
