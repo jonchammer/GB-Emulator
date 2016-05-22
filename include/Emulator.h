@@ -13,6 +13,7 @@
 // Forward declaration of necessary classes
 class CPU;
 class Memory;
+class Timers;
 class Graphics;
 class Input;
 class Sound;
@@ -71,6 +72,7 @@ public:
     // Getters
     CPU* getCPU()           { return mCPU;      }
     Memory* getMemory()     { return mMemory;   }
+    Timers* getTimers()     { return mTimers;   }
     Graphics* getGraphics() { return mGraphics; }
     Input* getInput()       { return mInput;    }
     Sound* getSound()       { return mSound;    }
@@ -78,6 +80,7 @@ public:
 private:
     CPU* mCPU;           // The simulated CPU
     Memory* mMemory;     // The simulated memory unit
+    Timers* mTimers;     // Timer registers
     Graphics* mGraphics; // Handles the scanline rendering
     Input* mInput;       // Handles user input
     Sound* mSound;       // Handles sound processing

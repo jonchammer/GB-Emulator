@@ -1,11 +1,8 @@
+- Super Mario Land won't start.
 - Synchronize the screen buffer so that there is no visual tearing.
 - Finish going through test roms. Code currently fails 01 from Sound1 and Sound2.
 - Sound during BIOS.
-- Rapid transitions between light and dark (esp. during Link's Awakening when entering a dungeon) cause flickering, rather than a smooth transition.
-- Link's Awakening crash after 1st dungeon searching for BowWow.
 - Finish adding RTC support for MBC3.
-- Consider putting ROM/RAM read stuff in MBC classes.
-- Move timer code from Memory to its own unit.
 - Move all emulator updates / rendering to another thread. Only handle events on the main thread.
 - GBC Improvements. GBC games can be run, but it is not well tested.
   + Double speed

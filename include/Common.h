@@ -97,6 +97,7 @@ const int BLACK      = 0xFF000000;
 #include "Memory.h"
 #include "CPU.h"
 #include "Emulator.h"
+#include "Timers.h"
 #include "Graphics.h"
 #include "Input.h"
 #include "Sound.h"

@@ -68,12 +68,7 @@ public:
      *            in Common.h.
      */
     void requestInterrupt(int id);
-    
-    /**
-     * Called once per instruction. Updates the clock timer and the divider register.
-     */
-    void updateTimers(int cycles);
-    
+
     /**
      * Called by the CPU to inform us that we've reached the end of the BIOS.
      */
@@ -88,11 +83,8 @@ public:
      */
     void reset(bool skipBIOS);
     
-    void loadCartridge(Cartridge* cartridge)
-    {
-         mLoadedCartridge = cartridge;
-    }
-    
+    // Cartridge manipulation
+    void loadCartridge(Cartridge* cartridge) { mLoadedCartridge = cartridge; }
     Cartridge* getLoadedCartridge() { return mLoadedCartridge; }
     
 private:
@@ -103,14 +95,6 @@ private:
     byte* mRTCRegister;     // Size is 5 bytes. Only used for MBC3.
     
     bool mInBIOS;           // True if we are in the BIOS.
-
-    int mTimerPeriod;       // Keeps track of the rate at which the timer updates
-    int mTimerCounter;      // Current state of the timer
-    int mDividerCounter;    // Keeps track of the rate at which the divider register updates
-        
-    // Private functions to handle timing updates
-    void handleDividerRegister(int cycles);
-    void setClockFrequency();
 };
 
 #endif /* MEMORY_H */

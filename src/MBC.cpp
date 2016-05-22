@@ -76,11 +76,7 @@ void MBC2::write(word address, byte data)
         if (testBit(address, 4) == 1) return;
         
         // Isolate the low nibble. 'A' means enable RAM banking, '0' means disable it.
-        byte testData = data & 0xF;
-        if (testData == 0xA)
-            mEnableRAM = true;
-        else if (testData == 0x0)
-            mEnableRAM = false;
+        mEnableRAM = ((data & 0x0F) == 0x0A);
     }
     
     // Do ROM Bank change
@@ -98,11 +94,7 @@ void MBC3::write(word address, byte data)
     if (address < 0x2000)
     {
         // Isolate the low nibble. 'A' means enable RAM banking, '0' means disable it.
-        byte testData = data & 0xF;
-        if (testData == 0xA)
-            mEnableRAM = true;
-        else if (testData == 0x0)
-            mEnableRAM = false;
+        mEnableRAM = ((data & 0x0F) == 0x0A);
     }
     
     // Do ROM Bank change
@@ -138,11 +130,7 @@ void MBC5::write(word address, byte data)
     if (address < 0x2000)
     {
         // Isolate the low nibble. 'A' means enable RAM banking, '0' means disable it.
-        byte testData = data & 0xF;
-        if (testData == 0xA)
-            mEnableRAM = true;
-        else if (testData == 0x0)
-            mEnableRAM = false;
+        mEnableRAM = ((data & 0x0F) == 0x0A);
     }
     
     // The entire contents of the data (all 8 bits) are the low 8

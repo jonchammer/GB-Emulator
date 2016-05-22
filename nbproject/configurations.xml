@@ -7,6 +7,7 @@
       </df>
       <in>Cartridge.h</in>
       <in>MBC.h</in>
+      <in>Timers.h</in>
     </df>
     <df root="src" name="1">
       <df name="Sound">
@@ -24,6 +25,7 @@
       <in>Memory.cpp</in>
       <in>SDL_Environment.cpp</in>
       <in>Sound.cpp</in>
+      <in>Timers.cpp</in>
       <in>main.cpp</in>
     </df>
     <logicalFolder name="ExternalFiles"
@@ -75,6 +77,8 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="include/Timers.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/CPU.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Cartridge.cpp" ex="false" tool="1" flavor2="0">
@@ -100,6 +104,8 @@
       <item path="src/Sound/SoundUnit3.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Sound/SoundUnit4.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Timers.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>

@@ -76,12 +76,7 @@ void Memory::reset(bool skipBIOS)
     // Initialize the main memory
     for (int i = 0; i < MAIN_MEMORY_INIT_SIZE; ++i)
         mMainMemory[MAIN_MEMORY_INIT_INDICES[i]] = MAIN_MEMORY_INIT_VALUES[i];
-    
-    // Initialize timing information
-    mDividerCounter  = 0;
-    mTimerPeriod     = 1024;
-    mTimerCounter    = 0;
-    
+        
     // Start out in the BIOS
     mInBIOS = !skipBIOS;
 }
@@ -121,9 +116,16 @@ byte Memory::read(word address) const
         return mEmulator->getSound()->read(address);
     }
     
+    // Timers
+    else if (address == DIVIDER_REGISTER || address == TIMA || address == TMA || address == TAC)
+    {
+        return mEmulator->getTimers()->read(address);
+    }
+    
     else if (address >= 0xFEA0 && address <= 0xFEFF)
     {
         cout << "RESTRICTED READ: "; printHex(cout, address); cout << endl;
+        //return mMainMemory[address];
         return 0x00;
     }
     
@@ -178,15 +180,9 @@ void Memory::write(word address, byte data)
     }
     
     // Setting the timer attributes
-    else if (address == TAC)
+    else if (address == DIVIDER_REGISTER || address == TIMA || address == TMA || address == TAC)
     {
-        // The frequency is specified by the lower 2 bits of TMC
-        byte currentFrequency = read(TAC) & 0x3;
-        mMainMemory[TAC]      = data;
-        byte newFrequency     = data & 0x3;
-        
-        if (currentFrequency != newFrequency)
-            setClockFrequency();
+        mEmulator->getTimers()->write(address, data);
     }
     
     // Trap divider register
@@ -214,57 +210,4 @@ void Memory::requestInterrupt(int id)
     byte req = read(INTERRUPT_REQUEST_REGISTER);
     req      = setBit(req, id);
     write(INTERRUPT_REQUEST_REGISTER, req);
-}
-
-void Memory::updateTimers(int cycles)
-{
-    handleDividerRegister(cycles);
-    
-    // The clock must be enabled for it to be updated
-    // Bit 2 of TMC determines whether the clock is enabled or not
-    if (testBit(read(TAC), 2))
-    {
-        mTimerCounter += cycles;
-        
-        // The timer should be updated
-        if (mTimerCounter >= mTimerPeriod)
-        {
-            int passedPeriods = mTimerCounter / mTimerPeriod;
-            mTimerCounter %= mTimerPeriod;
-            
-            // Timer is about to overflow
-            word TIMAVal = read(TIMA);
-            if (TIMAVal + passedPeriods >= 255)
-            {
-                write(TIMA, TIMAVal + passedPeriods + read(TMA));
-                requestInterrupt(INTERRUPT_TIMER);
-            }
-            
-            // Otherwise update the timer
-            else write(TIMA, TIMAVal + passedPeriods);
-        }
-    }
-}
-
-void Memory::setClockFrequency()
-{
-    // The frequency is specified by the lower 2 bits of TMC
-    byte freq = read(TAC) & 0x3;
-    switch (freq)
-    {
-        case 0 : mTimerPeriod = 1024; break; // Freq = 4096
-        case 1 : mTimerPeriod = 16;   break; // Freq = 262144
-        case 2 : mTimerPeriod = 64;   break; // Freq = 65536
-        case 3 : mTimerPeriod = 256;  break; // Freq = 16382
-    }
-}
-
-void Memory::handleDividerRegister(int cycles)
-{
-    mDividerCounter += cycles;
-    if (mDividerCounter >= 255)
-    {
-        mDividerCounter = 0;
-        mMainMemory[DIVIDER_REGISTER]++;
-    }
 }

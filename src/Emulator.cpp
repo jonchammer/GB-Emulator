@@ -9,9 +9,10 @@
 
 Emulator::Emulator(bool skipBIOS) : mPaused(false)
 {
-    // Create the Memory and CPU
+    // Create the various components we need
     mMemory   = new Memory(this, skipBIOS);
     mCPU      = new CPU(this, mMemory, skipBIOS); 
+    mTimers   = new Timers(mMemory);
     mGraphics = new Graphics(mMemory, false, false, RGBPALETTE_BLACKWHITE);
     mInput    = new Input(mMemory);
     mSound    = new Sound(mMemory, skipBIOS, 44100, 1024);
@@ -21,6 +22,7 @@ Emulator::~Emulator()
 {
     delete mCPU;
     delete mMemory;
+    delete mTimers;
     delete mGraphics;
     delete mInput;
     delete mSound;
@@ -30,6 +32,7 @@ void Emulator::reset(bool skipBIOS)
 {
     mMemory->reset(skipBIOS);
     mCPU->reset(skipBIOS);
+    mTimers->reset();
     mGraphics->reset();
     mInput->reset();
     mSound->reset(skipBIOS);
@@ -55,7 +58,7 @@ void Emulator::update()
 void Emulator::sync(int cycles)
 {
     mGraphics->update(cycles);
-    mMemory->updateTimers(cycles); 
+    mTimers->update(cycles);
     mSound->update(cycles);
     
     mCycleCount += cycles;

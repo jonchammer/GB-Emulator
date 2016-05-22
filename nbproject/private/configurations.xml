@@ -27,6 +27,7 @@
       <in>MBC.h</in>
       <in>Memory.h</in>
       <in>Sound.h</in>
+      <in>Timers.h</in>
     </df>
     <df root="src" name="1">
       <df name="Sound">
@@ -45,6 +46,7 @@
       <in>Memory.cpp</in>
       <in>SDL_Environment.cpp</in>
       <in>Sound.cpp</in>
+      <in>Timers.cpp</in>
       <in>main.cpp</in>
     </df>
   </logicalFolder>

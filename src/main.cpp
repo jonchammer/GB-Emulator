@@ -15,7 +15,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    //string game = "../roms/tests/OAMBug/2-causes.gb";
+    //string game = "../roms/tests/OAMBug/oam_bug.gb";
     string game = "../roms/Super_Mario_Land.gb";
     
     // Create the game cartridge
