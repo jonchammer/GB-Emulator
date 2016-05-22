@@ -11,13 +11,13 @@
 #include <iostream>
 #include <fstream>
 #include "Common.h"
-#include "MBC.h"
+#include "Cartridge.h"
 
 using namespace std;
 
 // Forward declaration of necessary classes
 class Emulator;
-class MBC;
+class Cartridge;
 
 class Memory 
 {
@@ -75,34 +75,6 @@ public:
     void updateTimers(int cycles);
     
     /**
-     * Load the given .gb file into the cartrdige memory.
-     * @param filename The name of the .gb file (including extension)
-     * @return         True if we were able to read the cartridge. False otherwise.
-     */
-    bool loadCartridge(const string& filename);
-    
-    /**
-     * Loads the given save file so the player can pick up where he left off.
-     * @param filename The name of the .sav file (usually the same as the game name)
-     * @return         True if the load was successful. False otherwise.
-     */
-    bool loadSave(const string& filename);
-    
-    /**
-     * Saves the current state of the RAM banks into a file (.sav). 
-     * @param filename The name of the .sav file (usually the same as the game name)
-     * @return         True if the save was successful. False otherwise.
-     */
-    bool saveGame(const string& filename);
-   
-    /**
-     * Reads the name of the game from cartridge memory into a string.
-     */
-    string getCartridgeName();
-    
-    void printCartridgeInfo();
-    
-    /**
      * Called by the CPU to inform us that we've reached the end of the BIOS.
      */
     void exitBIOS() {mInBIOS = false;}
@@ -116,35 +88,26 @@ public:
      */
     void reset(bool skipBIOS);
     
-    // TODO: this whole process is hacky. See if there's a better alternative.
-    void updateSave() {if (mUpdateSave) {saveGame(mSaveName); mUpdateSave = false;}}
+    void loadCartridge(Cartridge* cartridge)
+    {
+         mLoadedCartridge = cartridge;
+    }
+    
+    Cartridge* getLoadedCartridge() { return mLoadedCartridge; }
     
 private:
     Emulator* mEmulator;
+    Cartridge* mLoadedCartridge;
     
-    byte* mCartridgeMemory; // Size is 2048 KB, range is [0, 0x1F FFFF]
     byte* mMainMemory;      // Size is   64 KB, range is [0, 0xFFFF]
-    byte* mRAMBanks;        // Size is   32 KB (4 banks x 8KB)
     byte* mRTCRegister;     // Size is 5 bytes. Only used for MBC3.
     
     bool mInBIOS;           // True if we are in the BIOS.
-    MBC* mMBC;              // A pointer to the current MBC unit (varies based on cartridge type)
 
     int mTimerPeriod;       // Keeps track of the rate at which the timer updates
     int mTimerCounter;      // Current state of the timer
     int mDividerCounter;    // Keeps track of the rate at which the divider register updates
-    
-    bool mUpdateSave;       // When true, the save file will be updated
-    string mSaveName;       // The name of the save file.
-    
-    // Private functions that are used to handle bank updates
-    void handleBanking(word address, byte data);
-    void enableRAMWriting(word address, byte data);
-    void changeLoROMBank(byte data);
-    void changeHiROMBank(byte data);
-    void changeRAMBank(byte data);
-    void changeROMRAMMode(byte data);
-    
+        
     // Private functions to handle timing updates
     void handleDividerRegister(int cycles);
     void setClockFrequency();

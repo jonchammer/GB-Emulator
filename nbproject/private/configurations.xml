@@ -19,6 +19,7 @@
         <in>SweepUnit.h</in>
       </df>
       <in>CPU.h</in>
+      <in>Cartridge.h</in>
       <in>Common.h</in>
       <in>Emulator.h</in>
       <in>Graphics.h</in>
@@ -35,6 +36,7 @@
         <in>SoundUnit4.cpp</in>
       </df>
       <in>CPU.cpp</in>
+      <in>Cartridge.cpp</in>
       <in>Emulator.cpp</in>
       <in>GL_Render.cpp</in>
       <in>Graphics.cpp</in>

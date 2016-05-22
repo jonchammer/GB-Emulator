@@ -5,6 +5,7 @@
       <df name="Sound">
         <in>StreamingAudioQueue.h</in>
       </df>
+      <in>Cartridge.h</in>
       <in>MBC.h</in>
     </df>
     <df root="src" name="1">
@@ -15,6 +16,7 @@
         <in>SoundUnit4.cpp</in>
       </df>
       <in>CPU.cpp</in>
+      <in>Cartridge.cpp</in>
       <in>Emulator.cpp</in>
       <in>Graphics.cpp</in>
       <in>Input.cpp</in>
@@ -64,6 +66,8 @@
           <preBuildCommand>cmake -G "MSYS Makefiles" ..</preBuildCommand>
         </preBuild>
       </makefileType>
+      <item path="include/Cartridge.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/MBC.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/Sound/StreamingAudioQueue.h"
@@ -72,6 +76,8 @@
             flavor2="0">
       </item>
       <item path="src/CPU.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Cartridge.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Emulator.cpp" ex="false" tool="1" flavor2="0">
       </item>

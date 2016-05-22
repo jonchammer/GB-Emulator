@@ -100,7 +100,7 @@ void updateFPS(SDL_Window* window)
         SDL_SetWindowTitle(window, titleBuffer);
         
         // Save the game if the game has asked for it
-        em->getMemory()->updateSave();
+        em->getMemory()->getLoadedCartridge()->save();
     }
 }
 
@@ -161,7 +161,7 @@ void soundFunc(void* udata, short* buffer, int length)
 void startEmulation(int argc, char** argv, Emulator* emulator)
 {
     em    = emulator;
-    title = em->getMemory()->getCartridgeName();
+    title = em->getMemory()->getLoadedCartridge()->getCartridgeInfo().name;
     
     // Initialize SDL    
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)

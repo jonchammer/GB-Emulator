@@ -10,42 +10,34 @@
 
 #include "Memory.h"
 #include "Emulator.h"
+#include "Cartridge.h"
 using namespace std;
 
 int main(int argc, char** argv)
 {
     //string game = "../roms/tests/OAMBug/2-causes.gb";
-    string game = "../roms/Kirby.gb";
+    string game = "../roms/Super_Mario_Land.gb";
     
-    // The save file has the same name with a .sav extension.
-    int dot = game.find_last_of('.');
-    string save = game.substr(0, dot) + ".sav";
+    // Create the game cartridge
+    Cartridge cartridge;
+    if (!cartridge.load(game))
+    {
+        cerr << "Unable to load game: " << game << endl;
+        return 1;
+    }
     
     // Create the emulator and load the ROM
     Emulator emulator(true);
-    
-    if (!emulator.getMemory()->loadCartridge(game))
-    {
-        cout << "Unable to load game." << endl;
-        return 1;
-    }
-    else 
-    {
-        cout << "Game loaded: " << emulator.getMemory()->getCartridgeName() << endl;
-        
-        emulator.getMemory()->printCartridgeInfo();
-    }
-    
-    // Try to load the save file too.
-    emulator.getMemory()->loadSave(save);
-     
-//    emulator.getInput()->keyPressed(BUTTON_START);
-//    emulator.getCPU()->setLogging(true);
-//    while (true)
-//    {
-//        emulator.update();
-//    }
-    
+    emulator.getMemory()->loadCartridge(&cartridge);
+    cartridge.printInfo();
+  
+////    emulator.getInput()->keyPressed(BUTTON_START);
+////    emulator.getCPU()->setLogging(true);
+////    while (true)
+////    {
+////        emulator.update();
+////    }
+//    
     // Start the emulation
     startEmulation(argc, argv, &emulator);
     
