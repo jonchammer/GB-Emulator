@@ -123,8 +123,8 @@ byte Memory::read(word address) const
     
     else if (address >= 0xFEA0 && address <= 0xFEFF)
     {
-        cout << "RESTRICTED READ?" << endl;
-        return mMainMemory[address];
+        cout << "RESTRICTED READ: "; printHex(cout, address); cout << endl;
+        return 0x00;
     }
     
     // Read from main memory
@@ -139,7 +139,7 @@ byte Memory::readNaive(word address) const
 void Memory::write(word address, byte data)
 {
     // An attempt to write to ROM means that we're dealing with
-    // a bank issue. We need to handle it.
+    // a bank issue. Let the cartridge deal with it.
     if (address < 0x8000) mLoadedCartridge->write(address, data);
 
     // Graphics access
@@ -151,7 +151,7 @@ void Memory::write(word address, byte data)
              ((address >= Graphics::BGPI)       && (address <= Graphics::OBPD))) 
         mEmulator->getGraphics()->write(address, data);
     
-    // Write to the current RAM Bank, but only if RAM banking has been enabled.
+    // Write to the current RAM Bank
     else if ( (address >= 0xA000) && (address < 0xC000) )
         mLoadedCartridge->write(address, data);
 
@@ -173,8 +173,8 @@ void Memory::write(word address, byte data)
     // This area is restricted
     else if ( (address >= 0xFEA0) && (address < 0xFEFF) )
     {
-        cout << "RESTRICTED AREA" << endl;
-        mMainMemory[address] = data;
+        //cout << "RESTRICTED WRITE: "; printHex(cout, address); cout << endl;
+        //mMainMemory[address] = data;
     }
     
     // Setting the timer attributes

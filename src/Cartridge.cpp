@@ -16,17 +16,15 @@ void Cartridge::write(const word address, const byte data)
     // An attempt to write to ROM means that we're dealing with
     // a bank issue. We need to handle it.
     if (address < 0x8000)
-    {
         mMBC->write(address, data);
-    }
     
     // Write to the current RAM Bank, but only if RAM banking has been enabled.
     else if ( (address >= 0xA000) && (address < 0xC000) )
     {
         if (mMBC->isRAMEnabled())
         {
-            word newAddress = address - 0xA000;
-            mRAMBanks[newAddress + (mMBC->getCurrentRAMBank() * 0x2000)] = data;
+            word newAddress = (address - 0xA000) + (mMBC->getCurrentRAMBank() * 0x2000);
+            mRAMBanks[newAddress] = data;
         }
         
         // Writing here is a signal the game should be saved, assuming the game can
@@ -46,14 +44,12 @@ byte Cartridge::read(const word address) const
     else if (address >= 0x4000 && address < 0x8000)
         return mData[(address - 0x4000) + (mMBC->getCurrentROMBank() * 0x4000)];
     
-    // Read from the correct RAM memory bank
+    // Read from the correct RAM memory bank, but only if RAM has been enabled
     else if ( (address >= 0xA000) && (address <= 0xBFFF) )
     {
         if (mMBC->isRAMEnabled())
-        {
-            word newAddress = address - 0xA000;
-            return mRAMBanks[newAddress + (mMBC->getCurrentRAMBank() * 0x2000)];
-        }
+            return mRAMBanks[(address - 0xA000) + (mMBC->getCurrentRAMBank() * 0x2000)];
+
         else return 0x00;
     }
 }

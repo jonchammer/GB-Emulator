@@ -1,6 +1,6 @@
 /* 
  * File:   Cartridge.h
- * Author: Jon
+ * Author: Jon C. Hammer
  *
  * Created on May 21, 2016, 7:40 PM
  */
