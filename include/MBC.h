@@ -9,13 +9,16 @@
 #define MBC_H
 
 #include "Common.h"
+#include "Cartridge.h"
+
+class Cartridge;
 
 // Common base class for all MBC chips. Each subclass is free to implement
 // banking however is desired, but the interface is the same.
 class MBC
 {
 public:
-    MBC() : mCurrentROMBank(1), mCurrentRAMBank(0), mEnableRAM(false) {}
+    MBC(Cartridge* owner) : mOwner(owner), mCurrentROMBank(1), mCurrentRAMBank(0), mEnableRAM(false) {}
     
     virtual void write(word address, byte data) = 0;
     
@@ -23,6 +26,7 @@ public:
     word getCurrentRAMBank() { return mCurrentRAMBank; }
     bool isRAMEnabled()      { return mEnableRAM;      }
 protected:
+    Cartridge* mOwner;
     word mCurrentROMBank;
     word mCurrentRAMBank;
     bool mEnableRAM;
@@ -32,6 +36,7 @@ protected:
 class MBC0 : public MBC
 {
 public:
+    MBC0(Cartridge* owner) : MBC(owner) {}
     void write(word address, byte data) {}
 };
 
@@ -39,7 +44,7 @@ public:
 class MBC1 : public MBC
 {
 public:
-    MBC1() : mROMBanking(true) {}
+    MBC1(Cartridge* owner) : MBC(owner), mROMBanking(true) {}
     void write(word address, byte data);
 private:
     bool mROMBanking;
@@ -50,6 +55,7 @@ private:
 class MBC2 : public MBC
 {
 public:
+    MBC2(Cartridge* owner) : MBC(owner) {}
     void write(word address, byte data);
 };
 
@@ -57,6 +63,7 @@ public:
 class MBC3 : public MBC
 {
 public:
+    MBC3(Cartridge* owner) : MBC(owner) {}
     void write(word address, byte data);
 };
 
@@ -64,6 +71,7 @@ public:
 class MBC5 : public MBC
 {
 public:
+    MBC5(Cartridge* owner) : MBC(owner) {}
     void write(word address, byte data);
 };
 

@@ -15,9 +15,9 @@ void MBC1::write(word address, byte data)
         // Put the lower 5 bits into the current ROM Bank.
         // The next 2 bits (5,6) can be set in changeHiROMBank
         byte lower5 = data & 0x1F; // Isolate the lower 5 bits
-        mCurrentROMBank &= 0xE0;   // Disable the lower 5 bits
+        mCurrentROMBank &= 0x60;   // Disable the lower 5 bits, leaving bits 5 and 6
         mCurrentROMBank |= lower5;
-        
+
         // Any access to these banks is invalid. The next bank is the one that should
         // be used
         if (mCurrentROMBank == 0x0 || mCurrentROMBank == 0x20 || mCurrentROMBank == 0x40 || mCurrentROMBank == 0x60) 
@@ -30,30 +30,33 @@ void MBC1::write(word address, byte data)
         // ROM Bank change
         if (mROMBanking)
         {
-            // Disable the upper 3 bits of the current ROM bank
-            mCurrentROMBank &= 0x1F;
+            // The upper bits can only be set if there are enough ROM banks to handle it
+            if (mOwner->getCartridgeInfo().numROMBanks > 32)
+            {
+                // Disable the upper 3 bits of the current ROM bank
+                mCurrentROMBank &= 0x1F;
 
-            // Disable the lower 5 bits of the data (leaving the upper 3 bits))
-            data &= 0xE0;
-            mCurrentROMBank |= data;
+                // The lower 2 bits represent bits 5 and 6 of the ROM bank
+                mCurrentROMBank |= ((data & 0x03) << 5);
 
-            // Any access to these banks is invalid. The next bank is the one that should
-            // be used
-            if (mCurrentROMBank == 0x0 || mCurrentROMBank == 0x20 || mCurrentROMBank == 0x40 || mCurrentROMBank == 0x60) 
-                mCurrentROMBank++;
+                // Any access to these banks is invalid. The next bank is the one that should
+                // be used
+                if (mCurrentROMBank == 0x0 || mCurrentROMBank == 0x20 || mCurrentROMBank == 0x40 || mCurrentROMBank == 0x60) 
+                    mCurrentROMBank++;
+            }
         }
 
         // RAM Bank change
         else 
         {
             // Isolate the lower 2 bits (there are only 4 RAM banks total)
-            mCurrentRAMBank = data & 0x3;  
+            mCurrentRAMBank = data & 0x03;  
         }
     }
     
     // This will change whether we are doing ROM banking or RAM banking
     else if ( (address >= 0x6000) && (address < 0x8000) )
-    {
+    { 
         // The last bit determines if we enter ROM mode or RAM mode.
         // 0 == ROM mode, 1 == RAM mode
         mROMBanking  = (data & 0x1 == 0);

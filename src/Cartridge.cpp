@@ -23,8 +23,17 @@ void Cartridge::write(const word address, const byte data)
     {
         if (mMBC->isRAMEnabled())
         {
-            word newAddress = (address - 0xA000) + (mMBC->getCurrentRAMBank() * 0x2000);
-            mRAMBanks[newAddress] = data;
+            if (mMBC->getCurrentRAMBank() < mInfo.numRAMBanks)
+            {
+                word newAddress = (address - 0xA000) + (mMBC->getCurrentRAMBank() * 0x2000);
+                mRAMBanks[newAddress] = data;
+            }
+            
+            else 
+            {
+                cerr << "Illegal RAM bank write. Accessing data from RAM Bank " << mMBC->getCurrentRAMBank() <<
+                " when there are only " << mInfo.numRAMBanks << " banks." << endl;
+            }
         }
         
         // Writing here is a signal the game should be saved, assuming the game can
@@ -42,14 +51,34 @@ byte Cartridge::read(const word address) const
     
     // Read from the current ROM Bank
     else if (address >= 0x4000 && address < 0x8000)
-        return mData[(address - 0x4000) + (mMBC->getCurrentROMBank() * 0x4000)];
+    {
+        if (mMBC->getCurrentROMBank() < mInfo.numROMBanks)
+            return mData[(address - 0x4000) + (mMBC->getCurrentROMBank() * 0x4000)];
+        
+        else 
+        {
+            cerr << "Illegal ROM bank read. Accessing data from ROM Bank " << mMBC->getCurrentROMBank() <<
+                " when there are only " << mInfo.numROMBanks << " banks." << endl;
+            return 0x00;
+        }
+    }
     
     // Read from the correct RAM memory bank, but only if RAM has been enabled
     else if ( (address >= 0xA000) && (address <= 0xBFFF) )
     {
         if (mMBC->isRAMEnabled())
-            return mRAMBanks[(address - 0xA000) + (mMBC->getCurrentRAMBank() * 0x2000)];
-
+        {
+            if (mMBC->getCurrentRAMBank() < mInfo.numRAMBanks)
+                return mRAMBanks[(address - 0xA000) + (mMBC->getCurrentRAMBank() * 0x2000)];
+            
+            else
+            {
+                cerr << "Illegal RAM bank read. Accessing data from RAM Bank " << mMBC->getCurrentRAMBank() <<
+                " when there are only " << mInfo.numRAMBanks << " banks." << endl;
+                return 0x00;
+            }
+        }
+        
         else return 0x00;
     }
 }
@@ -83,11 +112,11 @@ bool Cartridge::load(const string& filename, const string* saveFilename)
         // Assign an MBC unit
         switch (mInfo.type)
         {
-            case TYPE_ROM_ONLY: mMBC = new MBC0(); break;
-            case TYPE_MBC1:     mMBC = new MBC1(); break;
-            case TYPE_MBC2:     mMBC = new MBC2(); break;
-            case TYPE_MBC3:     mMBC = new MBC3(); break;
-            case TYPE_MBC5:     mMBC = new MBC5(); break;
+            case TYPE_ROM_ONLY: mMBC = new MBC0(this); break;
+            case TYPE_MBC1:     mMBC = new MBC1(this); break;
+            case TYPE_MBC2:     mMBC = new MBC2(this); break;
+            case TYPE_MBC3:     mMBC = new MBC3(this); break;
+            case TYPE_MBC5:     mMBC = new MBC5(this); break;
         }
         
         // Create the RAM Banks. Use value initialization to make sure all cells
