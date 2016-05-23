@@ -1,7 +1,7 @@
 #include "Sound.h"
 #include <algorithm>
 
-Sound::Sound(Memory* memory, const bool &CGB, const bool skipBIOS, int sampleRate, int sampleBufferLength):
+Sound::Sound(Memory* memory, const bool skipBIOS, const bool &CGB, int sampleRate, int sampleBufferLength):
     mSound1GlobalToggle(1),
     mSound2GlobalToggle(1),
     mSound3GlobalToggle(1),
@@ -192,26 +192,27 @@ byte Sound::read(const word address) const
        
 void Sound::reset(const bool skipBIOS)
 {
-    mSound1->reset(skipBIOS);
-	mSound2->reset(skipBIOS);
-	mSound3->reset(skipBIOS);
-	mSound4->reset(skipBIOS);
-
-	NR50Changed(0, true);
-	NR51Changed(0, true);
-	mAllSoundEnabled     = 0;
+    mAllSoundEnabled     = 0;
 	mFrameSequencerClock = 0;
 	mFrameSequencerStep  = 1;
 	mSampleCounter       = 0;
 	mSampleBufferPos     = 0;
     
-    // Initialize variables for BIOS
-    if (!skipBIOS)
+    mSound1->reset(skipBIOS);
+	mSound2->reset(skipBIOS);
+	mSound3->reset(skipBIOS);
+	mSound4->reset(skipBIOS);
+
+    mNR50 = 0xFF;
+    mNR51 = 0xFF;
+	
+    // Initialize variables differently if we've skipped over the BIOS
+    if (skipBIOS)
     {
+        mAllSoundEnabled = 1;
         NR50Changed(0x77, true);
         NR51Changed(0xF3, true);
         NR52Changed(0xF1);
-        mAllSoundEnabled = 1;
     }
 }
 

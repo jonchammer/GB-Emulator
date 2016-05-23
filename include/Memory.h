@@ -55,11 +55,6 @@ public:
     void requestInterrupt(int id);
 
     /**
-     * Called by the CPU to inform us that we've reached the end of the BIOS.
-     */
-    void exitBIOS() {mInBIOS = false;}
-    
-    /**
      * Resets the contents of the memory to its default values. This also
      * unloads any currently loaded ROMs, so loadCartridge() will have to
      * be called again.

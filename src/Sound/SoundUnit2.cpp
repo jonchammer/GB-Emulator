@@ -43,19 +43,17 @@ short SoundUnit2::getWaveRightOutput()
 
 void SoundUnit2::reset(const bool skipBIOS)
 {
-	NR21Changed(0, true);
-	NR22Changed(0, true);
-	NR23Changed(0, true);
-	NR24Changed(0, true);
+	NR21Changed(0xFF, true);
+	NR22Changed(0xFF, true);
+	NR23Changed(0xFF, true);
+	NR24Changed(0xFF, true);
 
 	mStatusBit = 0;
-    if (!skipBIOS)
+    if (skipBIOS)
     {
-//        NR21Changed(0x3F, true);
-//        NR22Changed(0x00, true);
-//        NR24Changed(0xBF, true);
-        NR21Changed(0x80, true);
-        NR22Changed(0xF3, true);
+        NR21Changed(0x3F, true);
+        NR22Changed(0x00, true);
+        NR24Changed(0xBF, true);
     }
 }
 

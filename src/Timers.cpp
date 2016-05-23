@@ -1,10 +1,10 @@
 #include "Timers.h"
 
-Timers::Timers(Memory* memory) : mMemory(memory) 
+Timers::Timers(Memory* memory, bool skipBIOS) : mMemory(memory) 
 {
     // Attach this component to the memory at the correct locations
     mMemory->attachComponent(this, 0xFF04, 0xFF07);
-    reset();
+    reset(skipBIOS);
 }
     
 void Timers::write(const word address, const byte data)
@@ -77,7 +77,7 @@ void Timers::update(int cycles)
     }
 }
 
-void Timers::reset()
+void Timers::reset(bool skipBIOS)
 {
     // Initialize timing information
     mDividerCounter  = 0;
@@ -89,6 +89,12 @@ void Timers::reset()
     mTIMA       = 0x0;
     mTMA        = 0x0;
     mTAC        = 0x0;
+    
+    if (skipBIOS)
+    {
+        mDividerReg = 0xAB;
+        mTAC        = 0xF8;
+    }
 }
 
 void Timers::setClockFrequency()

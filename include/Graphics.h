@@ -75,13 +75,13 @@ public:
         LCDMODE_LYXX_OAMRAM
     };
 
-    Graphics(Memory* memory, const bool &_CGB, const bool &_CGBDoubleSpeed, DMGPalettes palette = RGBPALETTE_REAL);
+    Graphics(Memory* memory, bool skipBIOS, const bool &_CGB, const bool &_CGBDoubleSpeed, DMGPalettes palette = RGBPALETTE_REAL);
     
     ~Graphics();
     
     void update(int clockDelta);
 
-    void reset();
+    void reset(bool skipBIOS);
     
     void emulateBIOS();
 

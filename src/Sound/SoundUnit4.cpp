@@ -43,19 +43,20 @@ short SoundUnit4::getWaveRightOutput()
 
 void SoundUnit4::reset(const bool skipBIOS)
 {
-	NR41Changed(0, true);
-	NR42Changed(0, true);
-	NR43Changed(0, true);
-	NR44Changed(0, true);
+	NR41Changed(0xFF, true);
+	NR42Changed(0xFF, true);
+	NR43Changed(0xFF, true);
+	NR44Changed(0xFF, true);
 
 	mlfsr.reset();
 	mEnvelope.reset();
 	mLengthCounter.reset();
 	mStatusBit = 0;
     
-    if (!skipBIOS)
+    if (skipBIOS)
     {
-        NR41Changed(0xFF, true);
+        NR42Changed(0x00, true);
+        NR43Changed(0x00, true);
         NR44Changed(0xBF, true);
     }
 }

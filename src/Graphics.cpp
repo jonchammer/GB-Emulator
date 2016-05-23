@@ -9,7 +9,7 @@
 #define SET_LCD_MODE(value) {mSTAT &= 0xFC; mSTAT |= (value);}
 #define GET_TILE_PIXEL(VRAMAddr, x, y) ((((mVRAM[(VRAMAddr) + (y) * 2 + 1] >> (7 - (x))) & 0x1) << 1) | ((mVRAM[(VRAMAddr) + (y) * 2] >> (7 - (x))) & 0x1))
 
-Graphics::Graphics(Memory* memory, const bool &_CGB, const bool &_CGBDoubleSpeed, DMGPalettes palette) :
+Graphics::Graphics(Memory* memory, bool skipBIOS, const bool &_CGB, const bool &_CGBDoubleSpeed, DMGPalettes palette) :
     mMemory(memory),
     mBackgroundGlobalToggle(true),
     mWindowsGlobalToggle(true),
@@ -26,7 +26,7 @@ Graphics::Graphics(Memory* memory, const bool &_CGB, const bool &_CGBDoubleSpeed
     mMemory->attachComponent(this, 0xFF68, 0xFF6B); // GBC Registers
     
     mScreenBuffer = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4];
-	reset();
+	reset(skipBIOS);
 
 	if (palette == RGBPALETTE_REAL)
 	{
@@ -229,7 +229,7 @@ void Graphics::update(int clockDelta)
 	}
 }
 
-void Graphics::reset()
+void Graphics::reset(bool skipBIOS)
 {
 	memset(mVRAM, 0x0, VRAMBankSize * 2);
 	memset(mOAM, 0x0, 0xFF);
@@ -245,23 +245,25 @@ void Graphics::reset()
 	for (int i = 0; i < 64; i++)
 		mOBPD[i] = rand() % 0x100;
 
-	mLCDC = 0x0;
-	mSTAT = 0x0;
-	mSCY  = 0x0;
-	mSCX  = 0x0;
-	mBGP  = 0x0;
-	mOBP0 = 0x0;
-	mOBP1 = 0x0;
-	mWY   = 0x0;
-	mWX   = 0x0;
+    // LCDC cannot be 0 initially or some games (like Pokemon Red) won't load.
+	mLCDC = 0x91;
+	mSTAT = 0x00;
+	mSCY  = 0x00;
+	mSCX  = 0x00;
+	mBGP  = 0x00;
+	mOBP0 = 0x00;
+	mOBP1 = 0x00;
+	mWY   = 0x00;
+	mWX   = 0x00;
+    mLY   = 0x00;
+	mLYC  = 0x00;
+    
 	mSpriteQueue.clear();
 	mNewFrameReady      = false;
 	mClockCounter       = 0;
 	mClocksToNextState  = 0x0;
 	mScrollXClocks      = 0x0;
 	mLCDCInterrupted    = false;
-	mLY                 = 0x0;
-	mLYC                = 0x0;
 	mLCDMode            = LCDMODE_LYXX_OAM;
 	mDelayedWY          = -1;
 	mWindowLine         = 0;
@@ -277,22 +279,21 @@ void Graphics::reset()
 	mOAMDMAClockCounter = 0;
 	mOAMDMASource       = 0;
 	mOAMDMAProgress     = 0;
-    
-    // LCDC cannot be 0 initially, or some games will not load.
-    emulateBIOS();
-}
-
-void Graphics::emulateBIOS()
-{
-	mLCDC = 0x91;
-	mSCY  = 0x0;
-	mSCX  = 0x0;
-	mLYC  = 0x0;
-	mBGP  = 0xFC;
-	mOBP0 = 0xFF;
-	mOBP1 = 0xFF;
-	mWY   = 0x0;
-	mWX   = 0x0;
+        
+    if (skipBIOS)
+    {
+        mLCDC = 0x91;
+        mSTAT = 0x85;
+        mSCY  = 0x0;
+        mSCX  = 0x0;
+        mLY   = 0x0;
+        mLYC  = 0x0;
+        mBGP  = 0xFC;
+        mOBP0 = 0xFF;
+        mOBP1 = 0xFF;
+        mWY   = 0x0;
+        mWX   = 0x0;
+    }
 }
 
 byte Graphics::read(const word address) const

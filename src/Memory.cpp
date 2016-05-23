@@ -35,7 +35,9 @@ Memory::Memory(Emulator* emulator, bool skipBIOS) : mEmulator(emulator)
     
     // 256 bytes. Used for unused I/O ports, stack space, and interrupts
     mMiscRAM = new byte[0x100];
-       
+    memset(mMiscRAM, 0xFF, 0x7F);
+    memset(mMiscRAM + 0x80, 0x00, 0x40);
+    
     mComponentIndex = 0;
     reset(skipBIOS);
 }
@@ -62,10 +64,6 @@ byte Memory::read(const word address) const
 
     // Check the component map to route most addresses to the component
     // that can actually deal with it.
-    // NOTE: find() returns an iterator to the location of the element
-    // if it was found. The iterator points to a pair object, of which
-    // we want the second part. We can follow that pointer to determine
-    // which component needs to handle this address.
     else if ((component = getComponentForAddress(address)) != NULL)
         return component->read(address);
     
@@ -103,13 +101,14 @@ void Memory::write(const word address, const byte data)
 {
     Component* component = NULL;
     
+    // The last instruction in the BIOS will write 'a' to address
+    // 0xFF50. This is a signal that we have completed the boot.
+    if (address == 0xFF50 && mInBIOS)
+        mInBIOS = false;
+    
     // Check the component map to route most addresses to the component
     // that can actually deal with it.
-    // NOTE: find() returns an iterator to the location of the element
-    // if it was found. The iterator points to a pair object, of which
-    // we want the second part. We can follow that pointer to determine
-    // which component needs to handle this address.
-    if ((component = getComponentForAddress(address)) != NULL)
+    else if ((component = getComponentForAddress(address)) != NULL)
         component->write(address, data);
     
     // Write to working RAM (also used for echo RAM)
@@ -159,9 +158,9 @@ void Memory::loadCartridge(Cartridge* cartridge)
 
 void Memory::attachComponent(Component* component, word startAddress, word endAddress)
 {
-    cout << "Attaching Range: "; 
-    printHex(cout, startAddress); cout << " - "; printHex(cout, endAddress); 
-    cout << " to component: " << component << endl;
+//    cout << "Attaching Range: "; 
+//    printHex(cout, startAddress); cout << " - "; printHex(cout, endAddress); 
+//    cout << " to component: " << component << endl;
     
     mComponentAddresses[2 * mComponentIndex]     = startAddress;
     mComponentAddresses[2 * mComponentIndex + 1] = endAddress;

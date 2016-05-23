@@ -86,7 +86,7 @@ class Sound : public Component
 public:
     
     // Constructors / Destructors
-    Sound(Memory* memory, const bool &_CGB, const bool skipBIOS, int sampleRate = 44100, int sampleBufferLength = 1024);
+    Sound(Memory* memory, const bool skipBIOS, const bool &_CGB, int sampleRate = 44100, int sampleBufferLength = 1024);
     ~Sound();
 
     // Sound lifecycle methods.

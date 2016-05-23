@@ -19,7 +19,7 @@ public:
      * 
      * @param memory.   A pointer to the memory unit of the Gameboy.
      */
-    Input(Memory* memory);
+    Input(Memory* memory, bool skipBIOS);
     
     /**
      * Destructor.
@@ -49,7 +49,7 @@ public:
     /**
      * Resets the current state of the Input component to its original value.
      */
-    void reset();
+    void reset(bool skipBIOS);
     
 private:
     Memory* mMemory;      // Pointer to the main memory unit.

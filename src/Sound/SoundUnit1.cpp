@@ -26,8 +26,7 @@ void SoundUnit1::frameSequencerStep(byte sequencerStep)
 }
 
 short SoundUnit1::getWaveLeftOutput()
-{
-    
+{  
 	short leftSwitch    = (mSoundController.read(NR51) >> 4) & 0x1;
 	short masterVolume  = (mSoundController.read(NR50) >> 4) & 0x7;
 	short envelopeValue = mEnvelope.getEnvelopeValue();
@@ -46,11 +45,11 @@ short SoundUnit1::getWaveRightOutput()
 
 void SoundUnit1::reset(const bool skipBIOS)
 {
-	NR10Changed(0, true);
-	NR11Changed(0, true);
-	NR12Changed(0, true);
-	NR13Changed(0, true);
-	NR14Changed(0, true);
+	NR10Changed(0xFF, true);
+	NR11Changed(0xFF, true);
+	NR12Changed(0xFF, true);
+	NR13Changed(0xFF, true);
+	NR14Changed(0xFF, true);
 
 	mDuty.reset();
 	mSweep.reset();
@@ -59,7 +58,7 @@ void SoundUnit1::reset(const bool skipBIOS)
 	mStatusBit  = 0;
 	mWaveOutput = 0;
     
-    if (!skipBIOS)
+    if (skipBIOS)
     {
         //On DMG after BIOS executes NR52 contains 0xF1 - status bit for sound 1 is set 
         mStatusBit = 1;

@@ -14,19 +14,12 @@ CPU::CPU(Emulator* emulator, Memory* memory, bool skipBIOS) : mEmulator(emulator
 
 void CPU::reset(bool skipBIOS)
 {
-    // Initialize the PC
-    mProgramCounter = 0x0;
-    if (skipBIOS)
-        mProgramCounter = 0x100;
-    
-    // Initialize the stack pointer
+    mProgramCounter   = 0x0;
     mStackPointer.reg = 0xFFFE;
-    
-    // Initialize the registers
-    mRegisters.af = 0x01B0;
-    mRegisters.bc = 0x0013;
-    mRegisters.de = 0x00D8;
-    mRegisters.hl = 0x014D;
+    mRegisters.af     = 0x0000;
+    mRegisters.bc     = 0x0000;
+    mRegisters.de     = 0x0000;
+    mRegisters.hl     = 0x0000;
     
     // Initialize interrupt variables
     mInterruptMaster          = true;
@@ -35,15 +28,20 @@ void CPU::reset(bool skipBIOS)
     mPendingInterruptEnabled  = 0;
     mPendingInterruptDisabled = 0;
     
+    if (skipBIOS)
+    {
+        mProgramCounter = 0x100;
+        mRegisters.af = 0x01B0;
+        mRegisters.bc = 0x0013;
+        mRegisters.de = 0x00D8;
+        mRegisters.hl = 0x014D;
+    }
+
     mLogging = false;   
 }
 
 void CPU::update()
 {
-    // When the program counter gets to 0x100, it's a sign that the BIOS has
-    // completed. Tell the memory unit so it knows what to do.
-    if (mProgramCounter == 0x100) mMemory->exitBIOS();
-    
     byte opcode = readByte(mProgramCounter);
     
     if (mLogging && !mTestLog.eof())

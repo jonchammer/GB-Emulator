@@ -12,10 +12,10 @@ Emulator::Emulator(bool skipBIOS) : mPaused(false)
     // Create the various components we need
     mMemory   = new Memory(this, skipBIOS);
     mCPU      = new CPU(this, mMemory, skipBIOS); 
-    mTimers   = new Timers(mMemory);
-    mGraphics = new Graphics(mMemory, false, false, RGBPALETTE_BLACKWHITE);
-    mInput    = new Input(mMemory);
-    mSound    = new Sound(mMemory, false, skipBIOS, 44100, 1024); 
+    mTimers   = new Timers(mMemory, skipBIOS);
+    mGraphics = new Graphics(mMemory, skipBIOS, false, false, RGBPALETTE_BLACKWHITE);
+    mInput    = new Input(mMemory, skipBIOS);
+    mSound    = new Sound(mMemory, skipBIOS, false, 44100, 1024); 
 }
 
 Emulator::~Emulator()
@@ -32,9 +32,9 @@ void Emulator::reset(bool skipBIOS)
 {
     mMemory->reset(skipBIOS);
     mCPU->reset(skipBIOS);
-    mTimers->reset();
-    mGraphics->reset();
-    mInput->reset();
+    mTimers->reset(skipBIOS);
+    mGraphics->reset(skipBIOS);
+    mInput->reset(skipBIOS);
     mSound->reset(skipBIOS);
 }
 

@@ -7,11 +7,11 @@
 
 #include "Input.h"
 
-Input::Input(Memory* memory) : mMemory(memory)
+Input::Input(Memory* memory, bool skipBIOS) : mMemory(memory)
 {
     // Attach this component to the memory at the correct locations
     mMemory->attachComponent(this, JOYPAD_STATUS_ADDRESS, JOYPAD_STATUS_ADDRESS);
-    reset();
+    reset(skipBIOS);
 }
 
 Input::~Input()
@@ -19,10 +19,10 @@ Input::~Input()
     // Do nothing
 }
 
-void Input::reset()
+void Input::reset(bool skipBIOS)
 {
     mJoypadState = 0xFF;
-    mJoypadReg   = 0x00;
+    mJoypadReg   = 0xCF;
 }
 
 void Input::keyPressed(int key)

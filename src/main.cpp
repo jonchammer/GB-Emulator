@@ -16,7 +16,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
     //string game = "../roms/tests/OAMBug/oam_bug.gb";
-    string game = "../roms/Links_Awakening.gb";
+    string game = "../roms/Pokemon_Red.gb";
     
     // Create the game cartridge
     Cartridge cartridge;
@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     }
     
     // Create the emulator and load the ROM
-    Emulator emulator(true);
+    Emulator emulator(false);
     emulator.getMemory()->loadCartridge(&cartridge);
     cartridge.printInfo();
   

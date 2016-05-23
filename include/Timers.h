@@ -18,7 +18,7 @@ class Timers : public Component
 public:
     
     // Constructors
-    Timers(Memory* memory);
+    Timers(Memory* memory, bool skipBIOS);
     
     // Memory access
     void write(const word address, const byte data);
@@ -26,7 +26,7 @@ public:
     
     // State
     void update(int cycles);
-    void reset();
+    void reset(bool skipBIOS);
     
 private:
     

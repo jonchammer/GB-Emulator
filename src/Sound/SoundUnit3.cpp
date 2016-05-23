@@ -73,11 +73,12 @@ short SoundUnit3::getWaveRightOutput()
 
 void SoundUnit3::reset(const bool skipBIOS)
 {
-	NR30Changed(0, true);
-	NR31Changed(0, true);
-	NR32Changed(0, true);
-	NR33Changed(0, true);
-	NR34Changed(0, true);
+	NR30Changed(0xFF, true);
+	NR31Changed(0xFF, true);
+	NR32Changed(0xFF, true);
+	NR33Changed(0xFF, true);
+	NR34Changed(0xFF, true);
+    
     for (int i = 0; i < 0x10; ++i)
         mWaveRAM[i] = 0;
 
@@ -87,15 +88,12 @@ void SoundUnit3::reset(const bool skipBIOS)
 	mSampleBuffer = 0;
 	mClockCounter = 0;
     
-    // Sound Unit 3 isn't used during the BIOS, so we don't
-    // have to do anything special for it.
-//    if (!skipBIOS)
-//    {
-//        NR30Changed(0x7F, true);
-//        NR31Changed(0xFF, true);
-//        NR32Changed(0x9F, true);
-//        NR34Changed(0xBF, true);
-//    }
+    if (skipBIOS)
+    {
+        NR30Changed(0x7F, true);
+        NR32Changed(0x9F, true);
+        NR34Changed(0xBF, true);
+    }
 }
 
 //While sound 3 is ON Wave pattern RAM can be read or written only when sound 3 reads samples from it
