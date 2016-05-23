@@ -13,7 +13,7 @@ void Timers::write(const word address, const byte data)
     {
         case TAC:
         {
-            // The frequency is specified by the lower 2 bits of TMC
+            // The frequency is specified by the lower 2 bits of TAC
             byte currentFrequency = mTAC & 0x3;
             mTAC                  = data;
             byte newFrequency     = data & 0x3;
@@ -53,7 +53,7 @@ void Timers::update(int cycles)
     handleDividerRegister(cycles);
     
     // The clock must be enabled for it to be updated
-    // Bit 2 of TMC determines whether the clock is enabled or not
+    // Bit 2 of TAC determines whether the clock is enabled or not
     if (testBit(mTAC, 2))
     {
         mTimerCounter += cycles;
@@ -99,7 +99,7 @@ void Timers::reset(bool skipBIOS)
 
 void Timers::setClockFrequency()
 {
-    // The frequency is specified by the lower 2 bits of TMC
+    // The frequency is specified by the lower 2 bits of the TAC
     byte freq = mTAC & 0x3;
     switch (freq)
     {

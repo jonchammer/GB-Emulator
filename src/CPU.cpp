@@ -30,11 +30,11 @@ void CPU::reset(bool skipBIOS)
     
     if (skipBIOS)
     {
-        mProgramCounter = 0x100;
-        mRegisters.af = 0x01B0;
-        mRegisters.bc = 0x0013;
-        mRegisters.de = 0x00D8;
-        mRegisters.hl = 0x014D;
+        mProgramCounter = 0x0100;
+        mRegisters.af   = 0x01B0;
+        mRegisters.bc   = 0x0013;
+        mRegisters.de   = 0x00D8;
+        mRegisters.hl   = 0x014D;
     }
 
     mLogging = false;   

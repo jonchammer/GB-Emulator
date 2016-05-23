@@ -101,7 +101,7 @@ void Memory::write(const word address, const byte data)
 {
     Component* component = NULL;
     
-    // The last instruction in the BIOS will write 'a' to address
+    // The last instruction in the BIOS will write register 'a' to address
     // 0xFF50. This is a signal that we have completed the boot.
     if (address == 0xFF50 && mInBIOS)
         mInBIOS = false;
