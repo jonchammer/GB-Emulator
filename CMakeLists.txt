@@ -3,7 +3,7 @@ project(gb_emulator)
 
 # Add compiler flags here (e.g. -O3, -Wall, etc.)
 # This is also needed to use C++11. "-std=c++11"
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS "-std=c++11 -O3")
 
 # Set the location of the final executable to be where cmake/make are called
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})

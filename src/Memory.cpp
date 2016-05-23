@@ -36,8 +36,7 @@ Memory::Memory(Emulator* emulator, bool skipBIOS) : mEmulator(emulator)
     // 256 bytes. Used for unused I/O ports, stack space, and interrupts
     mMiscRAM = new byte[0x100];
        
-    mComponentMap = new Component*[0x10000]();
-    
+    mComponentIndex = 0;
     reset(skipBIOS);
 }
 
@@ -164,13 +163,20 @@ void Memory::attachComponent(Component* component, word startAddress, word endAd
     printHex(cout, startAddress); cout << " - "; printHex(cout, endAddress); 
     cout << " to component: " << component << endl;
     
-    for (word i = startAddress; i <= endAddress; ++i)
-    {
-        mComponentMap[i] = component;
-    }
+    mComponentAddresses[2 * mComponentIndex]     = startAddress;
+    mComponentAddresses[2 * mComponentIndex + 1] = endAddress;
+    mComponentMap[mComponentIndex]               = component;
+    mComponentIndex++;
 }
 
 Component* Memory::getComponentForAddress(const word address) const
 { 
-    return mComponentMap[address];
+    // Go through the component lists to find one that can handle this address
+    for (int i = 0, j = 0; i < mComponentIndex; i++, j += 2)
+    {
+        if (address >= mComponentAddresses[j] && address <= mComponentAddresses[j + 1])
+            return mComponentMap[i];
+    }
+    
+    return NULL;
 }

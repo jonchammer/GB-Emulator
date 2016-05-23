@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include "Common.h"
 #include "Cartridge.h"
 
@@ -77,13 +78,16 @@ private:
 
     Emulator* mEmulator;
     Cartridge* mLoadedCartridge;
-    Component** mComponentMap;
-
+    
+    word mComponentAddresses[30]; // Holds start, end addresses for the components (interlaced)
+    Component* mComponentMap[15]; // Holds pointers to the actual components
+    int mComponentIndex;          // The index of the last element in the component map
+   
     byte* mInternalRAM;   // Size is 8 KB, range is [0xC000, 0xDFFF] and [0xE000, 0xFDFF] (echo)
     byte* mMiscRAM;       // Size is 256 B, range is [0xFF00, 0xFFFF]. Used for unused I/O Ports, Stack Area, and Interrupts    
     bool mInBIOS;         // True if we are in the BIOS.
     
-    inline Component* getComponentForAddress(const word address) const;
+    Component* getComponentForAddress(const word address) const;
 };
 
 #endif /* MEMORY_H */
