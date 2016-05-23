@@ -7,31 +7,6 @@
 
 #include "Memory.h"
 
-// The size of MAIN_MEMORY_INIT_INDICES and MAIN_MEMORY_INIT_VALUES
-const int MAIN_MEMORY_INIT_SIZE = 31;
-
-// The locations in memory that need to be set
-const int MAIN_MEMORY_INIT_INDICES[] = 
-{
-    0xFF05, 0xFF06, 0xFF07, 0xFF10, 0xFF11, 0xFF12,
-    0xFF14, 0xFF16, 0xFF17, 0xFF19, 0xFF1A, 0xFF1B,
-    0xFF1C, 0xFF1E, 0xFF20, 0xFF21, 0xFF22, 0xFF23,
-    0xFF24, 0xFF25, 0xFF26, 0xFF40, 0xFF42, 0xFF43,
-    0xFF45, 0xFF47, 0xFF48, 0xFF49, 0xFF4A, 0xFF4B,
-    0xFFFF
-};
-
-// The values corresponding to the indices in MAIN_MEMORY_INIT_INDICES
-const byte MAIN_MEMORY_INIT_VALUES[] = 
-{
-    0x00, 0x00, 0x00, 0x80, 0xBF, 0xF3,
-    0xBF, 0x3F, 0x00, 0xBF, 0x7F, 0xFF,
-    0x9F, 0xBF, 0xFF, 0x00, 0x00, 0xBF,
-    0x77, 0xF3, 0xF1, 0x91, 0x00, 0x00,
-    0x00, 0xFC, 0xFF, 0xFF, 0x00, 0x00,
-    0x00
-};
-
 // The Gameboy BIOS
 const byte BIOS[] = 
 {
@@ -55,33 +30,28 @@ const byte BIOS[] =
 
 Memory::Memory(Emulator* emulator, bool skipBIOS) : mEmulator(emulator)
 {
-    // The main memory is 64 KB
-    mMainMemory = new byte[0x10000];
+    // Internal RAM is 8 KB
+    mInternalRAM = new byte[0x2000];
     
-    // The Real Time Clock register is only used for MBC3. It takes the
-    // place of the RAM banks when used.
-    mRTCRegister = new byte[0x5];
-    
+    // 256 bytes. Used for unused I/O ports, stack space, and interrupts
+    mMiscRAM = new byte[0x100];
+       
     reset(skipBIOS);
 }
 
 Memory::~Memory()
 {
-    delete[] mMainMemory;
-    delete[] mRTCRegister;
+    delete[] mInternalRAM;
+    delete[] mMiscRAM;
 }
 
 void Memory::reset(bool skipBIOS)
 {
-    // Initialize the main memory
-    for (int i = 0; i < MAIN_MEMORY_INIT_SIZE; ++i)
-        mMainMemory[MAIN_MEMORY_INIT_INDICES[i]] = MAIN_MEMORY_INIT_VALUES[i];
-        
     // Start out in the BIOS
     mInBIOS = !skipBIOS;
 }
 
-byte Memory::read(word address) const
+byte Memory::read(const word address) const
 {
     unordered_map<word, Component*>::const_iterator it;
     
@@ -98,6 +68,15 @@ byte Memory::read(word address) const
     else if ((it = mComponentMap.find(address)) != mComponentMap.end())
         return ((*it).second)->read(address);
     
+    // Read from internal RAM
+    else if (address >= 0xC000 && address <= 0xDFFF)
+        return mInternalRAM[address - 0xC000];
+    
+    // Read from echo RAM, which uses the same storage as the internal RAM
+    else if (address >= 0xE000 && address <= 0xFDFF)
+        return mInternalRAM[address - 0xE000];
+    
+    // This area is restricted
     else if (address >= 0xFEA0 && address <= 0xFEFF)
     {
         cout << "RESTRICTED READ: "; printHex(cout, address); cout << endl;
@@ -105,16 +84,21 @@ byte Memory::read(word address) const
         return 0x00;
     }
     
-    // Read from main memory
-    else return mMainMemory[address];
+    // Read from misc RAM
+    else if (address >= 0xFF00 && address <= 0xFFFF)
+        return mMiscRAM[address - 0xFF00];
+    
+    // Sanity check
+    else
+    {
+        cerr << "READ: Address not recognized: "; 
+        printHex(cerr, address); 
+        cerr << endl;
+        return 0x00;
+    }
 }
 
-byte Memory::readNaive(word address) const
-{
-    return mMainMemory[address];
-}
-
-void Memory::write(word address, byte data)
+void Memory::write(const word address, const byte data)
 {
     unordered_map<word, Component*>::const_iterator it;
     
@@ -127,32 +111,31 @@ void Memory::write(word address, byte data)
     if ((it = mComponentMap.find(address)) != mComponentMap.end())
         ((*it).second)->write(address, data);
     
-    // Writing to working RAM also writes to ECHO RAM
-    else if ((address >= 0xC000) && (address < 0xE000))
-    {
-        mMainMemory[address] = data;
-        if (address >= 0xC000 && address <= 0xDDFF)
-            mMainMemory[address + 0x2000] = data;
-    }
+    // Write to working RAM (also used for echo RAM)
+    else if (address >= 0xC000 && address <= 0xDFFF)
+        mInternalRAM[address - 0xC000] = data;
 
-    // Writing to ECHO ram also writes to normal RAM
-    else if ( (address >= 0xE000) && (address < 0xFE00) )
-    {
-        mMainMemory[address] = data;
-        mMainMemory[address - 0x2000] = data;
-    }
+    // Write to echo RAM (also used for working RAM)
+    else if (address >= 0xE000 && address <= 0xFDFF)
+        mInternalRAM[address - 0xE000] = data;
     
     // This area is restricted
-    else if ( (address >= 0xFEA0) && (address < 0xFEFF) )
+    else if (address >= 0xFEA0 && address <= 0xFEFF)
     {
         //cout << "RESTRICTED WRITE: "; printHex(cout, address); cout << endl;
         //mMainMemory[address] = data;
     }
 
-    // Unsupervised area
-    else
+    // Write to misc RAM
+    else if (address >= 0xFF00 && address <= 0xFFFF)
+        mMiscRAM[address - 0xFF00] = data;
+    
+    // Sanity check
+    else 
     {
-        mMainMemory[address] = data;
+        cerr << "WRITE: Address not recognized: "; 
+        printHex(cerr, address); 
+        cerr << endl;
     }
 }
 
@@ -166,6 +149,9 @@ void Memory::requestInterrupt(int id)
 void Memory::loadCartridge(Cartridge* cartridge) 
 { 
     mLoadedCartridge = cartridge; 
+    
+    // Make sure to attach the cartridge to the proper addresses so it can
+    // process its reads and writes.
     attachComponent(mLoadedCartridge, 0x0000, 0x7FFF); // ROM
     attachComponent(mLoadedCartridge, 0xA000, 0xBFFF); // RAM
 }

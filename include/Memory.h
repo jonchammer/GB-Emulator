@@ -40,20 +40,12 @@ public:
     /**
      * Read a byte from the given address in memory.
      */
-    byte read(word address) const;
-    
-    /**
-     * Read a byte from the given address in memory.
-     * No questions asked. Don't use unless you're sure you
-     * need it. The address must be contained within the
-     * main memory.
-     */
-    byte readNaive(word address) const;
+    byte read(const word address) const;
     
     /**
      * Write the given data to the given address in memory.
      */
-    void write(word address, byte data);
+    void write(const word address, const byte data);
     
     /**
      * Used by other components when an interrupt is needed.
@@ -87,10 +79,9 @@ private:
     Cartridge* mLoadedCartridge;
     unordered_map<word, Component*> mComponentMap;
     
-    byte* mMainMemory;      // Size is   64 KB, range is [0, 0xFFFF]
-    byte* mRTCRegister;     // Size is 5 bytes. Only used for MBC3.
-    
-    bool mInBIOS;           // True if we are in the BIOS.
+    byte* mInternalRAM;   // Size is 8 KB, range is [0xC000, 0xDFFF] and [0xE000, 0xFDFF] (echo)
+    byte* mMiscRAM;       // Size is 256 B, range is [0xFF00, 0xFFFF]. Used for unused I/O Ports, Stack Area, and Interrupts    
+    bool mInBIOS;         // True if we are in the BIOS.
 };
 
 #endif /* MEMORY_H */
