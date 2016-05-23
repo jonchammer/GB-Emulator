@@ -36,6 +36,8 @@ Memory::Memory(Emulator* emulator, bool skipBIOS) : mEmulator(emulator)
     // 256 bytes. Used for unused I/O ports, stack space, and interrupts
     mMiscRAM = new byte[0x100];
        
+    mComponentMap = new Component*[0x10000]();
+    
     reset(skipBIOS);
 }
 
@@ -53,7 +55,7 @@ void Memory::reset(bool skipBIOS)
 
 byte Memory::read(const word address) const
 {
-    unordered_map<word, Component*>::const_iterator it;
+    Component* component = NULL;
     
     // Read from BIOS memory
     if (mInBIOS && address < 0x100)
@@ -65,8 +67,8 @@ byte Memory::read(const word address) const
     // if it was found. The iterator points to a pair object, of which
     // we want the second part. We can follow that pointer to determine
     // which component needs to handle this address.
-    else if ((it = mComponentMap.find(address)) != mComponentMap.end())
-        return ((*it).second)->read(address);
+    else if ((component = getComponentForAddress(address)) != NULL)
+        return component->read(address);
     
     // Read from internal RAM
     else if (address >= 0xC000 && address <= 0xDFFF)
@@ -100,7 +102,7 @@ byte Memory::read(const word address) const
 
 void Memory::write(const word address, const byte data)
 {
-    unordered_map<word, Component*>::const_iterator it;
+    Component* component = NULL;
     
     // Check the component map to route most addresses to the component
     // that can actually deal with it.
@@ -108,8 +110,8 @@ void Memory::write(const word address, const byte data)
     // if it was found. The iterator points to a pair object, of which
     // we want the second part. We can follow that pointer to determine
     // which component needs to handle this address.
-    if ((it = mComponentMap.find(address)) != mComponentMap.end())
-        ((*it).second)->write(address, data);
+    if ((component = getComponentForAddress(address)) != NULL)
+        component->write(address, data);
     
     // Write to working RAM (also used for echo RAM)
     else if (address >= 0xC000 && address <= 0xDFFF)
@@ -158,6 +160,17 @@ void Memory::loadCartridge(Cartridge* cartridge)
 
 void Memory::attachComponent(Component* component, word startAddress, word endAddress)
 {
+    cout << "Attaching Range: "; 
+    printHex(cout, startAddress); cout << " - "; printHex(cout, endAddress); 
+    cout << " to component: " << component << endl;
+    
     for (word i = startAddress; i <= endAddress; ++i)
-        mComponentMap.insert({i, component});
+    {
+        mComponentMap[i] = component;
+    }
+}
+
+Component* Memory::getComponentForAddress(const word address) const
+{ 
+    return mComponentMap[address];
 }

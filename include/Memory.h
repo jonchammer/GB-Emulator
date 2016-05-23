@@ -10,7 +10,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <unordered_map>
 #include "Common.h"
 #include "Cartridge.h"
 
@@ -75,13 +74,16 @@ public:
     void attachComponent(Component* component, word startAddress, word endAddress);
     
 private:
+
     Emulator* mEmulator;
     Cartridge* mLoadedCartridge;
-    unordered_map<word, Component*> mComponentMap;
-    
+    Component** mComponentMap;
+
     byte* mInternalRAM;   // Size is 8 KB, range is [0xC000, 0xDFFF] and [0xE000, 0xFDFF] (echo)
     byte* mMiscRAM;       // Size is 256 B, range is [0xFF00, 0xFFFF]. Used for unused I/O Ports, Stack Area, and Interrupts    
     bool mInBIOS;         // True if we are in the BIOS.
+    
+    inline Component* getComponentForAddress(const word address) const;
 };
 
 #endif /* MEMORY_H */
