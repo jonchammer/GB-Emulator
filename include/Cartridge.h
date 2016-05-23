@@ -34,7 +34,7 @@ struct CartridgeInfo
     bool gbc;             // True if this cartridge has GBC support.
 };
 
-class Cartridge
+class Cartridge : public Component
 {
 public:
     

@@ -15,7 +15,7 @@ Emulator::Emulator(bool skipBIOS) : mPaused(false)
     mTimers   = new Timers(mMemory);
     mGraphics = new Graphics(mMemory, false, false, RGBPALETTE_BLACKWHITE);
     mInput    = new Input(mMemory);
-    mSound    = new Sound(mMemory, skipBIOS, 44100, 1024);
+    mSound    = new Sound(mMemory, false, skipBIOS, 44100, 1024); 
 }
 
 Emulator::~Emulator()

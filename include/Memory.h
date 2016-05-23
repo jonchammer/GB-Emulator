@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <unordered_map>
 #include "Common.h"
 #include "Cartridge.h"
 
@@ -76,12 +77,15 @@ public:
     void reset(bool skipBIOS);
     
     // Cartridge manipulation
-    void loadCartridge(Cartridge* cartridge) { mLoadedCartridge = cartridge; }
+    void loadCartridge(Cartridge* cartridge);
     Cartridge* getLoadedCartridge() { return mLoadedCartridge; }
+    
+    void attachComponent(Component* component, word startAddress, word endAddress);
     
 private:
     Emulator* mEmulator;
     Cartridge* mLoadedCartridge;
+    unordered_map<word, Component*> mComponentMap;
     
     byte* mMainMemory;      // Size is   64 KB, range is [0, 0xFFFF]
     byte* mRTCRegister;     // Size is 5 bytes. Only used for MBC3.

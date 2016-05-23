@@ -93,6 +93,13 @@ const int BLACK      = 0xFF000000;
 // Misc functions
 #define printHex(out, opcode) ((out) << "0x" << setw(4) << setfill('0') << hex << (int) (opcode))
 
+class Component
+{
+public:
+    virtual void write(const word address, const byte data) = 0;
+    virtual byte read(const word address) const = 0;
+};
+
 // Includes
 #include "Memory.h"
 #include "CPU.h"

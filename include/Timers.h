@@ -13,7 +13,7 @@
 // Forward Declarations
 class Memory;
 
-class Timers
+class Timers : public Component
 {
 public:
     

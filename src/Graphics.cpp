@@ -17,6 +17,14 @@ Graphics::Graphics(Memory* memory, const bool &_CGB, const bool &_CGBDoubleSpeed
     mCGB(_CGB),
     mCGBDoubleSpeed(_CGBDoubleSpeed)
 {
+    // Attach this component to the memory at the correct locations
+    mMemory->attachComponent(this, 0x8000, 0x9FFF); // VRAM
+    mMemory->attachComponent(this, 0xFE00, 0xFE9F); // OAM
+    mMemory->attachComponent(this, 0xFF40, 0xFF4B); // Graphics I/O ports
+    mMemory->attachComponent(this, 0xFF4F, 0xFF4F); // VBK
+    mMemory->attachComponent(this, 0xFF51, 0xFF55); // HDMA
+    mMemory->attachComponent(this, 0xFF68, 0xFF6B); // GBC Registers
+    
     mScreenBuffer = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4];
 	reset();
 
@@ -287,7 +295,7 @@ void Graphics::emulateBIOS()
 	mWX   = 0x0;
 }
 
-byte Graphics::read(word address)
+byte Graphics::read(const word address) const
 {
     if ((address >= VRAM_START) && (address <= VRAM_END))
         return readVRAM(address - VRAM_START);
@@ -371,7 +379,7 @@ void Graphics::writeOAM(byte addr, byte value)
 	}
 }
 
-byte Graphics::readVRAM(word addr)
+byte Graphics::readVRAM(word addr) const
 {
 	if (GET_LCD_MODE() != GBLCDMODE_OAMRAM || !LCD_ON())
 	{
@@ -383,7 +391,7 @@ byte Graphics::readVRAM(word addr)
 	}
 }
 
-byte Graphics::readOAM(byte addr) 
+byte Graphics::readOAM(byte addr) const
 {
 	if (GET_LCD_MODE() == GBLCDMODE_HBLANK || GET_LCD_MODE() == GBLCDMODE_VBLANK || !LCD_ON())
 	{

@@ -11,7 +11,7 @@
 #include "Common.h"
 #include "Memory.h"
 
-class Input 
+class Input : public Component
 {
 public:
     /**

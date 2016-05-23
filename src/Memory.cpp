@@ -83,44 +83,20 @@ void Memory::reset(bool skipBIOS)
 
 byte Memory::read(word address) const
 {
+    unordered_map<word, Component*>::const_iterator it;
+    
     // Read from BIOS memory
     if (mInBIOS && address < 0x100)
         return BIOS[address];
 
-    // Read from the correct ROM memory bank
-    else if ( address < 0x8000 )
-        return mLoadedCartridge->read(address);
-    
-    // Read from the correct RAM memory bank
-    else if ( (address >= 0xA000) && (address <= 0xBFFF) )
-        return mLoadedCartridge->read(address);
-        
-    // Graphics access
-    else if (((address >= Graphics::VRAM_START) && (address <= Graphics::VRAM_END)) ||
-             ((address >= Graphics::OAM_START)  && (address <= Graphics::OAM_END))  ||
-             ((address >= Graphics::LCDC)       && (address <= Graphics::WX))       ||
-             ((address == Graphics::VBK))                                           ||
-             ((address >= Graphics::HDMA1)      && (address <= Graphics::HDMA5))    ||
-             ((address >= Graphics::BGPI)       && (address <= Graphics::OBPD)))       
-        return mEmulator->getGraphics()->read(address);
-        
-    // Joypad I/O
-    else if (address == JOYPAD_STATUS_ADDRESS)
-    {
-        return mEmulator->getInput()->read(address);
-    }
-    
-    // Sound access
-    else if (address >= 0xFF10 && address < 0xFF40)
-    {
-        return mEmulator->getSound()->read(address);
-    }
-    
-    // Timers
-    else if (address == DIVIDER_REGISTER || address == TIMA || address == TMA || address == TAC)
-    {
-        return mEmulator->getTimers()->read(address);
-    }
+    // Check the component map to route most addresses to the component
+    // that can actually deal with it.
+    // NOTE: find() returns an iterator to the location of the element
+    // if it was found. The iterator points to a pair object, of which
+    // we want the second part. We can follow that pointer to determine
+    // which component needs to handle this address.
+    else if ((it = mComponentMap.find(address)) != mComponentMap.end())
+        return ((*it).second)->read(address);
     
     else if (address >= 0xFEA0 && address <= 0xFEFF)
     {
@@ -140,23 +116,17 @@ byte Memory::readNaive(word address) const
 
 void Memory::write(word address, byte data)
 {
-    // An attempt to write to ROM means that we're dealing with
-    // a bank issue. Let the cartridge deal with it.
-    if (address < 0x8000) mLoadedCartridge->write(address, data);
-
-    // Graphics access
-    else if (((address >= Graphics::VRAM_START) && (address <= Graphics::VRAM_END)) ||
-             ((address >= Graphics::OAM_START)  && (address <= Graphics::OAM_END))  ||
-             ((address >= Graphics::LCDC)       && (address <= Graphics::WX))       ||
-             ((address == Graphics::VBK))                                           ||
-             ((address >= Graphics::HDMA1)      && (address <= Graphics::HDMA5))    ||
-             ((address >= Graphics::BGPI)       && (address <= Graphics::OBPD))) 
-        mEmulator->getGraphics()->write(address, data);
+    unordered_map<word, Component*>::const_iterator it;
     
-    // Write to the current RAM Bank
-    else if ( (address >= 0xA000) && (address < 0xC000) )
-        mLoadedCartridge->write(address, data);
-
+    // Check the component map to route most addresses to the component
+    // that can actually deal with it.
+    // NOTE: find() returns an iterator to the location of the element
+    // if it was found. The iterator points to a pair object, of which
+    // we want the second part. We can follow that pointer to determine
+    // which component needs to handle this address.
+    if ((it = mComponentMap.find(address)) != mComponentMap.end())
+        ((*it).second)->write(address, data);
+    
     // Writing to working RAM also writes to ECHO RAM
     else if ((address >= 0xC000) && (address < 0xE000))
     {
@@ -178,23 +148,7 @@ void Memory::write(word address, byte data)
         //cout << "RESTRICTED WRITE: "; printHex(cout, address); cout << endl;
         //mMainMemory[address] = data;
     }
-    
-    // Setting the timer attributes
-    else if (address == DIVIDER_REGISTER || address == TIMA || address == TMA || address == TAC)
-    {
-        mEmulator->getTimers()->write(address, data);
-    }
 
-    // Joypad I/O
-    else if (address == JOYPAD_STATUS_ADDRESS)
-    {
-        mEmulator->getInput()->write(address, data);
-    }
-    
-    // Sound access
-    else if (address >= 0xFF10 && address < 0xFF40)
-        mEmulator->getSound()->write(address, data);
-    
     // Unsupervised area
     else
     {
@@ -207,4 +161,17 @@ void Memory::requestInterrupt(int id)
     byte req = read(INTERRUPT_REQUEST_REGISTER);
     req      = setBit(req, id);
     write(INTERRUPT_REQUEST_REGISTER, req);
+}
+
+void Memory::loadCartridge(Cartridge* cartridge) 
+{ 
+    mLoadedCartridge = cartridge; 
+    attachComponent(mLoadedCartridge, 0x0000, 0x7FFF); // ROM
+    attachComponent(mLoadedCartridge, 0xA000, 0xBFFF); // RAM
+}
+
+void Memory::attachComponent(Component* component, word startAddress, word endAddress)
+{
+    for (word i = startAddress; i <= endAddress; ++i)
+        mComponentMap.insert({i, component});
 }

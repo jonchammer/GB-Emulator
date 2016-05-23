@@ -15,7 +15,7 @@ enum DMGPalettes
     RGBPALETTE_REAL = 1
 };
     
-class Graphics
+class Graphics : public Component
 {
 public:
 
@@ -85,8 +85,8 @@ public:
     
     void emulateBIOS();
 
-    byte read(word address);
-    void write(word address, byte data);
+    byte read(const word address) const;
+    void write(const word address, const byte data);
     
     byte* getScreenData()  { return mScreenBuffer;   }
     bool IsNewFrameReady() { return mNewFrameReady;  }
@@ -272,8 +272,8 @@ private:
     // Getters / Setters for memory access
     void writeVRAM(word addr, byte value);
     void writeOAM(byte addr, byte value);
-    byte readVRAM(word addr);
-    byte readOAM(byte addr);
+    byte readVRAM(word addr) const;
+    byte readOAM(byte addr) const;
     void DMAStep(int clockDelta);
     void DMAChanged(byte value);
     void LCDCChanged(byte value);

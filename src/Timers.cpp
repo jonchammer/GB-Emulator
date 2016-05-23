@@ -2,6 +2,8 @@
 
 Timers::Timers(Memory* memory) : mMemory(memory) 
 {
+    // Attach this component to the memory at the correct locations
+    mMemory->attachComponent(this, 0xFF04, 0xFF07);
     reset();
 }
     

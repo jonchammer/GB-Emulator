@@ -9,6 +9,8 @@
 
 Input::Input(Memory* memory) : mMemory(memory)
 {
+    // Attach this component to the memory at the correct locations
+    mMemory->attachComponent(this, JOYPAD_STATUS_ADDRESS, JOYPAD_STATUS_ADDRESS);
     reset();
 }
 

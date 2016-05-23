@@ -45,11 +45,6 @@ Passed tests
         Frame sequencer on reset starts at step 1
  */
 
-// General sound registers
-const word NR50 = 0xFF24;
-const word NR51 = 0xFF25;
-const word NR52 = 0xFF26;
-
 // Sound Unit 1 Registers
 const word NR10 = 0xFF10;
 const word NR11 = 0xFF11;
@@ -76,17 +71,22 @@ const word NR42 = 0xFF21;
 const word NR43 = 0xFF22;
 const word NR44 = 0xFF23;
 
+// General sound registers
+const word NR50 = 0xFF24;
+const word NR51 = 0xFF25;
+const word NR52 = 0xFF26;
+
 // Defines the format of the sound callback. The sound callback has space for
 // user data that is not touched by the emulator, the sound buffer, and the
 // length of that buffer in samples.
 typedef void (*soundCallback)(void*, short*, int);
 
-class Sound
+class Sound : public Component
 {
 public:
     
     // Constructors / Destructors
-    Sound(const bool &_CGB, const bool skipBIOS, int sampleRate = 44100, int sampleBufferLength = 1024);
+    Sound(Memory* memory, const bool &_CGB, const bool skipBIOS, int sampleRate = 44100, int sampleBufferLength = 1024);
     ~Sound();
 
     // Sound lifecycle methods.
@@ -95,8 +95,8 @@ public:
     
     // Memory access routines - There are a lot of sound registers, so these handle reading
     // and writing to them, which simplifies the design of the memory unit.
-    void write(word address, byte value);
-    byte read(word address);
+    void write(const word address, const byte value);
+    byte read(const word address) const;
     
     // Called by the environment to set the designated sound callback. This function
     // will be called by the Sound class as soon as a sound buffer is ready to be

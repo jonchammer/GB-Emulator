@@ -1,7 +1,7 @@
 #include "Sound.h"
 #include <algorithm>
 
-Sound::Sound(const bool &CGB, const bool skipBIOS, int sampleRate, int sampleBufferLength):
+Sound::Sound(Memory* memory, const bool &CGB, const bool skipBIOS, int sampleRate, int sampleBufferLength):
     mSound1GlobalToggle(1),
     mSound2GlobalToggle(1),
     mSound3GlobalToggle(1),
@@ -13,6 +13,9 @@ Sound::Sound(const bool &CGB, const bool skipBIOS, int sampleRate, int sampleBuf
     mSoundCallbackData(NULL),
     mMasterVolume(1.0)
 {
+    // Attach this component to the memory at the correct locations
+    memory->attachComponent(this, 0xFF10, 0xFF3F);
+    
 	mSampleBuffer = new short[mSampleBufferLength];
 	mSamplePeriod = 4194304 / mSampleRate;
 
@@ -101,7 +104,7 @@ void Sound::update(int clockDelta)
 	}
 }
 
-void Sound::write(word address, byte value)
+void Sound::write(const word address, const byte value)
 {
     // Forward the request to whoever can handle it
     switch (address)
@@ -143,7 +146,7 @@ void Sound::write(word address, byte value)
     }
 }
 
-byte Sound::read(word address)
+byte Sound::read(const word address) const
 {
     // Forward the request to whoever can handle it
     switch (address)
