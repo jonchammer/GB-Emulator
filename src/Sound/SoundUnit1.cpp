@@ -66,7 +66,9 @@ void SoundUnit1::emulateBIOS()
 	mStatusBit = 1;
 	NR10Changed(0x80, true);
 	NR11Changed(0xBF, true);
-	NR12Changed(0xF3, true);
+	//NR12Changed(0xF3, true); // This line intentionally commented out. Otherwise,
+                               // an audible tone is played when the game first starts
+                               // that shouldn't be there. It is present in the original.
 	NR14Changed(0xBF, true);
 }
 
