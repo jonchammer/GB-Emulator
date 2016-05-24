@@ -37,29 +37,27 @@ void CPU::reset(bool skipBIOS)
         mRegisters.hl   = 0x014D;
     }
 
-    mLogging = false;   
+    mLogging = false;
+    mStep    = false;
 }
 
 void CPU::update()
 {
     byte opcode = readByte(mProgramCounter);
     
-    //if (mProgramCounter >= 0x0100)
-    //    return;
-    
-    if (mLogging && false)
+    // Control debugging mode
+    if (mStep)
     {
-        if (mProgramCounter >= 0x0007 && mRegisters.hl == 9800)
-            cin.get();
-        
-        cout << "PC: "; printHex(cout, mProgramCounter);
+        cin.get();
+
+        cout << "PC: ";  printHex(cout, mProgramCounter);
         cout << " Op: "; printHex(cout, opcode);
         cout << " AF: "; printHex(cout, mRegisters.af);
         cout << " BC: "; printHex(cout, mRegisters.bc);
         cout << " DE: "; printHex(cout, mRegisters.de);
         cout << " HL: "; printHex(cout, mRegisters.hl);
         cout << " SP: "; printHex(cout, mStackPointer.reg);
-        
+
         cout << " p1: "; printHex(cout, mMemory->read(mProgramCounter + 1));
         cout << " p2: "; printHex(cout, mMemory->read(mProgramCounter + 2));
         cout << endl;
@@ -67,7 +65,6 @@ void CPU::update()
 
     if (!mHalt)
     {
-        //cout << "Executing: "; printOpcode(cout, opcode); cout << endl;
         mProgramCounter++;
         executeInstruction(opcode);
         
@@ -234,15 +231,6 @@ byte CPU::readByte(const word address)
 void CPU::writeByte(const word address, const byte data)
 {
     mMemory->write(address, data);
-    if (address >= 0xFF10 && address <= 0xFF3F)
-    {
-        cout << "Write. ["; 
-        printHex(cout, address); 
-        cout << "] = "; 
-        printHex(cout, data); 
-        cout << endl;
-    }
-    
     mEmulator->sync(4);
 }
 

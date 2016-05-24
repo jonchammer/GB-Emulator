@@ -92,6 +92,8 @@ const int BLACK      = 0xFF000000;
 
 // Misc functions
 #define printHex(out, opcode) ((out) << "0x" << setw(4) << setfill('0') << hex << (int) (opcode))
+// Can also use printf. E.g. printf("%#04x", opcode); # adds a 0x, 0 controls leading zeros, 
+// 4 tells how many places, x means lowercase letters, and X means capital letters.
 
 class Component
 {

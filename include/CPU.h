@@ -104,16 +104,8 @@ public:
      */
     void reset(bool skipBIOS);
     
-    void setLogging(bool log) 
-    {
-        mLogging = log;
-        
-        /*if (mLogging)
-            mTestLog.open("log.txt");//mLogOut.open("log.txt");
-        else mTestLog.close();//mLogOut.close();
-        */
-        
-    }
+    void setLogging(bool log) { mLogging = log;    }
+    void toggleStepMode()     { mStep    = !mStep; }
     
 private:
     Emulator* mEmulator;            // A pointer to the hosting emulator
@@ -129,8 +121,7 @@ private:
     int mPendingInterruptDisabled;  // We have received an instruction to disable interrupts soon.
     
     bool mLogging;
-    //ofstream mLogOut;
-    //ifstream mTestLog;
+    bool mStep;                     // When true, the user can step through execution one instruction at a time.
     
     /**
      * Called during the emulation loop. Gives the CPU a chance to handle

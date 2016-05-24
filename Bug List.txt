@@ -1,11 +1,10 @@
 - Super Mario Land won't start.
 - Synchronize the screen buffer so that there is no visual tearing.
 - Finish going through test roms. Code currently fails 01 from Sound1 and Sound2.
-- Sound during BIOS.
 - Finish adding RTC support for MBC3.
 - Move all emulator updates / rendering to another thread. Only handle events on the main thread.
-- Find better solution to the component problem in the memory class. An array is used right now, but it sacrifices a memory footprint for a faster runtime. It should be possible to look up components based on address both quickly and compactly.
 - GBC Improvements. GBC games can be run, but it is not well tested.
   + Double speed
   + Color rendering
   + GBC-specific initializations
+- Add a more full-featured debugger. Stop on breakpoints, memory access, etc.
