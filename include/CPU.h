@@ -108,10 +108,10 @@ public:
     {
         mLogging = log;
         
-        if (mLogging)
+        /*if (mLogging)
             mTestLog.open("log.txt");//mLogOut.open("log.txt");
         else mTestLog.close();//mLogOut.close();
-        
+        */
         
     }
     
@@ -129,8 +129,8 @@ private:
     int mPendingInterruptDisabled;  // We have received an instruction to disable interrupts soon.
     
     bool mLogging;
-    ofstream mLogOut;
-    ifstream mTestLog;
+    //ofstream mLogOut;
+    //ifstream mTestLog;
     
     /**
      * Called during the emulation loop. Gives the CPU a chance to handle

@@ -1,11 +1,11 @@
 #include "SoundUnit3.h"
 
-SoundUnit3::SoundUnit3(const bool &_CGB, const bool skipBIOS, Sound &soundController):
+SoundUnit3::SoundUnit3(const bool &_CGB, Sound &soundController):
     mCGB(_CGB),
     mSoundController(soundController),
     mLengthCounter(0xFF, mStatusBit)
 {
-	reset(skipBIOS);
+	reset();
 }
 
 SoundUnit3::~SoundUnit3()
@@ -15,9 +15,7 @@ SoundUnit3::~SoundUnit3()
 void SoundUnit3::timerStep(int clockDelta)
 {
 	if (mClockCounter < 0 && (mClockCounter + clockDelta) >= 0)
-	{
 		mSampleBuffer = mWaveRAM[mSampleIndex >> 1];
-	}
 
 	mClockCounter += clockDelta;
 	
@@ -26,26 +24,30 @@ void SoundUnit3::timerStep(int clockDelta)
 		int passedPeriods = mClockCounter / mPeriod;
 		mClockCounter %= mPeriod;
 		
-		mSampleIndex = (mSampleIndex + passedPeriods) & 0x1F;
+		mSampleIndex  = (mSampleIndex + passedPeriods) & 0x1F;
 		mSampleBuffer = mWaveRAM[mSampleIndex >> 1];
 		
 		mOutput = (mSampleBuffer >> (4 * ((~mSampleIndex) & 0x1))) & 0xF;
 		switch ((mNR32 >> 5) & 0x3)
 		{
-		case 0x0://mute
-			mOutput = 0;
-			break;
+            // Mute
+            case 0x0:
+                mOutput = 0;
+                break;
 
-		case 0x1://1:1
-			break;
+            // 1:1
+            case 0x1:
+                break;
 
-		case 0x2://1:2
-			mOutput >>= 1;
-			break;
+            // 1:2
+            case 0x2:
+                mOutput >>= 1;
+                break;
 
-		case 0x3://1:4
-			mOutput >>= 2;
-			break;
+            // 1:4
+            case 0x3:
+                mOutput >>= 2;
+                break;
 		}
 	}
 }
@@ -71,29 +73,26 @@ short SoundUnit3::getWaveRightOutput()
 	return mOutput * (masterVolume + 1) * rightSwitch * mStatusBit;
 }
 
-void SoundUnit3::reset(const bool skipBIOS)
+void SoundUnit3::reset()
 {
-	NR30Changed(0xFF, true);
-	NR31Changed(0xFF, true);
-	NR32Changed(0xFF, true);
-	NR33Changed(0xFF, true);
-	NR34Changed(0xFF, true);
+	NR30Changed(0x0, true);
+	NR31Changed(0x0, true);
+	NR32Changed(0x0, true);
+	NR33Changed(0x0, true);
+	NR34Changed(0x0, true);
     
-    for (int i = 0; i < 0x10; ++i)
-        mWaveRAM[i] = 0;
+    memset(mWaveRAM, 0x0, 0x10);
 
 	mLengthCounter.reset();
 	mStatusBit    = 0;
 	mSampleIndex  = 0;
 	mSampleBuffer = 0;
 	mClockCounter = 0;
-    
-    if (skipBIOS)
-    {
-        NR30Changed(0x7F, true);
-        NR32Changed(0x9F, true);
-        NR34Changed(0xBF, true);
-    }
+}
+
+void SoundUnit3::emulateBIOS()
+{
+    reset();
 }
 
 //While sound 3 is ON Wave pattern RAM can be read or written only when sound 3 reads samples from it
@@ -102,18 +101,12 @@ byte SoundUnit3::getWaveRAM(byte pos)
 	if (mStatusBit)
 	{
 		if (mCGB || mClockCounter == 1)
-		{
 			return mWaveRAM[mSampleIndex >> 1];
-		}
-		else
-		{
-			return 0xFF;
-		}
+		
+        else return 0xFF;
 	}
-	else
-	{
-		return mWaveRAM[pos];
-	}
+    
+	else return mWaveRAM[pos];
 }
 
 void SoundUnit3::waveRAMChanged(byte pos, byte value)
@@ -121,39 +114,29 @@ void SoundUnit3::waveRAMChanged(byte pos, byte value)
 	if (mStatusBit)
 	{
 		if (mCGB || mClockCounter == 1)
-		{
 			mWaveRAM[mSampleIndex >> 1] = value;
-		}
 	}
-	else
-	{
-		mWaveRAM[pos] = value;
-	}
+    
+	else mWaveRAM[pos] = value;
 }
 
 //Sound on/off
 void SoundUnit3::NR30Changed(byte value, bool override)
 {
 	if (!mSoundController.isSoundEnabled() && !override)
-	{
 		return;
-	}
 
 	mNR30 = value;
 
 	if (!(value >> 7))
-	{
 		mStatusBit = 0;
-	}
 }
 
 //Sound length
 void SoundUnit3::NR31Changed(byte value, bool override)
 {
 	if (mCGB && !mSoundController.isSoundEnabled() && !override)
-	{
 		return;
-	}
 
 	//While all sound off only length can be written
 	mLengthCounter.NRX1Changed(value);
@@ -163,9 +146,7 @@ void SoundUnit3::NR31Changed(byte value, bool override)
 void SoundUnit3::NR32Changed(byte value, bool override)
 {
 	if (!mSoundController.isSoundEnabled() && !override)
-	{
 		return;
-	}
 
 	mNR32 = value;
 }
@@ -174,12 +155,9 @@ void SoundUnit3::NR32Changed(byte value, bool override)
 void SoundUnit3::NR33Changed(byte value, bool override)
 {
 	if (!mSoundController.isSoundEnabled() && !override)
-	{
 		return;
-	}
 	
 	mNR33 = value;
-
 	calculatePeriod();
 }
 
@@ -187,12 +165,9 @@ void SoundUnit3::NR33Changed(byte value, bool override)
 void SoundUnit3::NR34Changed(byte value, bool override)
 {
 	if (!mSoundController.isSoundEnabled() && !override)
-	{
 		return;
-	}
 	
 	mNR34 = value;
-
 	calculatePeriod();
 
 	//If channel initial set
@@ -203,18 +178,14 @@ void SoundUnit3::NR34Changed(byte value, bool override)
 		{
 			int waveRAMPos = ((mSampleIndex + 1) & 0x1F) >> 1;
 			if (waveRAMPos < 4)
-			{
 				mWaveRAM[0] = mWaveRAM[waveRAMPos];
-			}
-			else
-			{
-				memcpy(mWaveRAM, mWaveRAM + (waveRAMPos & 0xFC), 4); 
-			}
+            
+			else memcpy(mWaveRAM, mWaveRAM + (waveRAMPos & 0xFC), 4); 
 		}
 		
 		//Mostly guesswork
 		mClockCounter = -mPeriod - 5;
-		mSampleIndex = 1;
+		mSampleIndex  = 1;
 
 		//If sound 3 On
 		mStatusBit = 1;
@@ -230,10 +201,10 @@ void SoundUnit3::NR52Changed(byte value)
 		mStatusBit = 0;
 		
 		NR30Changed(0, true);
+        
 		if (mCGB)
-		{
 			NR31Changed(0, true);
-		}
+
 		NR32Changed(0, true);
 		NR33Changed(0, true);
 		NR34Changed(0, true);

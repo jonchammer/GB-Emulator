@@ -1,11 +1,11 @@
 #include "SoundUnit2.h"
 
-SoundUnit2::SoundUnit2(const bool &_CGB, const bool skipBIOS, Sound &soundController):
+SoundUnit2::SoundUnit2(const bool &_CGB, Sound &soundController):
     mCGB(_CGB),
     mSoundController(soundController),
     mLengthCounter(0x3F, mStatusBit)
 {
-	reset(skipBIOS);
+	reset();
 }
 
 SoundUnit2::~SoundUnit2()
@@ -41,29 +41,29 @@ short SoundUnit2::getWaveRightOutput()
 	return mDuty.getOutput() * envelopeValue * (masterVolume + 1) * rightSwitch * mStatusBit;
 }
 
-void SoundUnit2::reset(const bool skipBIOS)
+void SoundUnit2::reset()
 {
-	NR21Changed(0xFF, true);
-	NR22Changed(0xFF, true);
-	NR23Changed(0xFF, true);
-	NR24Changed(0xFF, true);
+	NR21Changed(0x0, true);
+	NR22Changed(0x0, true);
+	NR23Changed(0x0, true);
+	NR24Changed(0x0, true);
 
 	mStatusBit = 0;
-    if (skipBIOS)
-    {
-        NR21Changed(0x3F, true);
-        NR22Changed(0x00, true);
-        NR24Changed(0xBF, true);
-    }
+}
+
+void SoundUnit2::emulateBIOS()
+{
+    reset();
+    NR21Changed(0x80, true);
+    NR22Changed(0xF3, true);
 }
 
 //Wave pattern duty, Sound length
 void SoundUnit2::NR21Changed(byte value, bool override)
 {
 	if (mCGB && !mSoundController.isSoundEnabled() && !override)
-	{
 		return;
-	}
+	
 	if (!mSoundController.isSoundEnabled() && !override)
 	{
 		//While all sound off only length can be written
@@ -80,28 +80,21 @@ void SoundUnit2::NR21Changed(byte value, bool override)
 void SoundUnit2::NR22Changed(byte value, bool override)
 {
 	if (!mSoundController.isSoundEnabled() && !override)
-	{
 		return;
-	}
 
 	mEnvelope.NRX2Changed(value);
 
 	if (mEnvelope.disablesSound())
-	{
 		mStatusBit = 0;
-	}
 }
 
 //Low frequency bits
 void SoundUnit2::NR23Changed(byte value, bool override)
 {
 	if (!mSoundController.isSoundEnabled() && !override)
-	{
 		return;
-	}
 
 	mNR23 = value;
-
 	mDuty.NRX3Changed(value);
 }
 
@@ -109,22 +102,17 @@ void SoundUnit2::NR23Changed(byte value, bool override)
 void SoundUnit2::NR24Changed(byte value, bool override)
 {
 	if (!mSoundController.isSoundEnabled() && !override)
-	{
 		return;
-	}
 
 	mNR24 = value;
 
 	//If channel initial set
 	if (value >> 7)
-	{
 		mStatusBit = 1;
-	}
+    
 	//In some cases envelope unit disables sound unit
 	if (mEnvelope.disablesSound())
-	{
 		mStatusBit = 0;
-	}
 
 	mDuty.NRX4Changed(value);
 	mEnvelope.NRX4Changed(value);
@@ -138,13 +126,10 @@ void SoundUnit2::NR52Changed(byte value)
 		mStatusBit = 0;
 
 		if (mCGB)
-		{
 			NR21Changed(0, true);
-		}
 		else
-		{
 			NR21Changed(mNR21 & mLengthCounter.getLengthMask(), true);
-		}
+		
 		NR22Changed(0, true);
 		NR23Changed(0, true);
 		NR24Changed(0, true);

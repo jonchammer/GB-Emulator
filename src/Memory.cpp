@@ -35,8 +35,6 @@ Memory::Memory(Emulator* emulator, bool skipBIOS) : mEmulator(emulator)
     
     // 256 bytes. Used for unused I/O ports, stack space, and interrupts
     mMiscRAM = new byte[0x100];
-    memset(mMiscRAM, 0xFF, 0x7F);
-    memset(mMiscRAM + 0x80, 0x00, 0x40);
     
     mComponentIndex = 0;
     reset(skipBIOS);
@@ -52,6 +50,13 @@ void Memory::reset(bool skipBIOS)
 {
     // Start out in the BIOS
     mInBIOS = !skipBIOS;
+    
+    memset(mMiscRAM, 0xFF, 0x7F);
+    memset(mMiscRAM + 0x80, 0x00, 0x40);
+    mMiscRAM[INTERRUPT_REQUEST_REGISTER - 0xFF00] = 0x0;
+    mMiscRAM[INTERRUPT_ENABLED_REGISTER - 0xFF00] = 0x0;
+    
+    // TODO Reset cartridge too?
 }
 
 byte Memory::read(const word address) const

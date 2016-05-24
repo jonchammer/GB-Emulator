@@ -19,7 +19,7 @@ class Sound;
 class SoundUnit1
 {
 public:
-    SoundUnit1(const bool &_CGB, const bool skipBIOS, Sound &soundController);
+    SoundUnit1(const bool &_CGB, Sound &soundController);
     ~SoundUnit1();
 
     void timerStep(int clockDelta);
@@ -28,8 +28,9 @@ public:
     short getWaveLeftOutput();
     short getWaveRightOutput();
 
-    void reset(const bool skipBIOS);
-
+    void reset();
+    void emulateBIOS();
+    
     byte getStatus()
     {
         return mStatusBit;
@@ -95,8 +96,6 @@ private:
     SweepUnit mSweep;
     EnvelopeUnit mEnvelope;
     LengthCounter mLengthCounter;
-
-    int mWaveOutput;
 };
 
 #endif

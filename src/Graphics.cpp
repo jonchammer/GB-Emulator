@@ -246,7 +246,7 @@ void Graphics::reset(bool skipBIOS)
 		mOBPD[i] = rand() % 0x100;
 
     // LCDC cannot be 0 initially or some games (like Pokemon Red) won't load.
-	mLCDC = 0x91;
+	mLCDC = 0x00;
 	mSTAT = 0x00;
 	mSCY  = 0x00;
 	mSCX  = 0x00;

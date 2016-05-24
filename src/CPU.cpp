@@ -22,7 +22,7 @@ void CPU::reset(bool skipBIOS)
     mRegisters.hl     = 0x0000;
     
     // Initialize interrupt variables
-    mInterruptMaster          = true;
+    mInterruptMaster          = false;
     mHalt                     = false;
     mHaltBug                  = false;
     mPendingInterruptEnabled  = 0;
@@ -31,7 +31,7 @@ void CPU::reset(bool skipBIOS)
     if (skipBIOS)
     {
         mProgramCounter = 0x0100;
-        mRegisters.af   = 0x01B0;
+        mRegisters.af   = 0x01B0; // Or 0x11B0 for GBC
         mRegisters.bc   = 0x0013;
         mRegisters.de   = 0x00D8;
         mRegisters.hl   = 0x014D;
@@ -44,100 +44,25 @@ void CPU::update()
 {
     byte opcode = readByte(mProgramCounter);
     
-    if (mLogging && !mTestLog.eof())
+    //if (mProgramCounter >= 0x0100)
+    //    return;
+    
+    if (mLogging && false)
     {
-        static long line = 0;
-       // static bool mainSeen = false;
+        if (mProgramCounter >= 0x0007 && mRegisters.hl == 9800)
+            cin.get();
         
-        line++;
-        string tmp;
+        cout << "PC: "; printHex(cout, mProgramCounter);
+        cout << " Op: "; printHex(cout, opcode);
+        cout << " AF: "; printHex(cout, mRegisters.af);
+        cout << " BC: "; printHex(cout, mRegisters.bc);
+        cout << " DE: "; printHex(cout, mRegisters.de);
+        cout << " HL: "; printHex(cout, mRegisters.hl);
+        cout << " SP: "; printHex(cout, mStackPointer.reg);
         
-        // Registers
-        mTestLog >> tmp; mTestLog >> tmp;
-        word pc = (word) strtol(tmp.substr(2, 4).c_str(), NULL, 16);
-        mTestLog >> tmp; mTestLog >> tmp;
-        word sp = (word) strtol(tmp.substr(2, 4).c_str(), NULL, 16);
-        mTestLog >> tmp; mTestLog >> tmp;
-        byte a = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
-        mTestLog >> tmp; mTestLog >> tmp;
-        byte b = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
-        mTestLog >> tmp; mTestLog >> tmp;
-        byte c = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
-        mTestLog >> tmp; mTestLog >> tmp;
-        byte d = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
-        mTestLog >> tmp; mTestLog >> tmp;
-        byte e = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
-        mTestLog >> tmp; mTestLog >> tmp;
-        byte h = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
-        mTestLog >> tmp; mTestLog >> tmp;
-        byte l = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
-        
-        // Flags
-        byte flags = 0x0;
-        mTestLog >> tmp;
-        if (tmp[0] == 'Z')
-            flags = setBit(flags, FLAG_ZERO);
-        if (tmp[1] == 'N')
-            flags = setBit(flags, FLAG_NEG);
-        if (tmp[2] == 'H')
-            flags = setBit(flags, FLAG_HALF);
-        if (tmp[3] == 'C')
-            flags = setBit(flags, FLAG_CARRY);
-        
-        // Op code
-        mTestLog >> tmp;
-        byte op = (byte) strtol(tmp.substr(2, 2).c_str(), NULL, 16);
-        
-        // Ignore the rest of the line
-        getline(mTestLog, tmp);
-        
-        word af = a << 8 | flags;
-        word bc = b << 8 | c;
-        word de = d << 8 | e;
-        word hl = h << 8 | l;
-        
-        //if (pc == 0x0297) mainSeen = true;
-        
-        //if (mainSeen)
-       // {
-            //if (mProgramCounter != pc /*|| opcode != op || mRegisters.af != af || mRegisters.bc != bc || mRegisters.de != de || mRegisters.hl != hl*/ || mStackPointer.reg != sp)
-        if (line >= 142116)    
-        {
-                printf("LINE: %d\n", line);
-                cout << "EXPECTED: ";
-                cout << "PC: "; printHex(cout, pc); 
-                cout << " Op: "; printHex(cout, op); 
-                cout << " AF: "; printHex(cout, af);
-                cout << " BC: "; printHex(cout, bc);
-                cout << " DE: "; printHex(cout, de); 
-                cout << " HL: "; printHex(cout, hl);
-                cout << " SP: "; printHex(cout, sp); cout << endl;
-
-                cout << "GOT:      ";
-                cout << "PC: "; printHex(cout, mProgramCounter); 
-                cout << " Op: "; printHex(cout, opcode); 
-                cout << " AF: "; printHex(cout, mRegisters.af);
-                cout << " BC: "; printHex(cout, mRegisters.bc);
-                cout << " DE: "; printHex(cout, mRegisters.de); 
-                cout << " HL: "; printHex(cout, mRegisters.hl);
-                cout << " SP: "; printHex(cout, mStackPointer.reg); cout << endl;
-                cout << endl;
-            }
-        //}
-                
-        /*
-        cin.get();
-        mLogOut << "PC: "; printHex(mLogOut, mProgramCounter);
-        mLogOut << " Op: "; printHex(mLogOut, opcode);
-        mLogOut << " AF: "; printHex(mLogOut, mRegisters.af);
-        mLogOut << " BC: "; printHex(mLogOut, mRegisters.bc);
-        mLogOut << " DE: "; printHex(mLogOut, mRegisters.de);
-        mLogOut << " HL: "; printHex(mLogOut, mRegisters.hl);
-        mLogOut << " SP: "; printHex(mLogOut, mStackPointer.reg);
-        
-        mLogOut << " p1: "; printHex(mLogOut, mMemory->read(mProgramCounter + 1));
-        mLogOut << " p2: "; printHex(mLogOut, mMemory->read(mProgramCounter + 2));
-        mLogOut << endl;*/
+        cout << " p1: "; printHex(cout, mMemory->read(mProgramCounter + 1));
+        cout << " p2: "; printHex(cout, mMemory->read(mProgramCounter + 2));
+        cout << endl;
     }
 
     if (!mHalt)
@@ -163,20 +88,14 @@ void CPU::update()
     {
         mPendingInterruptDisabled--;
         if (mPendingInterruptDisabled == 0)
-        {
-            mPendingInterruptDisabled = false;
-            mInterruptMaster          = false;
-        }
+            mInterruptMaster = false;
     }
     
     if (mPendingInterruptEnabled > 0)
     {
         mPendingInterruptEnabled--;
         if (mPendingInterruptEnabled == 0)
-        {
-            mPendingInterruptEnabled = false;
-            mInterruptMaster         = true;
-        }
+            mInterruptMaster = true;
     }
 
     handleInterrupts();
@@ -299,6 +218,15 @@ word CPU::getImmediateWord()
 byte CPU::readByte(const word address)
 {
     byte value = mMemory->read(address);
+    if (mLogging && false)
+    {
+        cout << "Read. ["; 
+        printHex(cout, address); 
+        cout << "] = "; 
+        printHex(cout, value); 
+        cout << endl;
+    }
+    
     mEmulator->sync(4);
     return value;
 }
@@ -306,6 +234,15 @@ byte CPU::readByte(const word address)
 void CPU::writeByte(const word address, const byte data)
 {
     mMemory->write(address, data);
+    if (address >= 0xFF10 && address <= 0xFF3F)
+    {
+        cout << "Write. ["; 
+        printHex(cout, address); 
+        cout << "] = "; 
+        printHex(cout, data); 
+        cout << endl;
+    }
+    
     mEmulator->sync(4);
 }
 

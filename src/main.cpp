@@ -31,13 +31,13 @@ int main(int argc, char** argv)
     emulator.getMemory()->loadCartridge(&cartridge);
     cartridge.printInfo();
   
-////    emulator.getInput()->keyPressed(BUTTON_START);
-////    emulator.getCPU()->setLogging(true);
-////    while (true)
-////    {
-////        emulator.update();
-////    }
-//    
+//    emulator.getInput()->keyPressed(BUTTON_START);
+//    emulator.getCPU()->setLogging(true);
+//    while (true)
+//    {
+//        emulator.update();
+//    }
+    
     // Start the emulation
     startEmulation(argc, argv, &emulator);
     

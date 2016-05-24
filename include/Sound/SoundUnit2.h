@@ -17,7 +17,7 @@ each waveform taking 8 frequency timer clocks to cycle through.
 class SoundUnit2
 {
 public:
-    SoundUnit2(const bool &_CGB, const bool skipBIOS, Sound &soundController);
+    SoundUnit2(const bool &_CGB, Sound &soundController);
     ~SoundUnit2();
 
     void timerStep(int clockDelta);
@@ -26,8 +26,9 @@ public:
     short getWaveLeftOutput();
     short getWaveRightOutput();
 
-    void reset(const bool skipBIOS);
-
+    void reset();
+    void emulateBIOS();
+    
     byte getStatus()
     {
         return mStatusBit;

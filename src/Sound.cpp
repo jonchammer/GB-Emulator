@@ -16,13 +16,13 @@ Sound::Sound(Memory* memory, const bool skipBIOS, const bool &CGB, int sampleRat
     // Attach this component to the memory at the correct locations
     memory->attachComponent(this, 0xFF10, 0xFF3F);
     
-	mSampleBuffer = new short[mSampleBufferLength];
+	mSampleBuffer = new short[mSampleBufferLength]();
 	mSamplePeriod = 4194304 / mSampleRate;
 
-	mSound1 = new SoundUnit1(mCGB, skipBIOS, *this);
-	mSound2 = new SoundUnit2(mCGB, skipBIOS, *this);
-	mSound3 = new SoundUnit3(mCGB, skipBIOS, *this);
-	mSound4 = new SoundUnit4(mCGB, skipBIOS, *this);
+	mSound1 = new SoundUnit1(mCGB, *this);
+	mSound2 = new SoundUnit2(mCGB, *this);
+	mSound3 = new SoundUnit3(mCGB, *this);
+	mSound4 = new SoundUnit4(mCGB, *this);
 
 	reset(skipBIOS);
 }
@@ -192,27 +192,33 @@ byte Sound::read(const word address) const
        
 void Sound::reset(const bool skipBIOS)
 {
+    mSound1->reset();
+	mSound2->reset();
+	mSound3->reset();
+	mSound4->reset();
+    
+    NR50Changed(0, true);
+    NR51Changed(0, true);
+    
     mAllSoundEnabled     = 0;
 	mFrameSequencerClock = 0;
 	mFrameSequencerStep  = 1;
 	mSampleCounter       = 0;
 	mSampleBufferPos     = 0;
-    
-    mSound1->reset(skipBIOS);
-	mSound2->reset(skipBIOS);
-	mSound3->reset(skipBIOS);
-	mSound4->reset(skipBIOS);
 
-    mNR50 = 0xFF;
-    mNR51 = 0xFF;
-	
     // Initialize variables differently if we've skipped over the BIOS
     if (skipBIOS)
     {
-        mAllSoundEnabled = 1;
+        mSound1->emulateBIOS();
+        mSound2->emulateBIOS();
+        mSound3->emulateBIOS();
+        mSound4->emulateBIOS();
+        
         NR50Changed(0x77, true);
         NR51Changed(0xF3, true);
         NR52Changed(0xF1);
+        
+        mAllSoundEnabled = 1;
     }
 }
 

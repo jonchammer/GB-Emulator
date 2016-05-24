@@ -22,7 +22,7 @@ class Sound;
 class SoundUnit4
 {
 public:
-    SoundUnit4(const bool& CGB, const bool skipBIOS, Sound& soundController);
+    SoundUnit4(const bool& CGB, Sound& soundController);
     ~SoundUnit4();
 
     void timerStep(int clockDelta);
@@ -31,8 +31,9 @@ public:
     short getWaveLeftOutput();
     short getWaveRightOutput();
 
-    void reset(const bool skipBIOS);
-
+    void reset();
+    void emulateBIOS();
+    
     byte getStatus()
     {
         return mStatusBit;

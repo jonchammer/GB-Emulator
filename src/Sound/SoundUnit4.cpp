@@ -1,11 +1,11 @@
 #include "SoundUnit4.h"
 
-SoundUnit4::SoundUnit4(const bool &_CGB, const bool skipBIOS, Sound &soundController):
+SoundUnit4::SoundUnit4(const bool &_CGB, Sound &soundController):
     mCGB(_CGB),
     mSoundController(soundController),
     mLengthCounter(0x3F, mStatusBit, 0xFF)
 {
-	reset(skipBIOS);
+	reset();
 }
 
 SoundUnit4::~SoundUnit4()
@@ -41,33 +41,30 @@ short SoundUnit4::getWaveRightOutput()
 	return mlfsr.getOutput() * envelopeValue * (masterVolume + 1) * rightSwitch * mStatusBit;
 }
 
-void SoundUnit4::reset(const bool skipBIOS)
+void SoundUnit4::reset()
 {
-	NR41Changed(0xFF, true);
-	NR42Changed(0xFF, true);
-	NR43Changed(0xFF, true);
-	NR44Changed(0xFF, true);
+	NR41Changed(0x0, true);
+	NR42Changed(0x0, true);
+	NR43Changed(0x0, true);
+	NR44Changed(0x0, true);
 
 	mlfsr.reset();
 	mEnvelope.reset();
 	mLengthCounter.reset();
 	mStatusBit = 0;
-    
-    if (skipBIOS)
-    {
-        NR42Changed(0x00, true);
-        NR43Changed(0x00, true);
-        NR44Changed(0xBF, true);
-    }
+}
+
+void SoundUnit4::emulateBIOS()
+{
+    reset();
+    NR41Changed(0xFF, true);
 }
 
 //Sound length
 void SoundUnit4::NR41Changed(byte value, bool override)
 {
 	if (mCGB && !mSoundController.isSoundEnabled() && !override)
-	{
 		return;
-	}
 
 	//While all sound off only length can be written
 	mLengthCounter.NRX1Changed(value);
@@ -77,25 +74,19 @@ void SoundUnit4::NR41Changed(byte value, bool override)
 void SoundUnit4::NR42Changed(byte value, bool override)
 {
 	if (!mSoundController.isSoundEnabled() && !override)
-	{
 		return;
-	}
 
 	mEnvelope.NRX2Changed(value);
 
 	if (mEnvelope.disablesSound())
-	{
 		mStatusBit = 0;
-	}
 }
 
 //LFSR control
 void SoundUnit4::NR43Changed(byte value, bool override)
 {
 	if (!mSoundController.isSoundEnabled() && !override)
-	{
 		return;
-	}
 
 	mlfsr.NR43Changed(value);
 }
@@ -104,22 +95,17 @@ void SoundUnit4::NR43Changed(byte value, bool override)
 void SoundUnit4::NR44Changed(byte value, bool override)
 {
 	if (!mSoundController.isSoundEnabled() && !override)
-	{
 		return;
-	}
 
 	mNR44 = value;
 
 	//If channel initial set
 	if (value >> 7)
-	{
 		mStatusBit = 1;
-	}
+	
 	//In some cases envelope unit disables sound unit
 	if (mEnvelope.disablesSound())
-	{
 		mStatusBit = 0;
-	}
 
 	mlfsr.NR44Changed(value);
 	mEnvelope.NRX4Changed(value);
@@ -133,9 +119,8 @@ void SoundUnit4::NR52Changed(byte value)
 		mStatusBit = 0;
 
 		if (mCGB)
-		{
 			NR41Changed(0, true);
-		}
+		
 		NR42Changed(0, true);
 		NR43Changed(0, true);
 		NR44Changed(0, true);
