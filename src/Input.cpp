@@ -14,12 +14,7 @@ Input::Input(Memory* memory, bool skipBIOS) : mMemory(memory)
     reset(skipBIOS);
 }
 
-Input::~Input()
-{
-    // Do nothing
-}
-
-void Input::reset(bool skipBIOS)
+void Input::reset(bool /*skipBIOS*/)
 {
     mJoypadState = 0xFF;
     mJoypadReg   = 0xCF;

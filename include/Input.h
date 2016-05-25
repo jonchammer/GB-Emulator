@@ -24,7 +24,7 @@ public:
     /**
      * Destructor.
      */
-    ~Input();
+    virtual ~Input() {};
     
     /**
      * Indicate to the system that the given key was pressed. The key should

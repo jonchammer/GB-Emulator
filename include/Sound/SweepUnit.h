@@ -157,8 +157,7 @@ private:
     byte mNRX0SweepPeriod;
     byte mNRX0SweepDirection;
     byte mNRX0SweepShiftLength;
-
-    DutyUnit& mDuty;
+ 
     int mShadowReg;
     int mClockCounter;
     bool mSweepEnabled;
@@ -166,6 +165,7 @@ private:
 
     byte& mStatusBit;
     byte mCurrentSequencerStep;
+    DutyUnit& mDuty;
 };
 
 #endif

@@ -88,8 +88,9 @@ byte Memory::read(const word address) const
         return 0x00;
     }
     
-    // Read from misc RAM
-    else if (address >= 0xFF00 && address <= 0xFFFF)
+    // Read from misc RAM - This statement is a touch convoluted, but it's required
+    // for gcc to compile without a warning about the limited range of unsigned shorts
+    else if ((address >= 0xFF00 && address <= 0xFFFE) || (address == 0xFFFF))
         return mMiscRAM[address - 0xFF00];
     
     // Sanity check
@@ -104,6 +105,7 @@ byte Memory::read(const word address) const
 
 void Memory::write(const word address, const byte data)
 {
+    
     Component* component = NULL;
     
     // The last instruction in the BIOS will write register 'a' to address
@@ -127,12 +129,15 @@ void Memory::write(const word address, const byte data)
     // This area is restricted
     else if (address >= 0xFEA0 && address <= 0xFEFF)
     {
+        if (data != 0x0)
+            printf("Restricted Write: %#04x = %#04x\n", address, data);
         //cout << "RESTRICTED WRITE: "; printHex(cout, address); cout << endl;
         //mMainMemory[address] = data;
     }
 
-    // Write to misc RAM
-    else if (address >= 0xFF00 && address <= 0xFFFF)
+    // Write to misc RAM - This statement is a touch convoluted, but it's required
+    // for gcc to compile without a warning about the limited range of unsigned shorts
+    else if ((address >= 0xFF00 && address <= 0xFFFE) || (address == 0xFFFF))
         mMiscRAM[address - 0xFF00] = data;
     
     // Sanity check

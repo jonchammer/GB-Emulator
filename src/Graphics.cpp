@@ -11,11 +11,11 @@
 
 Graphics::Graphics(Memory* memory, bool skipBIOS, const bool &_CGB, const bool &_CGBDoubleSpeed, DMGPalettes palette) :
     mMemory(memory),
+    mCGB(_CGB),
+    mCGBDoubleSpeed(_CGBDoubleSpeed),
     mBackgroundGlobalToggle(true),
     mWindowsGlobalToggle(true),
-    mSpritesGlobalToggle(true),
-    mCGB(_CGB),
-    mCGBDoubleSpeed(_CGBDoubleSpeed)
+    mSpritesGlobalToggle(true)
 {
     // Attach this component to the memory at the correct locations
     mMemory->attachComponent(this, 0x8000, 0x9FFF); // VRAM

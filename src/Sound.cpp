@@ -2,16 +2,16 @@
 #include <algorithm>
 
 Sound::Sound(Memory* memory, const bool skipBIOS, const bool &CGB, int sampleRate, int sampleBufferLength):
+    mCGB(CGB),
+    mSoundCallback(NULL),
+    mSoundCallbackData(NULL),
+    mSampleRate(sampleRate),
+    mSampleBufferLength(sampleBufferLength),
+    mMasterVolume(1.0),
     mSound1GlobalToggle(1),
     mSound2GlobalToggle(1),
     mSound3GlobalToggle(1),
-    mSound4GlobalToggle(1),
-    mCGB(CGB),
-    mSampleRate(sampleRate),
-    mSampleBufferLength(sampleBufferLength),
-    mSoundCallback(NULL),
-    mSoundCallbackData(NULL),
-    mMasterVolume(1.0)
+    mSound4GlobalToggle(1)
 {
     // Attach this component to the memory at the correct locations
     memory->attachComponent(this, 0xFF10, 0xFF3F);
@@ -143,6 +143,12 @@ void Sound::write(const word address, const byte value)
             mSound3->waveRAMChanged((address & 0xFF) - 0x30, value);
             break;
         }
+        
+        default:
+        {
+            cerr << "Address "; printHex(cerr, address); 
+            cerr << " does not belong to Sound." << endl;
+        }
     }
 }
 
@@ -187,6 +193,13 @@ byte Sound::read(const word address) const
         case 0xFF38: case 0xFF39: case 0xFF3A: case 0xFF3B:
         case 0xFF3C: case 0xFF3D: case 0xFF3E: case 0xFF3F:
             return mSound3->getWaveRAM((address & 0xFF) - 0x30);
+            
+        default:
+        {
+            cerr << "Address "; printHex(cerr, address); 
+            cerr << " does not belong to Sound." << endl;
+            return 0x00;
+        }
     }
 }
        

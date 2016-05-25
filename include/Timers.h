@@ -19,6 +19,7 @@ public:
     
     // Constructors
     Timers(Memory* memory, bool skipBIOS);
+    virtual ~Timers() {}
     
     // Memory access
     void write(const word address, const byte data);

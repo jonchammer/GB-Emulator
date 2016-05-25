@@ -87,7 +87,7 @@ public:
     
     // Constructors / Destructors
     Sound(Memory* memory, const bool skipBIOS, const bool &_CGB, int sampleRate = 44100, int sampleBufferLength = 1024);
-    ~Sound();
+    virtual ~Sound();
 
     // Sound lifecycle methods.
     void update(int clockDelta);

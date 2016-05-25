@@ -11,7 +11,7 @@ void MBC1::write(word address, byte data)
     
     // Do ROM Bank change
     else if ( (address >= 0x2000) && (address < 0x4000) )
-    {
+    {        
         // Put the lower 5 bits into the current ROM Bank.
         // The next 2 bits (5,6) can be set in changeHiROMBank
         byte lower5 = data & 0x1F; // Isolate the lower 5 bits
@@ -59,7 +59,7 @@ void MBC1::write(word address, byte data)
     { 
         // The last bit determines if we enter ROM mode or RAM mode.
         // 0 == ROM mode, 1 == RAM mode
-        mROMBanking  = (data & 0x1 == 0);
+        mROMBanking  = ((data & 0x1) == 0);
         
         // When in ROM Mode, the gameboy can only use RAM bank 0
         if (mROMBanking)

@@ -19,6 +19,7 @@ class MBC
 {
 public:
     MBC(Cartridge* owner) : mOwner(owner), mCurrentROMBank(1), mCurrentRAMBank(0), mEnableRAM(false) {}
+    virtual ~MBC() {}
     
     virtual void write(word address, byte data) = 0;
     
@@ -37,7 +38,7 @@ class MBC0 : public MBC
 {
 public:
     MBC0(Cartridge* owner) : MBC(owner) {}
-    void write(word address, byte data) {}
+    void write(word, byte) {}
 };
 
 // MBC 1 - 16Mbit ROM/8KB RAM or 4Mbit ROM/32KB RAM

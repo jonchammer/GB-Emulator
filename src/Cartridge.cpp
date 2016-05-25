@@ -1,6 +1,6 @@
 #include "Cartridge.h"
 
-Cartridge::Cartridge() : mData(NULL), mRAMBanks(NULL), mMBC(NULL), mDataSize(0), mUpdateSave(false)
+Cartridge::Cartridge() : mData(NULL), mDataSize(0), mRAMBanks(NULL), mMBC(NULL), mUpdateSave(false)
 {
     reset();
 }
@@ -41,6 +41,12 @@ void Cartridge::write(const word address, const byte data)
         if (mInfo.hasBattery)
             mUpdateSave = true;
     }
+    
+    else
+    {
+        cerr << "Address "; printHex(cerr, address); 
+        cerr << " does not belong to Cartridge." << endl;
+    }
 }
 
 byte Cartridge::read(const word address) const
@@ -80,6 +86,13 @@ byte Cartridge::read(const word address) const
         }
         
         else return 0x00;
+    }
+    
+    else
+    {
+        cerr << "Address "; printHex(cerr, address); 
+        cerr << " does not belong to Cartridge." << endl;
+        return 0x00;
     }
 }
 

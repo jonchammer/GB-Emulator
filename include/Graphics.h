@@ -76,8 +76,7 @@ public:
     };
 
     Graphics(Memory* memory, bool skipBIOS, const bool &_CGB, const bool &_CGBDoubleSpeed, DMGPalettes palette = RGBPALETTE_REAL);
-    
-    ~Graphics();
+    virtual ~Graphics();
     
     void update(int clockDelta);
 

@@ -159,7 +159,7 @@ void soundFunc(void* udata, short* buffer, int length)
  * This function is defined in Emulator.h and called in the main function.
  * It is the interface between the host platform and the emulator.
  */
-void startEmulation(int argc, char** argv, Emulator* emulator)
+void startEmulation(int /*argc*/, char** /*argv*/, Emulator* emulator)
 {
     em    = emulator;
     title = em->getMemory()->getLoadedCartridge()->getCartridgeInfo().name;

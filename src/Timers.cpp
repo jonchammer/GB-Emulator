@@ -27,6 +27,12 @@ void Timers::write(const word address, const byte data)
         case DIVIDER_REGISTER: mDividerReg = 0;    break;
         case TIMA:             mTIMA       = data; break;
         case TMA:              mTMA        = data; break;
+        
+        default:
+        {
+            cerr << "Address "; printHex(cerr, address); 
+            cerr << " does not belong to Timer." << endl;
+        }
     }
 }
 

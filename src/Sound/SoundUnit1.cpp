@@ -1,10 +1,10 @@
 #include "SoundUnit1.h"
 
-SoundUnit1::SoundUnit1(const bool &_CGB, Sound &soundController):
+SoundUnit1::SoundUnit1(const bool &_CGB, Sound &soundController) :
     mCGB(_CGB),
     mSoundController(soundController),
-    mLengthCounter(0x3F, mStatusBit),
-    mSweep(mNR13, mNR14, mStatusBit, mDuty)
+    mSweep(mNR13, mNR14, mStatusBit, mDuty),
+    mLengthCounter(0x3F, mStatusBit)
 {
 	reset();
 }
