@@ -53,6 +53,12 @@ void Input::write(const word address, const byte data)
 {
     if (address == JOYPAD_STATUS_ADDRESS)
         mJoypadReg = data;
+    
+    else
+    {
+        cerr << "Address "; printHex(cerr, address); 
+        cerr << " does not belong to Joypad." << endl;
+    }
 }
 
 byte Input::read(const word address) const

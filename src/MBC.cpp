@@ -10,7 +10,7 @@ void MBC1::write(word address, byte data)
     }
     
     // Do ROM Bank change
-    else if ( (address >= 0x2000) && (address < 0x4000) )
+    else if (address >= 0x2000 && address < 0x4000)
     {        
         // Put the lower 5 bits into the current ROM Bank.
         // The next 2 bits (5,6) can be set in changeHiROMBank
@@ -25,7 +25,7 @@ void MBC1::write(word address, byte data)
     }
     
     // Do ROM or RAM bank change
-    else if ( (address >= 0x4000) && (address < 0x6000) )
+    else if (address >= 0x4000 && address < 0x6000)
     {
         // ROM Bank change
         if (mROMBanking)
@@ -55,7 +55,7 @@ void MBC1::write(word address, byte data)
     }
     
     // This will change whether we are doing ROM banking or RAM banking
-    else if ( (address >= 0x6000) && (address < 0x8000) )
+    else if (address >= 0x6000 && address < 0x8000)
     { 
         // The last bit determines if we enter ROM mode or RAM mode.
         // 0 == ROM mode, 1 == RAM mode
@@ -64,6 +64,12 @@ void MBC1::write(word address, byte data)
         // When in ROM Mode, the gameboy can only use RAM bank 0
         if (mROMBanking)
             mCurrentRAMBank = 0;
+    }
+    
+    else
+    {
+        cerr << "Address "; printHex(cerr, address); 
+        cerr << " does not belong to MBC." << endl;
     }
 }
 
@@ -80,11 +86,22 @@ void MBC2::write(word address, byte data)
     }
     
     // Do ROM Bank change
-    else if ( (address >= 0x2000) && (address < 0x4000) )
+    else if (address >= 0x2000 && address < 0x4000)
     {
         // The lower 4 bits are the desired ROM Bank (only 16 ROM banks can be used)
         mCurrentROMBank = data & 0xF;
         if (mCurrentROMBank == 0) mCurrentROMBank++;
+    }
+    
+    else if (address < 0x8000)
+    {
+        // Do nothing
+    }
+    
+    else
+    {
+        cerr << "Address "; printHex(cerr, address); 
+        cerr << " does not belong to MBC." << endl;
     }
 }
 
@@ -98,7 +115,7 @@ void MBC3::write(word address, byte data)
     }
     
     // Do ROM Bank change
-    else if ( (address >= 0x2000) && (address < 0x4000) )
+    else if (address >= 0x2000 && address < 0x4000)
     {
         // Put the lower 7 bits into the current ROM Bank.
         byte lower7 = data & 0x7F; // Isolate the lower 7 bits
@@ -111,16 +128,22 @@ void MBC3::write(word address, byte data)
     }
     
     // Do RAM bank change
-    else if ( (address >= 0x4000) && (address < 0x6000) )
+    else if (address >= 0x4000 && address < 0x6000)
     {
         // Isolate the lower 2 bits (there are only 4 RAM banks total)
         mCurrentRAMBank = data & 0x3;
     }
     
     // This will change whether we are doing ROM banking or RAM banking
-    else if ( (address >= 0x6000) && (address < 0x8000) )
+    else if (address >= 0x6000 && address < 0x8000)
     {
         // TODO: RTC Stuff
+    }
+    
+    else
+    {
+        cerr << "Address "; printHex(cerr, address); 
+        cerr << " does not belong to MBC." << endl;
     }
 }
 
@@ -153,5 +176,11 @@ void MBC5::write(word address, byte data)
     else if (address >= 0x4000 && address < 0x6000)
     {
         mCurrentRAMBank = (data & 0x0F);
+    }
+    
+    else
+    {
+        cerr << "Address "; printHex(cerr, address); 
+        cerr << " does not belong to MBC." << endl;
     }
 }

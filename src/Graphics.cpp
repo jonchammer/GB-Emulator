@@ -326,16 +326,28 @@ byte Graphics::read(const word address) const
         case BGPD:  return mBGPD[mBGPI & 0x3F];
         case OBPI:  return mOBPI | 0x40;
         case OBPD:  return mOBPD[mOBPI & 0x3F];
-        default:    return 0xFF;
+        
+        default:    
+        {
+            cerr << "Address "; printHex(cerr, address); 
+            cerr << " does not belong to Graphics." << endl;
+            return 0xFF;
+        }
     }
 }
 
 void Graphics::write(word address, byte data)
 {
     if ((address >= VRAM_START) && (address <= VRAM_END))
+    {
         writeVRAM(address - VRAM_START, data);
+        return;
+    }
     else if ((address >= OAM_START) && (address <= OAM_END))
+    {
         writeOAM(address - OAM_START, data);
+        return;
+    }
     
     switch (address)
     {
@@ -361,6 +373,12 @@ void Graphics::write(word address, byte data)
         case BGPD:  BGPDChanged(data);  break;
         case OBPI:  OBPIChanged(data);  break;
         case OBPD:  OBPDChanged(data);  break;
+        
+        default:    
+        {
+            cerr << "Address "; printHex(cerr, address); 
+            cerr << " does not belong to Graphics." << endl;
+        }
     }
 }
     

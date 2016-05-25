@@ -15,9 +15,9 @@ void Timers::write(const word address, const byte data)
         {
             // The frequency is specified by the lower 2 bits of TAC
             byte currentFrequency = mTAC & 0x3;
-            mTAC                  = data;
             byte newFrequency     = data & 0x3;
-
+            mTAC                  = data;
+            
             if (currentFrequency != newFrequency)
                 setClockFrequency();
             break;
