@@ -23,9 +23,9 @@ public:
     
     virtual void write(word address, byte data) = 0;
     
-    word getCurrentROMBank() { return mCurrentROMBank; }
-    word getCurrentRAMBank() { return mCurrentRAMBank; }
-    bool isRAMEnabled()      { return mEnableRAM;      }
+    virtual word getCurrentROMBank() { return mCurrentROMBank; }
+    virtual word getCurrentRAMBank() { return mCurrentRAMBank; }
+    virtual bool isRAMEnabled()      { return mEnableRAM;      }
 protected:
     Cartridge* mOwner;
     word mCurrentROMBank;
@@ -47,6 +47,19 @@ class MBC1 : public MBC
 public:
     MBC1(Cartridge* owner) : MBC(owner), mROMBanking(true) {}
     void write(word address, byte data);
+    
+    word getCurrentROMBank()
+    {
+        if (mROMBanking) return mCurrentROMBank;
+        else             return mCurrentROMBank & 0x1F;
+    }
+    
+    word getCurrentRAMBank() 
+    {
+        if (mROMBanking) return 0;
+        else             return mCurrentRAMBank;
+    }
+    
 private:
     bool mROMBanking;
 };

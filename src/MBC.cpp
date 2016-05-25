@@ -60,10 +60,6 @@ void MBC1::write(word address, byte data)
         // The last bit determines if we enter ROM mode or RAM mode.
         // 0 == ROM mode, 1 == RAM mode
         mROMBanking  = ((data & 0x1) == 0);
-        
-        // When in ROM Mode, the gameboy can only use RAM bank 0
-        if (mROMBanking)
-            mCurrentRAMBank = 0;
     }
     
     else
@@ -176,6 +172,11 @@ void MBC5::write(word address, byte data)
     else if (address >= 0x4000 && address < 0x6000)
     {
         mCurrentRAMBank = (data & 0x0F);
+    }
+    
+    else if (address >= 0x6000 && address < 0x8000)
+    {
+        // Do nothing
     }
     
     else

@@ -14,21 +14,54 @@
 class Memory;
 class Emulator;
 
-class Graphics 
+enum DMGPalettes
+{
+    RGBPALETTE_BLACKWHITE = 0,
+    RGBPALETTE_REAL = 1
+};
+
+class Graphics : Component
 {
 public:
+    // Important memory locations
+    const static word VRAM_START = 0x8000;
+    const static word VRAM_END   = 0x9FFF;
+    const static word OAM_START  = 0xFE00;
+    const static word OAM_END    = 0xFE9F;
+    const static word LCDC       = 0xFF40;
+    const static word STAT       = 0xFF41;
+    const static word SCY        = 0xFF42;
+    const static word SCX        = 0xFF43;
+    const static word LY         = 0xFF44;
+    const static word LYC        = 0xFF45;
+    const static word DMA        = 0xFF46;
+    const static word BGP        = 0xFF47;
+    const static word OBP0       = 0xFF48;
+    const static word OBP1       = 0xFF49;
+    const static word WY         = 0xFF4A;
+    const static word WX         = 0xFF4B;
+    const static word VBK        = 0xFF4F;
+    const static word HDMA1      = 0xFF51;
+    const static word HDMA2      = 0xFF52;
+    const static word HDMA3      = 0xFF53;
+    const static word HDMA4      = 0xFF54;
+    const static word HDMA5      = 0xFF55;
+    const static word BGPI       = 0xFF68;
+    const static word BGPD       = 0xFF69;
+    const static word OBPI       = 0xFF6A;
+    const static word OBPD       = 0xFF6B;
     
     /**
      * Creates a new Graphics unit for the Gameboy.
      * 
      * @param memory. A pointer to the memory unit.
      */
-    Graphics(Memory* memory);
+    Graphics(Memory* memory, bool skipBIOS, const bool &_CGB, const bool &_CGBDoubleSpeed, DMGPalettes palette = RGBPALETTE_REAL);
     
     /**
      * Destructor.
      */
-    ~Graphics();
+    virtual ~Graphics();
     
     /**
      * Called during the emulation loop. Used to update the screen buffer
@@ -41,13 +74,10 @@ public:
     /**
      * Resets the state of the screen buffer to its initial configuration.
      */
-    void reset();
-    
-    bool canAccessVRAM();
-    
-    bool canAccessOAM();
-    
-    void write(word address, byte data);
+    void reset(bool skipBIOS);
+
+    byte read(const word address) const;
+    void write(const word address, const byte data);
     
     /**
      * Returns a pointer to the raw screen buffer. This can be used to draw
@@ -65,8 +95,7 @@ private:
     int mScanlineCounter; // Keeps track of when to move to the next scanline
     bool mShowGrid;
     
-    byte mLCDC;
-    byte mSTAT;
+    byte* mData;
     
     // Helper functions
     void setLCDStatus();
@@ -75,8 +104,7 @@ private:
     void renderTiles();
     void renderSprites();
     int getColor(byte colorNum, word address) const;
-    
-    void LCDCChanged(byte value);
+    void handleDMATransfer(byte data);
 };
 
 #endif /* GRAPHICS_H */

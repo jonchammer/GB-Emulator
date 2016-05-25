@@ -105,7 +105,6 @@ byte Memory::read(const word address) const
 
 void Memory::write(const word address, const byte data)
 {
-    
     Component* component = NULL;
     
     // The last instruction in the BIOS will write register 'a' to address
@@ -179,7 +178,7 @@ void Memory::attachComponent(Component* component, word startAddress, word endAd
 }
 
 Component* Memory::getComponentForAddress(const word address) const
-{ 
+{     
     // Go through the component lists to find one that can handle this address
     for (int i = 0, j = 0; i < mComponentIndex; i++, j += 2)
     {

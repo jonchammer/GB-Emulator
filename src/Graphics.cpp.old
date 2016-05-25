@@ -8,109 +8,144 @@
 #include "Graphics.h"
 #include <cstdlib>
 
-Graphics::Graphics(Memory* memory) : mMemory(memory), mScanlineCounter(0)
+Graphics::Graphics(Memory* memory, bool skipBIOS, const bool &_CGB, const bool &_CGBDoubleSpeed, DMGPalettes palette) : mMemory(memory), mScanlineCounter(0)
 {
+    // Attach this component to the memory at the correct locations
+    mMemory->attachComponent(this, 0x8000, 0x9FFF); // VRAM
+    mMemory->attachComponent(this, 0xFE00, 0xFE9F); // OAM
+    mMemory->attachComponent(this, 0xFF40, 0xFF4B); // Graphics I/O ports
+    mMemory->attachComponent(this, 0xFF4F, 0xFF4F); // VBK
+    mMemory->attachComponent(this, 0xFF51, 0xFF55); // HDMA
+    mMemory->attachComponent(this, 0xFF68, 0xFF6B); // GBC Registers
+    
     mScreenData = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4];
-    reset();
+    mData = new byte[0x10000];
+    reset(skipBIOS);
 }
 
 Graphics::~Graphics()
 {
     delete[] mScreenData;
+    delete[] mData;
     mScreenData = NULL;
 }
 
-void Graphics::reset()
+void Graphics::reset(bool skipBIOS)
 {
     mScanlineCounter = 0;
     for (int i = 0; i < SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4; ++i)
-        mScreenData[i] = 0x00;
+        mScreenData[i] = 0xFF;
+    for (int i = 0; i < 0x10000; ++i)
+        mData[i] = 0x0;
+    
+    for (int i = 0xFE00; i <= 0xFE9F; ++i)
+        mData[i] = 0xFF;
+    
+    if (skipBIOS)
+    {
+        write(LCDC, 0x91);
+        write(STAT, 0x85);
+        write(BGP, 0xFC);
+        write(OBP0, 0xFF);
+    }
 }
 
-bool Graphics::canAccessVRAM()
+byte Graphics::read(const word address) const
 {
+    if ((address >= VRAM_START) && (address <= VRAM_END))
+        return mData[address];
+    else if (address >= OAM_START && address <= OAM_END)
+        return mData[address];
     
+    switch (address)
+    {
+        case LCDC:  return mData[address];
+        case STAT:  return mData[address];
+        case SCY:   return mData[address];
+        case SCX:   return mData[address];
+        case LY:    return mData[address];
+        case LYC:   return mData[address];
+        case BGP:   return mData[address];
+        case OBP0:  return mData[address];
+        case OBP1:  return mData[address];
+        case WY:    return mData[address];
+        case WX:    return mData[address];
+        case VBK:   return mData[address];
+        case HDMA1: return mData[address];
+        case HDMA2: return mData[address];
+        case HDMA3: return mData[address];
+        case HDMA4: return mData[address];
+        case HDMA5: return mData[address];
+        case BGPI:  return mData[address];
+        case BGPD:  return mData[address];
+        case OBPI:  return mData[address];
+        case OBPD:  return mData[address];
+        case DMA:   return mData[address];
+        
+        default:    
+        {
+            cerr << "Address "; printHex(cerr, address); 
+            cerr << " does not belong to Graphics." << endl;
+            return 0xFF;
+        }
+    }
 }
 
-bool Graphics::canAccessOAM()
+void Graphics::handleDMATransfer(byte data)
 {
+    word address = data << 8; // Multiply by 0x100
     
+    // Copy the data from 0xFE00 to the location given by address
+    // We should use the read()/write() mechanism, but directly
+    // manipulating the memory array will save a lot of overhead,
+    // especially because there will be no special behavior for
+    // this section of memory.
+    for (int i = 0; i < 0xA0; ++i)
+        write(0xFE00 + i, mMemory->read(address + i));
 }
 
 void Graphics::write(word address, byte data)
-{
+{    
+    if (address >= VRAM_START && address <= VRAM_END)
+    {
+        mData[address] = data;
+        return;
+    }
+    else if (address >= OAM_START && address <= OAM_END)
+    {
+        mData[address] = data;
+        return;
+    }
+    
     switch (address)
     {
-        case 0xFF40:
-        {
-            LCDCChanged(data);
-            mMemory->writeNaive(address, data);
-            break;
-        }
+        case LCDC:  mData[address] = data; break;
+        case STAT:  mData[address] = data; break;
+        case SCY:   mData[address] = data; break;
+        case SCX:   mData[address] = data; break;
+        case LY:    mData[address] = data; break;
+        case LYC:   mData[address] = data; break;
+        case BGP:   mData[address] = data; break;
+        case OBP0:  mData[address] = data; break;
+        case OBP1:  mData[address] = data; break;
+        case WY:    mData[address] = data; break;
+        case WX:    mData[address] = data; break;
+        case VBK:   mData[address] = data; break;
+        case HDMA1: mData[address] = data; break;
+        case HDMA2: mData[address] = data; break;
+        case HDMA3: mData[address] = data; break;
+        case HDMA4: mData[address] = data; break;
+        case HDMA5: mData[address] = data; break;
+        case BGPI:  mData[address] = data; break;
+        case BGPD:  mData[address] = data; break;
+        case OBPI:  mData[address] = data; break;
+        case OBPD:  mData[address] = data; break;
+        case DMA:   handleDMATransfer(data); break;
         
-        case 0xFF41:
+        default:    
         {
-            break;
-        }
-        
-        case 0xFF45:
-        {
-            break;
-        }
-        
-        case 0xFF46:
-        {
-            break;
-        }
-        
-        case 0xFF4F:
-        {
-            break;
-        }
-        
-        case 0xFF51:
-        {
-            break;
-        }
-        
-        case 0xFF52:
-        {
-            break;
-        }
-        
-        case 0xFF53:
-        {
-            break;
-        }
-        
-        case 0xFF54:
-        {
-            break;
-        }
-        
-        case 0xFF55:
-        {
-            break;
-        }
-        
-        case 0xFF68:
-        {
-            break;
-        }
-        
-        case 0xFF69:
-        {
-            break;
-        }
-        
-        case 0xFF6A:
-        {
-            break;
-        }
-        
-        case 0xFF6B:
-        {
-            break;
+            cerr << "Address "; printHex(cerr, address); 
+            cerr << " does not belong to Graphics." << endl;
         }
     }
 }
@@ -126,8 +161,8 @@ void Graphics::update(int cycles)
     if (mScanlineCounter <= 0)
     {
         // It's time to move on to the next scanline
-        mMemory->writeNaive(SCANLINE_ADDRESS, mMemory->read(SCANLINE_ADDRESS) + 1);
-        byte currentLine = mMemory->read(SCANLINE_ADDRESS);
+        write(SCANLINE_ADDRESS, read(SCANLINE_ADDRESS) + 1);
+        byte currentLine = read(SCANLINE_ADDRESS);
         
         // Reset the counter
         mScanlineCounter = 456;
@@ -146,7 +181,7 @@ void Graphics::update(int cycles)
         // TODO: I think it should reset to 0 when currentLine is >= 152, but
         // I haven't been able to find support for it yet.
         else if (currentLine > 153)
-            mMemory->writeNaive(SCANLINE_ADDRESS, -1);
+            write(SCANLINE_ADDRESS, -1);
         
         // Draw the current scanline
         else if (currentLine < SCREEN_HEIGHT_PIXELS)
@@ -156,19 +191,19 @@ void Graphics::update(int cycles)
 
 void Graphics::setLCDStatus()
 {
-    byte status = mMemory->read(LCD_STATUS_ADDRESS);
+    byte status = read(LCD_STATUS_ADDRESS);
     if (!isLCDEnabled())
     {
         // Set the mode to 1 during LCD disabled and reset the scanline
         mScanlineCounter = 456;
-        mMemory->writeNaive(SCANLINE_ADDRESS, 0);
+        write(SCANLINE_ADDRESS, 0);
         status &= 0xFC;
         status = setBit(status, 0);
-        mMemory->write(LCD_STATUS_ADDRESS, status);
+        write(LCD_STATUS_ADDRESS, status);
         return;
     }
     
-    byte currentLine = mMemory->read(SCANLINE_ADDRESS);
+    byte currentLine = read(SCANLINE_ADDRESS);
     byte currentMode = status & 0x3;
     
     byte mode             = 0;
@@ -223,7 +258,7 @@ void Graphics::setLCDStatus()
         mMemory->requestInterrupt(INTERRUPT_LCD);
     
     // Set the coincidence flag, if applicable
-    if (currentLine == mMemory->read(COINCIDENCE_ADDRESS))
+    if (currentLine == read(COINCIDENCE_ADDRESS))
     {
         status = setBit(status, 2);
         if (testBit(status, 6))
@@ -232,36 +267,36 @@ void Graphics::setLCDStatus()
     else status = clearBit(status, 2);
     
     // Save the final status to the proper location in memory
-    mMemory->write(LCD_STATUS_ADDRESS, status);
+    write(LCD_STATUS_ADDRESS, status);
 }
 
 bool Graphics::isLCDEnabled()
 {
-    return testBit(mMemory->read(LCD_CONTROL_REGISTER), 7);
+    return testBit(read(LCD_CONTROL_REGISTER), 7);
 }
 
 void Graphics::drawScanLine()
 {     
-    byte control = mMemory->read(LCD_CONTROL_REGISTER);
+    byte control = read(LCD_CONTROL_REGISTER);
     if (testBit(control, 0))
         renderTiles();
     
-    if (testBit(control, 1));
+    if (testBit(control, 1))
         renderSprites();
 }
 
 void Graphics::renderTiles()
 {
-    byte lcdControl       = mMemory->read(LCD_CONTROL_REGISTER);
+    byte lcdControl       = read(LCD_CONTROL_REGISTER);
     word tileData         = 0;
     word backgroundMemory = 0;
     bool unsign           = true;
     
     // Where to draw the visual area and the window
-    byte scrollX = mMemory->read(SCROLL_X);
-    byte scrollY = mMemory->read(SCROLL_Y);
-    byte windowX = mMemory->read(WINDOW_X) - 7;
-    byte windowY = mMemory->read(WINDOW_Y);
+    byte scrollX = read(SCROLL_X);
+    byte scrollY = read(SCROLL_Y);
+    byte windowX = read(WINDOW_X) - 7;
+    byte windowY = read(WINDOW_Y);
     
     bool usingWindow = false;
     
@@ -269,7 +304,7 @@ void Graphics::renderTiles()
     if (testBit(lcdControl, 5))
     {
         // Is the current scanline we're drawing within the window's y pos?
-        if (windowY <= mMemory->read(SCANLINE_ADDRESS))
+        if (windowY <= read(SCANLINE_ADDRESS))
             usingWindow = true;
     }
     
@@ -305,9 +340,9 @@ void Graphics::renderTiles()
     // yPos is used to calculate which of 32 vertical tiles the
     // current scanline is drawing
     if (!usingWindow)
-        yPos = scrollY + mMemory->read(SCANLINE_ADDRESS);
+        yPos = scrollY + read(SCANLINE_ADDRESS);
     else
-        yPos = mMemory->read(SCANLINE_ADDRESS) - windowY;
+        yPos = read(SCANLINE_ADDRESS) - windowY;
     
     // Which of the 8 vertical pixels of the current tile is the scanline on?
     word tileRow = (((byte) (yPos / 8)) * 32);
@@ -326,9 +361,9 @@ void Graphics::renderTiles()
         // Get the tile identity number. Remember, it can be signed or unsigned.
         word tileAddress = backgroundMemory + tileRow + tileCol;
         if (unsign)
-            tileNum = (byte) mMemory->read(tileAddress);
+            tileNum = (byte) read(tileAddress);
         else
-            tileNum = (signedByte) mMemory->read(tileAddress);
+            tileNum = (signedByte) read(tileAddress);
         
         // Deduce where this tile identifier is in memory.
         word tileLocation = tileData;
@@ -340,8 +375,8 @@ void Graphics::renderTiles()
         // Find the correct vertical line we're on of the tile to get the tile data from memory
         byte line = yPos % 8;
         line *= 2; // Each vertical line takes up two bytes of memory
-        byte data1 = mMemory->read(tileLocation + line);
-        byte data2 = mMemory->read(tileLocation + line + 1);
+        byte data1 = read(tileLocation + line);
+        byte data2 = read(tileLocation + line + 1);
         
         // Calculate color bit
         int colorBit = 7 - xPos % 8;
@@ -353,7 +388,7 @@ void Graphics::renderTiles()
         
         // Now that we have the color ID, get the actual color from the palette
         int color  = getColor(colorNum, BACKGROUND_PALETTE_ADDRESS);
-        int yCoord = mMemory->read(SCANLINE_ADDRESS);
+        int yCoord = read(SCANLINE_ADDRESS);
         if ((yCoord < 0) || (yCoord > 143) || (pixel < 0) || (pixel > 159))
             continue;
         
@@ -378,10 +413,10 @@ void Graphics::renderSprites()
 {
     // Sort out whether our sprites are 8x8 or 8x16
     int ySize = 8;
-    if (testBit(mMemory->read(LCD_CONTROL_REGISTER), 2))
+    if (testBit(read(LCD_CONTROL_REGISTER), 2))
         ySize = 16;
     
-    int scanline    = mMemory->read(SCANLINE_ADDRESS);
+    int scanline    = read(SCANLINE_ADDRESS);
     int spriteCount = 0;
     
     for (int sprite = 0; sprite < 40; ++sprite)
@@ -391,10 +426,10 @@ void Graphics::renderSprites()
         
         // Sprite occupies 4 bytes in the sprite attributes table
         byte index        = sprite * 4;
-        int yPos          = mMemory->read(0xFE00 + index) - 16;
-        int xPos          = mMemory->read(0xFE00 + index + 1) - 8;
-        byte tileLocation = mMemory->read(0xFE00 + index + 2);
-        byte attributes   = mMemory->read(0xFE00 + index + 3);
+        int yPos          = read(0xFE00 + index) - 16;
+        int xPos          = read(0xFE00 + index + 1) - 8;
+        byte tileLocation = read(0xFE00 + index + 2);
+        byte attributes   = read(0xFE00 + index + 3);
         
         bool xFlip = testBit(attributes, 5);
         bool yFlip = testBit(attributes, 6);
@@ -414,8 +449,8 @@ void Graphics::renderSprites()
             
             line *= 2; // Same as for tiles
             word dataAddress = (0x8000 + (tileLocation * 16)) + line;
-            byte data1 = mMemory->read(dataAddress);
-            byte data2 = mMemory->read(dataAddress + 1);
+            byte data1 = read(dataAddress);
+            byte data2 = read(dataAddress + 1);
             
             // It's easier to read in from right to left as pixel 0 is
             // bit 7 in the color data, pixel 1 is bit 6, etc.
@@ -467,7 +502,7 @@ void Graphics::renderSprites()
 int Graphics::getColor(byte colorNum, word address) const
 {
     int result   = WHITE;
-    byte palette = mMemory->read(address);
+    byte palette = read(address);
     int hi       = 0;
     int lo       = 0;
     
@@ -502,14 +537,4 @@ int Graphics::getColor(byte colorNum, word address) const
     }
     
     return result;
-}
-
-void Graphics::LCDCChanged(byte value)
-{
-    // If LCD is being turned off
-    if (!testBit(value, 7))
-    {
-        mSTAT &= ~0x3;
-        
-    }
 }
