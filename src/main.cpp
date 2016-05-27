@@ -11,13 +11,14 @@
 #include "Memory.h"
 #include "Emulator.h"
 #include "Cartridge.h"
+#include "Debugger.h"
 using namespace std;
 
 int main(int argc, char** argv)
 {
     //string game = "../roms/tests/OAMBug/oam_bug.gb";
-    //string game = "../roms/Links_Awakening.gb";
-    string game = "../roms/Super_Mario_Land.gb";
+    string game = "../roms/Links_Awakening.gb";
+    //string game = "../roms/Super_Mario_Land.gb";
     
     // Create the game cartridge
     Cartridge cartridge;
@@ -32,12 +33,12 @@ int main(int argc, char** argv)
     emulator.getMemory()->loadCartridge(&cartridge);
     cartridge.printInfo();
   
-//    emulator.getInput()->keyPressed(BUTTON_START);
-//    emulator.getCPU()->setLogging(true);
-//    while (true)
-//    {
-//        emulator.update();
-//    }
+    // Create and configure debugger
+    Debugger debugger;
+    debugger.setEnabled(true);
+    debugger.setBreakpoint(0x0150);
+    //debugger.setBreakpoint(0x2887);
+    emulator.attachDebugger(&debugger);
     
     // Start the emulation
     startEmulation(argc, argv, &emulator);

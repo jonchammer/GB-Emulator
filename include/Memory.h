@@ -19,6 +19,7 @@ using namespace std;
 // Forward declaration of necessary classes
 class Emulator;
 class Cartridge;
+class Debugger;
 
 class Memory 
 {
@@ -68,10 +69,14 @@ public:
     Cartridge* getLoadedCartridge() { return mLoadedCartridge; }
     
     void attachComponent(Component* component, word startAddress, word endAddress);
+    void attachDebugger(Debugger* debugger) { mDebugger = debugger; }
     
 private:
-
+    // Allow the debugger read only access to the state of the memory
+    friend class Debugger;
+    
     Emulator* mEmulator;
+    Debugger* mDebugger;          // A pointer to the debugger (can be NULL)
     Cartridge* mLoadedCartridge;
     
     word mComponentAddresses[30]; // Holds start, end addresses for the components (interlaced)

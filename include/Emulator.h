@@ -17,6 +17,7 @@ class Timers;
 class Graphics;
 class Input;
 class Sound;
+class Debugger;
 class Emulator;
 
 /**
@@ -63,6 +64,12 @@ public:
      * @param skipBIOS. When true, the BIOS will be skipped.
      */
     void reset(bool skipBIOS = false);
+    
+    /**
+     * Attach the given debugger to the emulator so the user can monitor code
+     * execution. If the pointer is NULL, the debugger is removed.
+     */
+    void attachDebugger(Debugger* debugger);
     
     // Adjust 'paused' state
     void togglePaused()         { mPaused = !mPaused; }

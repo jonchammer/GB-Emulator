@@ -28,7 +28,7 @@ const byte BIOS[] =
     0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50
 };
 
-Memory::Memory(Emulator* emulator, bool skipBIOS) : mEmulator(emulator)
+Memory::Memory(Emulator* emulator, bool skipBIOS) : mEmulator(emulator), mDebugger(NULL)
 {
     // Internal RAM is 8 KB
     mInternalRAM = new byte[0x2000];
@@ -62,36 +62,37 @@ void Memory::reset(bool skipBIOS)
 byte Memory::read(const word address) const
 {
     Component* component = NULL;
+    byte data = 0x00;
     
     // Read from BIOS memory
     if (mInBIOS && address < 0x100)
-        return BIOS[address];
+        data = BIOS[address];
 
     // Check the component map to route most addresses to the component
     // that can actually deal with it.
     else if ((component = getComponentForAddress(address)) != NULL)
-        return component->read(address);
+        data = component->read(address);
     
     // Read from internal RAM
     else if (address >= 0xC000 && address <= 0xDFFF)
-        return mInternalRAM[address - 0xC000];
-    
+        data = mInternalRAM[address - 0xC000];
+
     // Read from echo RAM, which uses the same storage as the internal RAM
     else if (address >= 0xE000 && address <= 0xFDFF)
-        return mInternalRAM[address - 0xE000];
-    
+        data = mInternalRAM[address - 0xE000];
+       
     // This area is restricted
     else if (address >= 0xFEA0 && address <= 0xFEFF)
     {
         cout << "RESTRICTED READ: "; printHex(cout, address); cout << endl;
         //return mMainMemory[address];
-        return 0x00;
+        data = 0x00;
     }
     
     // Read from misc RAM - This statement is a touch convoluted, but it's required
     // for gcc to compile without a warning about the limited range of unsigned shorts
     else if ((address >= 0xFF00 && address <= 0xFFFE) || (address == 0xFFFF))
-        return mMiscRAM[address - 0xFF00];
+        data = mMiscRAM[address - 0xFF00];
     
     // Sanity check
     else
@@ -99,8 +100,11 @@ byte Memory::read(const word address) const
         cerr << "READ: Address not recognized: "; 
         printHex(cerr, address); 
         cerr << endl;
-        return 0x00;
+        data = 0x00;
     }
+    
+    if (mDebugger != NULL) mDebugger->memoryRead(address, data);
+    return data;
 }
 
 void Memory::write(const word address, const byte data)
@@ -120,7 +124,7 @@ void Memory::write(const word address, const byte data)
     // Write to working RAM (also used for echo RAM)
     else if (address >= 0xC000 && address <= 0xDFFF)
         mInternalRAM[address - 0xC000] = data;
-
+    
     // Write to echo RAM (also used for working RAM)
     else if (address >= 0xE000 && address <= 0xFDFF)
         mInternalRAM[address - 0xE000] = data;
@@ -136,7 +140,7 @@ void Memory::write(const word address, const byte data)
 
     // Write to misc RAM - This statement is a touch convoluted, but it's required
     // for gcc to compile without a warning about the limited range of unsigned shorts
-    else if ((address >= 0xFF00 && address <= 0xFFFE) || (address == 0xFFFF))
+    else if ((address >= 0xFF00 && address <= 0xFFFE) || (address == 0xFFFF))     
         mMiscRAM[address - 0xFF00] = data;
     
     // Sanity check
@@ -146,6 +150,8 @@ void Memory::write(const word address, const byte data)
         printHex(cerr, address); 
         cerr << endl;
     }
+    
+    if (mDebugger != NULL) mDebugger->memoryWrite(address, data);
 }
 
 void Memory::requestInterrupt(int id)

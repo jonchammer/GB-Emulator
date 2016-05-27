@@ -15,7 +15,7 @@ Emulator::Emulator(bool skipBIOS) : mPaused(false)
     mTimers   = new Timers(mMemory, skipBIOS);
     mGraphics = new Graphics(mMemory, skipBIOS, false, false, RGBPALETTE_BLACKWHITE);
     mInput    = new Input(mMemory, skipBIOS);
-    mSound    = new Sound(mMemory, skipBIOS, false, 44100, 1024); 
+    mSound    = new Sound(mMemory, skipBIOS, false, 44100, 1024);
 }
 
 Emulator::~Emulator()
@@ -53,6 +53,17 @@ void Emulator::update()
     mCycleCount = 0;
     while (mCycleCount < MAX_CYCLES)
         mCPU->update();
+}
+
+void Emulator::attachDebugger(Debugger* debugger)
+{
+    mCPU->attachDebugger(debugger);
+    mMemory->attachDebugger(debugger);
+    mInput->attachDebugger(debugger);
+    
+    debugger->attachCPU(mCPU);
+    debugger->attachMemory(mMemory);
+    debugger->attachInput(mInput);
 }
 
 void Emulator::sync(int cycles)

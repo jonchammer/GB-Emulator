@@ -7,7 +7,7 @@
 
 #include "Input.h"
 
-Input::Input(Memory* memory, bool skipBIOS) : mMemory(memory)
+Input::Input(Memory* memory, bool skipBIOS) : mMemory(memory), mDebugger(NULL)
 {
     // Attach this component to the memory at the correct locations
     mMemory->attachComponent(this, JOYPAD_STATUS_ADDRESS, JOYPAD_STATUS_ADDRESS);
@@ -41,12 +41,16 @@ void Input::keyPressed(int key)
     // If the game has asked for button information and we have a normal
     // button that has been pressed, also issue the joypad interrupt.
     else if (testBit(keyReq, 5) && !direction)
-        mMemory->requestInterrupt(INTERRUPT_JOYPAD);        
+        mMemory->requestInterrupt(INTERRUPT_JOYPAD);
+    
+    if (mDebugger != NULL) mDebugger->joypadUpdate();
 }
 
 void Input::keyReleased(int key)
 {
     mJoypadState = setBit(mJoypadState, key);
+    
+    if (mDebugger != NULL) mDebugger->joypadUpdate();
 }
 
 void Input::write(const word address, const byte data)
@@ -58,7 +62,7 @@ void Input::write(const word address, const byte data)
     {
         cerr << "Address "; printHex(cerr, address); 
         cerr << " does not belong to Joypad." << endl;
-    }
+    }  
 }
 
 byte Input::read(const word address) const

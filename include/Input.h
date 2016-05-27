@@ -51,8 +51,14 @@ public:
      */
     void reset(bool skipBIOS);
     
+    void attachDebugger(Debugger* debugger) { mDebugger = debugger; }
+    
 private:
+    // Allow the debugger read only access to the state of the CPU
+    friend class Debugger;
+    
     Memory* mMemory;      // Pointer to the main memory unit.
+    Debugger* mDebugger;  // A pointer to the debugger (can be NULL)
     byte mJoypadState;    // Contains the current state of each button (1 per bit). 0 is pressed.
     byte mJoypadReg;      // The register that contains the information sent to the game
 };

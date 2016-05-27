@@ -24,6 +24,8 @@ Graphics::Graphics(Memory* memory, bool skipBIOS, const bool &_CGB, const bool &
     mMemory->attachComponent(this, 0xFF4F, 0xFF4F); // VBK
     mMemory->attachComponent(this, 0xFF51, 0xFF55); // HDMA
     mMemory->attachComponent(this, 0xFF68, 0xFF6B); // GBC Registers
+    mMemory->attachComponent(this, 0xFF57, 0xFF67); // ??? - Included by Gomeboy, but don't seem to be useful
+    mMemory->attachComponent(this, 0xFF6C, 0xFF6F); // ???
     
     mScreenBuffer = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4];
 	reset(skipBIOS);
@@ -393,33 +395,23 @@ void Graphics::writeVRAM(word addr, byte value)
 void Graphics::writeOAM(byte addr, byte value)
 {
 	if (GET_LCD_MODE() == GBLCDMODE_HBLANK || GET_LCD_MODE() == GBLCDMODE_VBLANK || !LCD_ON())
-	{
 		mOAM[addr] = value;
-	}
 }
 
 byte Graphics::readVRAM(word addr) const
 {
 	if (GET_LCD_MODE() != GBLCDMODE_OAMRAM || !LCD_ON())
-	{
 		return mVRAM[mVRAMBankOffset + addr];
-	}
-	else
-	{
-		return 0xFF;
-	}
+    
+	else return 0xFF;
 }
 
 byte Graphics::readOAM(byte addr) const
 {
 	if (GET_LCD_MODE() == GBLCDMODE_HBLANK || GET_LCD_MODE() == GBLCDMODE_VBLANK || !LCD_ON())
-	{
 		return mOAM[addr];
-	}
-	else
-	{
-		return 0xFF;
-	}
+	
+	else return 0xFF;
 }
 
 void Graphics::DMAStep(int clockDelta)
@@ -508,7 +500,7 @@ void Graphics::STATChanged(byte value)
 }
 
 void Graphics::LYCChanged(byte value) 
-{ 
+{
 	if (mLYC != value)
 	{
 		mLYC = value;

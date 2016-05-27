@@ -51,7 +51,6 @@ bool handleEvents()
                     
                     // Misc.
                     case SDLK_p: em->togglePaused(); break;
-                    case SDLK_o: em->getCPU()->toggleStepMode(); break;
                     //case SDLK_g: em->getGraphics()->toggleGrid(); break;
                 }
                 break;

@@ -110,6 +110,7 @@ public:
 #include "Graphics.h"
 #include "Input.h"
 #include "Sound.h"
+#include "Debugger.h"
 
 #endif /* TYPES_H */
 

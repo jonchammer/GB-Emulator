@@ -21,6 +21,7 @@
       <in>CPU.h</in>
       <in>Cartridge.h</in>
       <in>Common.h</in>
+      <in>Debugger.h</in>
       <in>Emulator.h</in>
       <in>Graphics.h</in>
       <in>Input.h</in>
@@ -38,6 +39,7 @@
       </df>
       <in>CPU.cpp</in>
       <in>Cartridge.cpp</in>
+      <in>Debugger.cpp</in>
       <in>Emulator.cpp</in>
       <in>GL_Render.cpp</in>
       <in>Graphics.cpp</in>

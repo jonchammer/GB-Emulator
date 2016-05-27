@@ -6,6 +6,7 @@
         <in>StreamingAudioQueue.h</in>
       </df>
       <in>Cartridge.h</in>
+      <in>Debugger.h</in>
       <in>MBC.h</in>
       <in>Timers.h</in>
     </df>
@@ -18,6 +19,7 @@
       </df>
       <in>CPU.cpp</in>
       <in>Cartridge.cpp</in>
+      <in>Debugger.cpp</in>
       <in>Emulator.cpp</in>
       <in>Graphics.cpp</in>
       <in>Input.cpp</in>
@@ -58,6 +60,7 @@
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
           <executablePath>build\gb_emulator.exe</executablePath>
           <ccTool>
+            <standard>8</standard>
             <incDir>
               <pElem>C:/SDL/SDL2-2.0.4/x86_64-w64-mingw32/include/SDL2</pElem>
             </incDir>
@@ -69,6 +72,8 @@
         </preBuild>
       </makefileType>
       <item path="include/Cartridge.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Debugger.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/MBC.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -82,6 +87,8 @@
       <item path="src/CPU.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Cartridge.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Debugger.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Emulator.cpp" ex="false" tool="1" flavor2="0">
       </item>

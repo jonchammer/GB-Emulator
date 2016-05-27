@@ -7,7 +7,7 @@
 
 #include "CPU.h"
 
-CPU::CPU(Emulator* emulator, Memory* memory, bool skipBIOS) : mEmulator(emulator), mMemory(memory)
+CPU::CPU(Emulator* emulator, Memory* memory, bool skipBIOS) : mEmulator(emulator), mMemory(memory), mDebugger(NULL)
 {
     reset(skipBIOS);
 }
@@ -38,35 +38,19 @@ void CPU::reset(bool skipBIOS)
     }
 
     mLogging = false;
-    mStep    = false;
 }
 
 void CPU::update()
 {
-    byte opcode = readByte(mProgramCounter);
+    mCurrentOpcode = readByte(mProgramCounter);
     
-    // Control debugging mode
-    if (mStep)
-    {
-        cin.get();
-
-        cout << "PC: ";  printHex(cout, mProgramCounter);
-        cout << " Op: "; printHex(cout, opcode);
-        cout << " AF: "; printHex(cout, mRegisters.af);
-        cout << " BC: "; printHex(cout, mRegisters.bc);
-        cout << " DE: "; printHex(cout, mRegisters.de);
-        cout << " HL: "; printHex(cout, mRegisters.hl);
-        cout << " SP: "; printHex(cout, mStackPointer.reg);
-
-        cout << " p1: "; printHex(cout, mMemory->read(mProgramCounter + 1));
-        cout << " p2: "; printHex(cout, mMemory->read(mProgramCounter + 2));
-        cout << endl;
-    }
+    // Allow the debugger to step in if necessary
+    if (mDebugger != NULL) mDebugger->CPUUpdate();
 
     if (!mHalt)
     {
         mProgramCounter++;
-        executeInstruction(opcode);
+        executeInstruction(mCurrentOpcode);
         
         // Emulation of the halt bug in the original gameboy. When a halt occurs
         // while interrupts are disabled, the following byte is repeated. For example,

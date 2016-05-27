@@ -18,6 +18,7 @@ using namespace std;
 // Forward declaration of necessary classes
 class Memory;
 class Emulator;
+class Debugger;
 
 // Definition of the register file that contains each of the 8 registers
 struct Registers
@@ -104,15 +105,23 @@ public:
      */
     void reset(bool skipBIOS);
     
+    void attachDebugger(Debugger* debugger) { mDebugger = debugger; }
+    
     void setLogging(bool log) { mLogging = log;    }
-    void toggleStepMode()     { mStep    = !mStep; }
     
 private:
+    
+    // Allow the debugger read only access to the state of the CPU
+    friend class Debugger;
+    
     Emulator* mEmulator;            // A pointer to the hosting emulator
     Memory* mMemory;                // A pointer to main memory
+    Debugger* mDebugger;            // A pointer to the debugger (can be NULL)
+    
     Registers mRegisters;           // The registers for the CPU
     word mProgramCounter;           // Range is [0, 0xFFFF]
     StackPointer mStackPointer;     // The location of the top of the stack in memory
+    byte mCurrentOpcode;            // The current opcode being executed
     
     bool mInterruptMaster;          // True if interrupts are globally enabled
     bool mHalt;                     // True if the CPU has been halted
@@ -121,7 +130,6 @@ private:
     int mPendingInterruptDisabled;  // We have received an instruction to disable interrupts soon.
     
     bool mLogging;
-    bool mStep;                     // When true, the user can step through execution one instruction at a time.
     
     /**
      * Called during the emulation loop. Gives the CPU a chance to handle

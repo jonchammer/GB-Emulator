@@ -98,8 +98,7 @@ void Timers::reset(bool skipBIOS)
     
     if (skipBIOS)
     {
-        mDividerReg = 0xAB;
-        mTAC        = 0xF8;
+        // Do nothing. The registers are already initialized correctly.
     }
 }
 
