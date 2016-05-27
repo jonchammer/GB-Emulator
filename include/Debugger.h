@@ -36,6 +36,8 @@ public:
     
 private:
     
+    enum State {DEFAULT, STEP_OVER, STEP_OUT};
+    
     CPU* mCPU;
     Memory* mMemory;
     Input* mInput;
@@ -43,6 +45,8 @@ private:
     // Debug state
     bool mEnabled; // When true, the debugger will be operational.
     bool mPaused;  // When true, execution will freeze and will allow the user to step through the code.
+    State mState;
+    vector<word> mStackTrace;
     
     unordered_set<word> mBreakpoints; // PC Breakpoints (e.g. 0xFFEE)
     // Memory reads

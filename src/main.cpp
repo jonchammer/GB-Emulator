@@ -36,8 +36,8 @@ int main(int argc, char** argv)
     // Create and configure debugger
     Debugger debugger;
     debugger.setEnabled(true);
-    debugger.setBreakpoint(0x0150);
-    //debugger.setBreakpoint(0x2887);
+    //debugger.setBreakpoint(0x0100);
+    debugger.setBreakpoint(0x016C);
     emulator.attachDebugger(&debugger);
     
     // Start the emulation

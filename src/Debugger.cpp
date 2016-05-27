@@ -1,6 +1,6 @@
 #include "Debugger.h"
 
-Debugger::Debugger() : mEnabled(false), mPaused(false)
+Debugger::Debugger() : mEnabled(false), mPaused(false), mState(DEFAULT)
 {
     
 }
@@ -13,6 +13,7 @@ void showMenu()
          << "  P - Step out"             << endl
          << "  C - Continue"             << endl
          << "  H - Show this menu again" << endl
+         << "  S - Show stack trace"     << endl
          << "  Q - Quit debugging"       << endl << endl;
 }
 
@@ -36,9 +37,9 @@ void Debugger::executeCommand()
 
         switch (command[0])
         {
-            case 'i': return;
-            case 'o': return;
-            case 'p': return;
+            case 'i': mState = DEFAULT;   return;
+            case 'o': mState = STEP_OVER; return;
+            case 'p': mState = STEP_OUT;  return;
             
             case 'c': 
             {
@@ -49,6 +50,18 @@ void Debugger::executeCommand()
             case 'h':
             {
                 showMenu();
+                break;
+            }
+            case 's':
+            {
+                // Print the stack trace
+                cout << "Stack: [ ";
+                for (size_t i = 0; i < mStackTrace.size(); ++i)
+                {
+                    printHex(cout, mStackTrace[i]); 
+                    cout << " ";
+                }
+                cout << "]" << endl;
                 break;
             }
             case 'q':
@@ -75,10 +88,45 @@ void Debugger::CPUUpdate()
         showMenu();
     }
     
+    static byte lastOpcode = 0x00;
+    static size_t targetStackSize;
+    
     if (mPaused)
     {
         printState();
-        executeCommand();
+        
+        // Manage the stack trace
+        if (mStackTrace.empty())
+            mStackTrace.push_back(mCPU->mProgramCounter);
+        else if (lastOpcode == 0xCD)
+            mStackTrace.push_back(mCPU->mProgramCounter);
+        else if (lastOpcode == 0xC9)
+            mStackTrace.pop_back();
+        
+        mStackTrace.back() = mCPU->mProgramCounter;
+        
+        // Handle state transitions
+        if (mState == DEFAULT)  
+        {
+            executeCommand();
+            
+            if (mState == STEP_OVER)
+                targetStackSize = mStackTrace.size();
+            else if (mState == STEP_OUT)
+                targetStackSize = mStackTrace.size() - 1;
+        }
+        
+        // We skip over instructions until the stack trace has the proper number
+        // of elements in it. For step over, we want the number of elements to
+        // be the same (+1 -> -1 -> 0). When we step out, we want to proceed
+        // until we return, which reduces the stack size by 1.
+        else if (mState == STEP_OVER || mState == STEP_OUT)
+        {
+            if (mStackTrace.size() == targetStackSize)
+                executeCommand();
+        }
+        
+        lastOpcode = mCPU->mCurrentOpcode;
     }
 }
 
