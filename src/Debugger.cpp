@@ -98,10 +98,33 @@ void Debugger::CPUUpdate()
         // Manage the stack trace
         if (mStackTrace.empty())
             mStackTrace.push_back(mCPU->mProgramCounter);
+        
+        // Calls
         else if (lastOpcode == 0xCD)
             mStackTrace.push_back(mCPU->mProgramCounter);
-        else if (lastOpcode == 0xC9)
+        else if (lastOpcode == 0xC4 || lastOpcode == 0xCC || lastOpcode == 0xD4 || lastOpcode == 0xDC)
+        {
+            // Figure out where the call on the last instruction was supposed to go
+            word callAddress = mMemory->read(mCPU->mProgramCounter - 1) << 8;
+            callAddress     |= mMemory->read(mCPU->mProgramCounter - 2);
+            
+            // If our current program counter matches the call address, we know the call was
+            // actually made. (Otherwise, the conditional test failed, and the call was skipped)
+            if (callAddress == mCPU->mProgramCounter)
+                mStackTrace.push_back(mCPU->mProgramCounter);
+        }
+ 
+        // Returns
+        else if (lastOpcode == 0xC9 || lastOpcode == 0xD9)
             mStackTrace.pop_back();
+        else if (lastOpcode == 0xC0 || lastOpcode == 0xC8 || lastOpcode == 0xD0 || lastOpcode == 0xD8)
+        {
+            // When a conditional return fails, the current program counter will be one higher than
+            // the previous one (which is at the top of the stack trace). So to test if a return
+            // succeeded, we need to make sure those two counters have different values.
+            if (mStackTrace.back() != mCPU->mProgramCounter - 1)
+                mStackTrace.pop_back();
+        }
         
         mStackTrace.back() = mCPU->mProgramCounter;
         
@@ -152,15 +175,9 @@ void Debugger::setBreakpoint(const word pc)
 
 void Debugger::printState()
 {
-    cout << "PC: ";  printHex(cout, mCPU->mProgramCounter);
-    cout << " Op: "; printHex(cout, mCPU->mCurrentOpcode);
-    cout << " AF: "; printHex(cout, mCPU->mRegisters.af);
-    cout << " BC: "; printHex(cout, mCPU->mRegisters.bc);
-    cout << " DE: "; printHex(cout, mCPU->mRegisters.de);
-    cout << " HL: "; printHex(cout, mCPU->mRegisters.hl);
-    cout << " SP: "; printHex(cout, mCPU->mStackPointer.reg);
-
-    cout << " p1: "; printHex(cout, mMemory->read(mCPU->mProgramCounter + 1));
-    cout << " p2: "; printHex(cout, mMemory->read(mCPU->mProgramCounter + 2));
-    cout << endl;
+    printf("0x%04X - [0x%04X] %-25s - AF: 0x%04X BC: 0x%04X DE: 0x%04X HL: 0x%04X SP: 0x%04X\n",
+            mCPU->mProgramCounter, mCPU->mCurrentOpcode, 
+            mCPU->dissassembleInstruction(mCPU->mProgramCounter).c_str(),
+            mCPU->mRegisters.af, mCPU->mRegisters.bc, 
+            mCPU->mRegisters.de, mCPU->mRegisters.hl, mCPU->mStackPointer.reg);
 }

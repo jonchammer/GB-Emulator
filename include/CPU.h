@@ -105,9 +105,14 @@ public:
      */
     void reset(bool skipBIOS);
     
-    void attachDebugger(Debugger* debugger) { mDebugger = debugger; }
+    /**
+     * Translates the instruction at the given address into a human readable
+     * assembly string (e.g. JR NZ, 28AF).
+     */
+    string dissassembleInstruction(const word pc);
     
-    void setLogging(bool log) { mLogging = log;    }
+    void attachDebugger(Debugger* debugger) { mDebugger = debugger; }
+    void setLogging(bool log)               { mLogging = log;       }
     
 private:
     
