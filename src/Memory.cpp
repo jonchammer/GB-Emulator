@@ -53,8 +53,8 @@ void Memory::reset(bool skipBIOS)
     
     memset(mMiscRAM, 0xFF, 0x7F);
     memset(mMiscRAM + 0x80, 0x00, 0x40);
-    mMiscRAM[INTERRUPT_REQUEST_REGISTER - 0xFF00] = 0x0;
-    mMiscRAM[INTERRUPT_ENABLED_REGISTER - 0xFF00] = 0x0;
+    mMiscRAM[INTERRUPT_REQUEST_REGISTER - 0xFF00] = 0xE0;
+    mMiscRAM[INTERRUPT_ENABLED_REGISTER - 0xFF00] = 0x00;
     
     // TODO Reset cartridge too?
 }

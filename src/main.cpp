@@ -17,8 +17,8 @@ using namespace std;
 int main(int argc, char** argv)
 {
     //string game = "../roms/tests/OAMBug/oam_bug.gb";
-    string game = "../roms/Links_Awakening.gb";
-    //string game = "../roms/Super_Mario_Land.gb";
+    //string game = "../roms/Links_Awakening.gb";
+    string game = "../roms/Super_Mario_Land.gb";
     
     // Create the game cartridge
     Cartridge cartridge;
@@ -36,7 +36,10 @@ int main(int argc, char** argv)
     // Create and configure debugger
     Debugger debugger;
     debugger.setEnabled(true);
-    debugger.setBreakpoint(0x0100);
+    debugger.setNumLastInstructions(200);
+    //debugger.setPaused(true);
+    //debugger.setJoypadBreakpoint(BUTTON_START);
+    //debugger.setBreakpoint(0x67AA);
     //debugger.setBreakpoint(0x28AA);
     emulator.attachDebugger(&debugger);
     

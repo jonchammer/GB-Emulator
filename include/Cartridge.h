@@ -53,6 +53,7 @@ public:
     
     // Getters / Setters / Misc
     CartridgeInfo& getCartridgeInfo() { return mInfo; }
+    MBC* getMBC()                     { return mMBC;  }
     void printInfo();
     
 private:

@@ -100,45 +100,46 @@ void CPU::handleInterrupts()
         if (mInterruptMaster)
         {
             mInterruptMaster = false;
+            if (mDebugger != NULL) mDebugger->CPUStackPush();
             pushWordOntoStack(mProgramCounter);
             
             // V Blank
-            if (testBit(req, 0) && testBit(enabled, 0))
+            if (testBit(req, INTERRUPT_VBLANK) && testBit(enabled, INTERRUPT_VBLANK))
             {
-                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, 0));
+                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, INTERRUPT_VBLANK));
                 mProgramCounter = INTERRUPT_SERVICE_VBLANK;
                 mEmulator->sync(8);
             }
             
             // LCD
-            else if (testBit(req, 1) && testBit(enabled, 1))
+            else if (testBit(req, INTERRUPT_LCD) && testBit(enabled, INTERRUPT_LCD))
             {
-                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, 1));
+                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, INTERRUPT_LCD));
                 mProgramCounter = INTERRUPT_SERVICE_LCD;
                 mEmulator->sync(8);
             }
             
             // Timer
-            else if (testBit(req, 2) && testBit(enabled, 2))
+            else if (testBit(req, INTERRUPT_TIMER) && testBit(enabled, INTERRUPT_TIMER))
             {
-                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, 2));
+                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, INTERRUPT_TIMER));
                 mProgramCounter = INTERRUPT_SERVICE_TIMER;
                 mEmulator->sync(8);
             }
             
             // Serial Transfer
-            else if (testBit(req, 3) && testBit(enabled, 3))
+            else if (testBit(req, INTERRUPT_SERIAL) && testBit(enabled, INTERRUPT_SERIAL))
             {
-                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, 3));
+                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, INTERRUPT_SERIAL));
                 mProgramCounter = INTERRUPT_SERVICE_SERIAL;
                 mEmulator->sync(8);
  
             }
             
             // Joypad
-            else if (testBit(req, 4) && testBit(enabled, 4))
+            else if (testBit(req, INTERRUPT_JOYPAD) && testBit(enabled, INTERRUPT_JOYPAD))
             {
-                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, 4));
+                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, INTERRUPT_JOYPAD));
                 mProgramCounter = INTERRUPT_SERVICE_JOYPAD;
                 mEmulator->sync(8);
             }
@@ -542,6 +543,12 @@ void CPU::executeInstruction(byte opcode)
             cerr << ", Program Counter: ";
             printHex(cerr, mProgramCounter - 1);
             cerr << endl;
+            
+            if (mDebugger != NULL) 
+            {
+                mDebugger->printStackTrace();
+                mDebugger->printLastInstructions();
+            }
         }
     }
 }
@@ -835,6 +842,8 @@ void CPU::executeExtendedInstruction()
             cerr << "Extended opcode not recognized: ";
             printHex(cerr, (0xCB << 8 | opcode));
             cerr << endl;
+            
+            if (mDebugger != NULL) mDebugger->printStackTrace();
         }
     }
 }
@@ -1125,6 +1134,7 @@ void CPU::CPU_CALL(bool useCondition, int flag, bool condition)
    
     if (!useCondition || (testFlag(flag) == condition))
     {
+        if (mDebugger != NULL) mDebugger->CPUStackPush();
         pushWordOntoStack(mProgramCounter);
         mProgramCounter = nn;
     }
@@ -1135,6 +1145,7 @@ void CPU::CPU_RETURN_CC(bool condition)
     mEmulator->sync(4);
     if (condition)
     {
+        if (mDebugger != NULL) mDebugger->CPUStackPop();
         mProgramCounter = popWordOffStack();
         mEmulator->sync(4);
     }
@@ -1142,12 +1153,14 @@ void CPU::CPU_RETURN_CC(bool condition)
 
 void CPU::CPU_RETURN()
 {
+    if (mDebugger != NULL) mDebugger->CPUStackPop();
     mProgramCounter = popWordOffStack();
     mEmulator->sync(4);
 }
 
 void CPU::CPU_RESTART(byte n)
 {
+    if (mDebugger != NULL) mDebugger->CPUStackPush();
     pushWordOntoStack(mProgramCounter);
     mProgramCounter = n;
 }
@@ -1464,10 +1477,10 @@ string CPU::dissassembleInstruction(const word pc)
         case 0xF0: return "LD A, (FF00+" + arg1 +")";
         
         // 16 bit loads
-        case 0x01: return "LD BC, (" + arg2 + arg1 + ")";
-        case 0x11: return "LD DE, (" + arg2 + arg1 + ")";
-        case 0x21: return "LD HL, (" + arg2 + arg1 + ")";
-        case 0x31: return "LD SP, (" + arg2 + arg1 + ")";
+        case 0x01: return "LD BC, " + arg2 + arg1;
+        case 0x11: return "LD DE, " + arg2 + arg1;
+        case 0x21: return "LD HL, " + arg2 + arg1;
+        case 0x31: return "LD SP, " + arg2 + arg1;
         case 0xF9: return "LD SP, HL";
         case 0xF8: return "LD HL, SP+" + arg1;
         case 0x08: return "LD (" + arg2 + arg1 + "), SP";

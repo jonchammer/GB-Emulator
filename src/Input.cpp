@@ -43,14 +43,14 @@ void Input::keyPressed(int key)
     else if (testBit(keyReq, 5) && !direction)
         mMemory->requestInterrupt(INTERRUPT_JOYPAD);
     
-    if (mDebugger != NULL) mDebugger->joypadUpdate();
+    if (mDebugger != NULL) mDebugger->joypadDown(key);
 }
 
 void Input::keyReleased(int key)
 {
     mJoypadState = setBit(mJoypadState, key);
     
-    if (mDebugger != NULL) mDebugger->joypadUpdate();
+    if (mDebugger != NULL) mDebugger->joypadUp(key);
 }
 
 void Input::write(const word address, const byte data)
