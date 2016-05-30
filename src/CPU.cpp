@@ -84,64 +84,39 @@ void CPU::update()
 
 void CPU::handleInterrupts()
 {
+    static word serviceRoutines[] = {INTERRUPT_SERVICE_VBLANK, INTERRUPT_SERVICE_LCD, 
+        INTERRUPT_SERVICE_TIMER, INTERRUPT_SERVICE_SERIAL, INTERRUPT_SERVICE_JOYPAD};
+    
     byte req     = mMemory->read(INTERRUPT_REQUEST_REGISTER);
     byte enabled = mMemory->read(INTERRUPT_ENABLED_REGISTER);
-    
-    // Only do work if corresponding flags are set in both registers.
-    // For interrupts, we only care about the lower 5 bits.
-    if ((req & enabled) & 0x1F)
+
+    // We only care about the lower 5 bits of both registers
+    if (req & enabled & 0x1F)
     {
         // An interrupt disables HALT, even if the interrupt is not serviced
         // because of the interrupt master flag.
-        if (mHalt)
-            mHalt = false;
+        if (mHalt) mHalt = false;
         
-        // Check the interrupt master flag to actually service the interrupt
         if (mInterruptMaster)
         {
-            mInterruptMaster = false;
-            if (mDebugger != NULL) mDebugger->CPUStackPush();
-            pushWordOntoStack(mProgramCounter);
-            
-            // V Blank
-            if (testBit(req, INTERRUPT_VBLANK) && testBit(enabled, INTERRUPT_VBLANK))
+            // Go through each interrupt in order of priority
+            for (int i = 0; i < 5; ++i)
             {
-                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, INTERRUPT_VBLANK));
-                mProgramCounter = INTERRUPT_SERVICE_VBLANK;
-                mEmulator->sync(8);
-            }
-            
-            // LCD
-            else if (testBit(req, INTERRUPT_LCD) && testBit(enabled, INTERRUPT_LCD))
-            {
-                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, INTERRUPT_LCD));
-                mProgramCounter = INTERRUPT_SERVICE_LCD;
-                mEmulator->sync(8);
-            }
-            
-            // Timer
-            else if (testBit(req, INTERRUPT_TIMER) && testBit(enabled, INTERRUPT_TIMER))
-            {
-                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, INTERRUPT_TIMER));
-                mProgramCounter = INTERRUPT_SERVICE_TIMER;
-                mEmulator->sync(8);
-            }
-            
-            // Serial Transfer
-            else if (testBit(req, INTERRUPT_SERIAL) && testBit(enabled, INTERRUPT_SERIAL))
-            {
-                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, INTERRUPT_SERIAL));
-                mProgramCounter = INTERRUPT_SERVICE_SERIAL;
-                mEmulator->sync(8);
- 
-            }
-            
-            // Joypad
-            else if (testBit(req, INTERRUPT_JOYPAD) && testBit(enabled, INTERRUPT_JOYPAD))
-            {
-                mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, INTERRUPT_JOYPAD));
-                mProgramCounter = INTERRUPT_SERVICE_JOYPAD;
-                mEmulator->sync(8);
+                if (testBit(req, i) && testBit(enabled, i))
+                {
+                    mInterruptMaster = false;
+                    mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, i));
+                    
+                    // Save current execution state
+                    if (mDebugger != NULL) mDebugger->CPUStackPush();
+                    pushWordOntoStack(mProgramCounter);
+                    
+                    // Go to the proper interrupt service routine
+                    mProgramCounter = serviceRoutines[i];
+                    mEmulator->sync(8);
+                    
+                    break;
+                }
             }
         }
     }

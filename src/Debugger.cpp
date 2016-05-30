@@ -48,10 +48,10 @@ void Debugger::CPUUpdate()
 //        printStackTrace();
 //    }
     
-    /*if (mCPU->mProgramCounter == 0x67AA)
-    {
-        mMemory->write(0xFF0F, 0xE0);
-    }*/
+//    if (mCPU->mProgramCounter == 0x67AA)
+//    {
+//        mMemory->write(0xFF0F, 0xE0);
+//    }
     
     // Keep track of the last N instructions
     mLastInstructions.push_back({mCPU->mProgramCounter, currentROMBank});
