@@ -95,7 +95,7 @@ void CPU::handleInterrupts()
     {
         // An interrupt disables HALT, even if the interrupt is not serviced
         // because of the interrupt master flag.
-        if (mHalt) mHalt = false;
+        mHalt = false;
         
         if (mInterruptMaster)
         {

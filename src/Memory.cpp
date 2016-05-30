@@ -53,7 +53,7 @@ void Memory::reset(bool skipBIOS)
     
     memset(mMiscRAM, 0xFF, 0x7F);
     memset(mMiscRAM + 0x80, 0x00, 0x40);
-    mMiscRAM[INTERRUPT_REQUEST_REGISTER - 0xFF00] = 0xE0;
+    mMiscRAM[INTERRUPT_REQUEST_REGISTER - 0xFF00] = 0xE1;
     mMiscRAM[INTERRUPT_ENABLED_REGISTER - 0xFF00] = 0x00;
     
     // TODO Reset cartridge too?
@@ -88,7 +88,7 @@ byte Memory::read(const word address) const
         //return mMainMemory[address];
         data = 0x00;
     }
-    
+
     // Read from misc RAM - This statement is a touch convoluted, but it's required
     // for gcc to compile without a warning about the limited range of unsigned shorts
     else if ((address >= 0xFF00 && address <= 0xFFFE) || (address == 0xFFFF))
@@ -138,6 +138,11 @@ void Memory::write(const word address, const byte data)
         //mMainMemory[address] = data;
     }
 
+    // BGB leaves the upper 3 bits alone when setting the IF register. Those
+    // bits are always set.
+    else if (address == 0xFF0F)
+        mMiscRAM[address - 0xFF00] = (data | 0xE0);
+    
     // Write to misc RAM - This statement is a touch convoluted, but it's required
     // for gcc to compile without a warning about the limited range of unsigned shorts
     else if ((address >= 0xFF00 && address <= 0xFFFE) || (address == 0xFFFF))     

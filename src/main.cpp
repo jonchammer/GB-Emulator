@@ -37,9 +37,10 @@ int main(int argc, char** argv)
     Debugger debugger;
     debugger.setEnabled(true);
     debugger.setNumLastInstructions(200);
+    //debugger.setBreakpoint(0x100);
+    debugger.setBreakpoint(0x67AA);
     //debugger.setPaused(true);
     //debugger.setJoypadBreakpoint(BUTTON_START);
-    //debugger.setBreakpoint(0x67AA);
     //debugger.setBreakpoint(0x28AA);
     emulator.attachDebugger(&debugger);
     

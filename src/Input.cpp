@@ -29,27 +29,19 @@ void Input::keyPressed(int key)
     // Remember, if a key pressed its bit is 0, not 1
     mJoypadState = clearBit(mJoypadState, key);
     
-    // Is this a standard button or a directional button?
-    bool direction = (key <= 3);
-    byte keyReq    = mJoypadReg;
-    
     // If the game has asked for direction information and we have a direction
-    // button that has been pressed, issue the joypad interrupt.
-    if (testBit(keyReq, 4) && direction)
+    // button that has been pressed, issue the joypad interrupt. Similarly
+    // for standard buttons
+    if ((testBit(mJoypadReg, 4) && key <= 3) ||
+        (testBit(mJoypadReg, 5) && key >= 4))
         mMemory->requestInterrupt(INTERRUPT_JOYPAD);
-    
-    // If the game has asked for button information and we have a normal
-    // button that has been pressed, also issue the joypad interrupt.
-    else if (testBit(keyReq, 5) && !direction)
-        mMemory->requestInterrupt(INTERRUPT_JOYPAD);
-    
+        
     if (mDebugger != NULL) mDebugger->joypadDown(key);
 }
 
 void Input::keyReleased(int key)
 {
     mJoypadState = setBit(mJoypadState, key);
-    
     if (mDebugger != NULL) mDebugger->joypadUp(key);
 }
 
