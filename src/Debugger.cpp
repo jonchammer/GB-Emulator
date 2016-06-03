@@ -131,15 +131,17 @@ void Debugger::memoryRead(const word /*address*/, const byte /*data*/)
     if (!mEnabled || !mPaused) return;
 }
 
-void Debugger::memoryWrite(const word address, const byte /*data*/)
+void Debugger::memoryWrite(const word address, const byte data)
 {
     if (!mEnabled) return;
     
-    /*
-    if (address == 0x2000)
-    {
-        mPaused = true;
-    }*/
+    
+//    if (address == 0xFF0F)
+//    {
+//        printf("0x%04x = 0x%02x\n", address, data);
+//        printState();
+//        //mPaused = true;
+//    }
 }
 
 void Debugger::setBreakpoint(const word pc)

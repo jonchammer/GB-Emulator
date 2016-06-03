@@ -17,7 +17,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
     //string game = "../roms/tests/OAMBug/oam_bug.gb";
-    //string game = "../roms/Kirby.gb";
+    //string game = "../roms/Pokemon_Red.gb";
     string game = "../roms/Super_Mario_Land.gb";
     
     // Create the game cartridge
@@ -36,9 +36,9 @@ int main(int argc, char** argv)
     // Create and configure debugger
     Debugger debugger;
     debugger.setEnabled(true);
-    debugger.setNumLastInstructions(200);
-    //debugger.setBreakpoint(0x100);
-    debugger.setBreakpoint(0x67AA);
+    //debugger.setNumLastInstructions(200);
+    //debugger.setBreakpoint(0x6796);
+    //debugger.setBreakpoint(0x67AA);
     //debugger.setPaused(true);
     //debugger.setJoypadBreakpoint(BUTTON_START);
     //debugger.setBreakpoint(0x28AA);

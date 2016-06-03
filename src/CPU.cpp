@@ -87,17 +87,18 @@ void CPU::handleInterrupts()
     static word serviceRoutines[] = {INTERRUPT_SERVICE_VBLANK, INTERRUPT_SERVICE_LCD, 
         INTERRUPT_SERVICE_TIMER, INTERRUPT_SERVICE_SERIAL, INTERRUPT_SERVICE_JOYPAD};
     
+    // We only care about the lower 5 bits of both registers, but we will
+    // leave the upper bits alone in case they are being used elsewhere
     byte req     = mMemory->read(INTERRUPT_REQUEST_REGISTER);
     byte enabled = mMemory->read(INTERRUPT_ENABLED_REGISTER);
-
-    // We only care about the lower 5 bits of both registers
-    if (req & enabled & 0x1F)
+    
+    if (req & 0x1F)
     {
         // An interrupt disables HALT, even if the interrupt is not serviced
         // because of the interrupt master flag.
         mHalt = false;
         
-        if (mInterruptMaster)
+        if (mInterruptMaster && (req & enabled & 0x1F))
         {
             // Go through each interrupt in order of priority
             for (int i = 0; i < 5; ++i)
@@ -105,6 +106,8 @@ void CPU::handleInterrupts()
                 if (testBit(req, i) && testBit(enabled, i))
                 {
                     mInterruptMaster = false;
+                    
+                    // Clear the interrupt bit since we've handled the request
                     mMemory->write(INTERRUPT_REQUEST_REGISTER, clearBit(req, i));
                     
                     // Save current execution state

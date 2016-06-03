@@ -55,8 +55,8 @@ const word BACKGROUND_PALETTE_ADDRESS = 0xFF47;  // Location of the background c
 const word SPRITE_PALETTE_ADDRESS1    = 0xFF48;  // Location of the first sprite color palette in memory
 const word SPRITE_PALETTE_ADDRESS2    = 0xFF49;  // Location of the second sprite color palette in memory
 
-const word INTERRUPT_ENABLED_REGISTER = 0xFFFF;
-const word INTERRUPT_REQUEST_REGISTER = 0xFF0F;
+const word INTERRUPT_ENABLED_REGISTER = 0xFFFF; // IE
+const word INTERRUPT_REQUEST_REGISTER = 0xFF0F; // IF
 
 const word INTERRUPT_SERVICE_VBLANK = 0x40;
 const word INTERRUPT_SERVICE_LCD    = 0x48;
