@@ -238,7 +238,7 @@ private:
     int mSpriteClocks[11];         // Sprites rendering affects LCD timings
     bool mNewFrameReady;           // Indicates that new frame rendered
     byte* mScreenBuffer;
-    byte mBackBuffer[144][160];    // Holds pixel colors in palette values
+    byte* mNativeBuffer;           // Holds pixel colors in palette values
     std::vector<int> mSpriteQueue; // Contains sprites to be rendered in the right order
 
     // LCD modes loop
