@@ -13,13 +13,8 @@ void Timers::write(const word address, const byte data)
     {
         case TAC:
         {
-            // The frequency is specified by the lower 2 bits of TAC
-            byte currentFrequency = mTAC & 0x3;
-            byte newFrequency     = data & 0x3;
-            mTAC                  = data;
-            
-            if (currentFrequency != newFrequency)
-                setClockFrequency();
+            mTAC = data;
+            setClockFrequency();
             break;
         }
         
@@ -73,7 +68,7 @@ void Timers::update(int cycles)
             // Timer is about to overflow
             if (mTIMA + passedPeriods >= 255)
             {
-                mTIMA += passedPeriods + mTMA;
+                mTIMA = mTMA;
                 mMemory->requestInterrupt(INTERRUPT_TIMER);
             }
             

@@ -493,14 +493,14 @@ void CPU::executeInstruction(byte opcode)
         case 0xDC: CPU_CALL(true, FLAG_CARRY, true);  return;
         
         // Restarts
-        case 0xC7: CPU_RESTART(0x00); return;
-        case 0xCF: CPU_RESTART(0x08); return;
-        case 0xD7: CPU_RESTART(0x10); return;
-        case 0xDF: CPU_RESTART(0x18); return;
-        case 0xE7: CPU_RESTART(0x20); return;
-        case 0xEF: CPU_RESTART(0x28); return;
-        case 0xF7: CPU_RESTART(0x30); return;
-        case 0xFF: CPU_RESTART(0x38); return;
+        case 0xC7: CPU_RESTART(0x0000); return;
+        case 0xCF: CPU_RESTART(0x0008); return;
+        case 0xD7: CPU_RESTART(0x0010); return;
+        case 0xDF: CPU_RESTART(0x0018); return;
+        case 0xE7: CPU_RESTART(0x0020); return;
+        case 0xEF: CPU_RESTART(0x0028); return;
+        case 0xF7: CPU_RESTART(0x0030); return;
+        case 0xFF: CPU_RESTART(0x0038); return;
         
         // Returns
         case 0xC9: CPU_RETURN();                          return;
@@ -508,7 +508,7 @@ void CPU::executeInstruction(byte opcode)
         case 0xC8: CPU_RETURN_CC(testFlag(FLAG_ZERO));    return;
         case 0xD0: CPU_RETURN_CC(!testFlag(FLAG_CARRY));  return;
         case 0xD8: CPU_RETURN_CC(testFlag(FLAG_CARRY));   return;
-        case 0xD9: CPU_RETURN(); mInterruptMaster = true; return;
+        case 0xD9: mInterruptMaster = true; CPU_RETURN(); return;
         
         // Extended instructions
         case 0xCB: executeExtendedInstruction(); return;
@@ -1136,11 +1136,11 @@ void CPU::CPU_RETURN()
     mEmulator->sync(4);
 }
 
-void CPU::CPU_RESTART(byte n)
+void CPU::CPU_RESTART(word addr)
 {
     if (mDebugger != NULL) mDebugger->CPUStackPush();
     pushWordOntoStack(mProgramCounter);
-    mProgramCounter = n;
+    mProgramCounter = addr;
 }
 
 void CPU::CPU_RLC(byte& reg)

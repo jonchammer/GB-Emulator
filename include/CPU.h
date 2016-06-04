@@ -177,7 +177,7 @@ private:
     void CPU_CALL(bool useCondition, int flag, bool condition);
     void CPU_RETURN_CC(bool condition);
     void CPU_RETURN();
-    void CPU_RESTART(byte n);
+    void CPU_RESTART(word addr);
     
     void CPU_CPL();
     void CPU_CCF();

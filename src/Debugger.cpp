@@ -26,7 +26,6 @@ void Debugger::CPUUpdate()
     word currentROMBank = mMemory->getLoadedCartridge()->getMBC()->getCurrentROMBank();
     
     // Make sure the stack trace is kept up to date
-    size_t origSize = mStackTrace.size();
     if (mNextPush)
     {
         mStackTrace.push_back({mCPU->mProgramCounter, currentROMBank});
@@ -42,16 +41,6 @@ void Debugger::CPUUpdate()
     if ((mStackTrace.back().address == mStackTrace[mStackTrace.size() - 2].address) &&
         (mStackTrace.back().romBank == mStackTrace[mStackTrace.size() - 2].romBank))
         mStackTrace.pop_back();
-    
-//    if (mStackTrace.size() != origSize)
-//    {
-//        printStackTrace();
-//    }
-    
-//    if (mCPU->mProgramCounter == 0x67AA)
-//    {
-//        mMemory->write(0xFF0F, 0xE0);
-//    }
     
     // Keep track of the last N instructions
     mLastInstructions.push_back({mCPU->mProgramCounter, currentROMBank});
@@ -103,10 +92,7 @@ void Debugger::CPUStackPush()
 void Debugger::CPUStackPop()
 {
     if (mStackTrace.size() > 1)
-    {
         mStackTrace.pop_back();
-//        printStackTrace();
-    }
 }
 
 void Debugger::joypadDown(const int key)
@@ -131,17 +117,9 @@ void Debugger::memoryRead(const word /*address*/, const byte /*data*/)
     if (!mEnabled || !mPaused) return;
 }
 
-void Debugger::memoryWrite(const word address, const byte data)
+void Debugger::memoryWrite(const word /*address*/, const byte /*data*/)
 {
     if (!mEnabled) return;
-    
-    
-//    if (address == 0xFF0F)
-//    {
-//        printf("0x%04x = 0x%02x\n", address, data);
-//        printState();
-//        //mPaused = true;
-//    }
 }
 
 void Debugger::setBreakpoint(const word pc)
