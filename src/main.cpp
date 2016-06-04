@@ -17,8 +17,8 @@ using namespace std;
 int main(int argc, char** argv)
 {
     //string game = "../roms/tests/MemoryTiming/mem_timing.gb";
-    //string game = "../roms/Tetris.gb";
-    string game = "../roms/Super_Mario_Land.gb";
+    string game = "../roms/Pokemon_Red.gb";
+    //string game = "../roms/Super_Mario_Land.gb";
     
     // Create the game cartridge
     Cartridge cartridge;

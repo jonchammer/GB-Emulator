@@ -27,7 +27,8 @@ Graphics::Graphics(Memory* memory, bool skipBIOS, const bool &_CGB, const bool &
     mMemory->attachComponent(this, 0xFF57, 0xFF67); // ??? - Included by Gomeboy, but don't seem to be useful
     mMemory->attachComponent(this, 0xFF6C, 0xFF6F); // ???
     
-    mScreenBuffer = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4];
+    mFrontBuffer  = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4];
+    mBackBuffer   = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4];
     mNativeBuffer = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS];
     
 	reset(skipBIOS);
@@ -74,7 +75,7 @@ Graphics::Graphics(Memory* memory, bool skipBIOS, const bool &_CGB, const bool &
 
 Graphics::~Graphics()
 {
-    delete[] mScreenBuffer;
+    delete[] mFrontBuffer;
     delete[] mNativeBuffer;
 }
 
@@ -95,9 +96,9 @@ void Graphics::update(int clockDelta)
 		{
 			mLY = 0;
 			mClocksToNextState = 70224;
-            memset(mScreenBuffer, 0xFF, 160 * 144 * 4 * sizeof(mScreenBuffer[0]));
+            memset(mBackBuffer, 0xFF, 160 * 144 * 4 * sizeof(mBackBuffer[0]));
             memset(mNativeBuffer, 0x00, 160 * 144 * sizeof(mNativeBuffer[0]));
-			mNewFrameReady = true;
+            std::swap(mBackBuffer, mFrontBuffer);
 			continue;
 		}
 		
@@ -224,7 +225,7 @@ void Graphics::update(int clockDelta)
 				mDelayedWY = -1;
 			}
 
-			mNewFrameReady     = true;
+            std::swap(mFrontBuffer, mBackBuffer);
 			mWindowLine        = 0;
 			mLCDMode           = LCDMODE_LYXX_OAM;
 			mClocksToNextState = 4;
@@ -237,7 +238,7 @@ void Graphics::reset(bool skipBIOS)
 {
 	memset(mVRAM, 0x0, VRAMBankSize * 2);
 	memset(mOAM, 0x0, 0xFF);
-    memset(mScreenBuffer, 0xFF, 160 * 144 * 4 * sizeof(mScreenBuffer[0]));
+    memset(mBackBuffer, 0xFF, 160 * 144 * 4 * sizeof(mBackBuffer[0]));
     memset(mNativeBuffer, 0x00, 160 * 144 * sizeof(mNativeBuffer[0]));
 
 	// Initially, all background colors are initialized to white
@@ -677,10 +678,10 @@ void Graphics::renderBackground()
                 
                 int c  = mGBC2RGBPalette[color & 0x7FFF];
                 index *= 4;
-                mScreenBuffer[index]     = (c >> 16) & 0xFF; // Red
-                mScreenBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                mScreenBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                mScreenBuffer[index + 3] = 0xFF;             // Alpha
+                mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                mBackBuffer[index + 3] = 0xFF;             // Alpha
 			}
 			else
 			{
@@ -691,10 +692,10 @@ void Graphics::renderBackground()
                 
                 int c  = mGB2RGBPalette[mNativeBuffer[index]];
                 index *= 4;
-                mScreenBuffer[index]     = (c >> 16) & 0xFF; // Red
-                mScreenBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                mScreenBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                mScreenBuffer[index + 3] = 0xFF;             // Alpha
+                mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                mBackBuffer[index + 3] = 0xFF;             // Alpha
 			}
 			 
 			tileMapX     = (tileMapX + ((tileMapTileX + 1) >> 3)) & 0x1F;
@@ -704,7 +705,7 @@ void Graphics::renderBackground()
 	else
 	{
 		//Clearing current scanline as background covers whole screen
-        memset(mScreenBuffer + (4 * mLY * SCREEN_WIDTH_PIXELS), 0xFF, 160 * 4);
+        memset(mBackBuffer + (4 * mLY * SCREEN_WIDTH_PIXELS), 0xFF, 160 * 4);
         memset(mNativeBuffer + (mLY * SCREEN_WIDTH_PIXELS), 0x00, 160);
 	}
 }
@@ -776,10 +777,10 @@ void Graphics::renderWindow()
                     
                     int c = mGBC2RGBPalette[color & 0x7FFF];
                     index *= 4;
-                    mScreenBuffer[index]     = (c >> 16) & 0xFF; // Red
-                    mScreenBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                    mScreenBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                    mScreenBuffer[index + 3] = 0xFF;             // Alpha
+                    mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                    mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                    mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                    mBackBuffer[index + 3] = 0xFF;             // Alpha
 				}
 				else
 				{
@@ -790,10 +791,10 @@ void Graphics::renderWindow()
                     
 					int c = mGB2RGBPalette[mNativeBuffer[index]];
                     index *= 4;
-                    mScreenBuffer[index]     = (c >> 16) & 0xFF; // Red
-                    mScreenBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                    mScreenBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                    mScreenBuffer[index + 3] = 0xFF;             // Alpha
+                    mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                    mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                    mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                    mBackBuffer[index + 3] = 0xFF;             // Alpha
 				}
 				
 				tileMapX     = (tileMapX + ((tileMapTileX + 1) >> 3)) & 0x1F;
@@ -899,10 +900,10 @@ void Graphics::renderSprites()
                         
                         int c = mGBC2RGBPalette[color & 0x7FFF];
                         index *= 4;
-                        mScreenBuffer[index]     = (c >> 16) & 0xFF; // Red
-                        mScreenBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                        mScreenBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                        mScreenBuffer[index + 3] = 0xFF;             // Alpha
+                        mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                        mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                        mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                        mBackBuffer[index + 3] = 0xFF;             // Alpha
 					}
 					else
 					{
@@ -911,10 +912,10 @@ void Graphics::renderSprites()
                         
 						int c  = mGB2RGBPalette[mNativeBuffer[index]];
                         index *= 4;
-                        mScreenBuffer[index]     = (c >> 16) & 0xFF; // Red
-                        mScreenBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                        mScreenBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                        mScreenBuffer[index + 3] = 0xFF;             // Alpha
+                        mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                        mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                        mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                        mBackBuffer[index + 3] = 0xFF;             // Alpha
 					}
 				}
 			}
@@ -946,10 +947,10 @@ void Graphics::renderSprites()
                         
                         int c  = mGBC2RGBPalette[color & 0x7FFF];
                         index *= 4;
-                        mScreenBuffer[index]     = (c >> 16) & 0xFF; // Red
-                        mScreenBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                        mScreenBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                        mScreenBuffer[index + 3] = 0xFF;             // Alpha
+                        mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                        mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                        mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                        mBackBuffer[index + 3] = 0xFF;             // Alpha
 					}
 					else
 					{
@@ -958,10 +959,10 @@ void Graphics::renderSprites()
                         
 						int c  = mGB2RGBPalette[mNativeBuffer[index]];
                         index *= 4;
-                        mScreenBuffer[index]     = (c >> 16) & 0xFF; // Red
-                        mScreenBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                        mScreenBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                        mScreenBuffer[index + 3] = 0xFF;             // Alpha
+                        mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                        mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                        mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                        mBackBuffer[index + 3] = 0xFF;             // Alpha
 					}
 				}
 			}

@@ -75,21 +75,20 @@ public:
         LCDMODE_LYXX_OAMRAM
     };
 
+    // Constructors / Destructors
     Graphics(Memory* memory, bool skipBIOS, const bool &_CGB, const bool &_CGBDoubleSpeed, DMGPalettes palette = RGBPALETTE_REAL);
     virtual ~Graphics();
     
+    // State transitions
     void update(int clockDelta);
-
     void reset(bool skipBIOS);
-    
-    void emulateBIOS();
 
+    // Memory access
     byte read(const word address) const;
     void write(const word address, const byte data);
     
-    byte* getScreenData()  { return mScreenBuffer;   }
-    bool IsNewFrameReady() { return mNewFrameReady;  }
-    void WaitForNewFrame() { mNewFrameReady = false; }
+    // Screen information
+    byte* getScreenData()  { return mFrontBuffer; }
     
     // Debug
     void toggleBackground() { mBackgroundGlobalToggle = !mBackgroundGlobalToggle; }
@@ -237,7 +236,8 @@ private:
     int mGBC2RGBPalette[32768];    // GBG color -> ARGB color
     int mSpriteClocks[11];         // Sprites rendering affects LCD timings
     bool mNewFrameReady;           // Indicates that new frame rendered
-    byte* mScreenBuffer;
+    byte* mFrontBuffer;            // The pixel data that is currently being shown on the screen
+    byte* mBackBuffer;             // The pixel data that is currently being written
     byte* mNativeBuffer;           // Holds pixel colors in palette values
     std::vector<int> mSpriteQueue; // Contains sprites to be rendered in the right order
 
