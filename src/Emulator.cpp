@@ -97,6 +97,9 @@ void Emulator::loadCartridge(Cartridge* cartridge)
 
 void Emulator::sync(int cycles)
 {
+    if (mConfig->doubleSpeed)
+        cycles >>= 1;
+    
     mGraphics->update(cycles);
     mTimers->update(cycles);
     mSound->update(cycles);

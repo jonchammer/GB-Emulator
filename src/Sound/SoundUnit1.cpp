@@ -84,7 +84,7 @@ void SoundUnit1::NR10Changed(byte value, bool override)
 //Wave pattern duty, Sound length
 void SoundUnit1::NR11Changed(byte value, bool override)
 {
-	if (GBC() && !mSoundController.isSoundEnabled() && !override)
+	if (GBC(mConfig) && !mSoundController.isSoundEnabled() && !override)
 		return;
 
 	if (!mSoundController.isSoundEnabled() && !override)
@@ -151,7 +151,7 @@ void SoundUnit1::NR52Changed(byte value)
 		
 		NR10Changed(0, true);
         
-		if (GBC())
+		if (GBC(mConfig))
 			NR11Changed(0, true);
 		else
 			NR11Changed(mNR11 & mLengthCounter.getLengthMask(), true);

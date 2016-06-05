@@ -278,7 +278,7 @@ private:
 
     void BGPIChanged(byte value)
     {
-        if (GBC())
+        if (GBC(mConfig))
         {
             mBGPI = value;
         }
@@ -287,7 +287,7 @@ private:
 
     void OBPIChanged(byte value)
     {
-        if (GBC())
+        if (GBC(mConfig))
         {
             mOBPI = value;
         }

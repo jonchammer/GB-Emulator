@@ -94,7 +94,7 @@ struct EmulatorConfiguration
 // just do something like this instead: "0x%04x". This guarantees the 0x will be printed.
 
 // Shorthand for defining when we are using GBC hardware
-#define GBC() (mConfig->system == System::GBC)
+#define GBC(config) ((config)->system == System::GBC)
 
 // Components are classes that are capable of being read from or written to.
 class Component

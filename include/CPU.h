@@ -131,7 +131,7 @@ private:
     Registers mRegisters;           // The registers for the CPU
     word mProgramCounter;           // Range is [0, 0xFFFF]
     StackPointer mStackPointer;     // The location of the top of the stack in memory
-    byte mCurrentOpcode;            // The current opcode being executed
+    byte mCurrentOpcode;            // The current opcode being executed   
     
     bool mInterruptMaster;          // True if interrupts are globally enabled
     bool mHalt;                     // True if the CPU has been halted
@@ -199,7 +199,9 @@ private:
     void CPU_TEST_BIT(byte reg, int bit);
     void CPU_SWAP(byte& reg);
     void CPU_DECIMAL_ADJUST();
+    
     void CPU_HALT();
+    void CPU_STOP();
 };
 
 #endif /* CPU_H */

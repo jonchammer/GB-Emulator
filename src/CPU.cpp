@@ -31,10 +31,13 @@ void CPU::reset()
     if (mConfig->skipBIOS)
     {
         mProgramCounter = 0x0100;
-        mRegisters.af   = 0x01B0; // Or 0x11B0 for GBC
+        mRegisters.af   = 0x01B0;
         mRegisters.bc   = 0x0013;
         mRegisters.de   = 0x00D8;
         mRegisters.hl   = 0x014D;
+        
+        if (GBC(mConfig))
+            mRegisters.a = 0x11;
     }
 
     mLogging = false;
@@ -220,7 +223,7 @@ void CPU::executeInstruction(byte opcode)
     {
         case 0x00: return;               // No-OP
         case 0x76: CPU_HALT(); return;   // HALT
-        case 0x10: return;               // STOP
+        case 0x10: CPU_STOP(); return;   // STOP
         
         // Simple 8-bit loads
         case 0x3E: mRegisters.a = getImmediateByte();      return;
@@ -1335,13 +1338,21 @@ void CPU::CPU_HALT()
         // Check for the halt bug. Interrupts must be disabled and there must be at least one pending interrupt.
         if (!mInterruptMaster && (mMemory->read(INTERRUPT_ENABLED_REGISTER) & mMemory->read(INTERRUPT_REQUEST_REGISTER) & 0x1F))
         {
-            // if GCB, the halt bug was fixed. All HALTS are followed by NOPs automatically.
-            //if (mGBC)
-            //    mEmulator->sync(4);
+            // The halt bug was fixed for the GBC. All HALTS are followed by NOPs automatically.
+            if (GBC(mConfig))
+                mEmulator->sync(4);
             
-            //else
-                mHaltBug = true;
+            else mHaltBug = true;
         }
+    }
+}
+
+void CPU::CPU_STOP()
+{
+    if (GBC(mConfig) && (mMemory->read(0xFF4D) & 0x1))
+    {
+        mMemory->write(0xFF4D, 0x0);
+        mConfig->doubleSpeed = !mConfig->doubleSpeed;
     }
 }
 

@@ -141,7 +141,7 @@ void Graphics::update(int clockDelta)
 			}
 
 			//HDMA block copy
-			if (GBC() && mHDMAActive)
+			if (GBC(mConfig) && mHDMAActive)
 			{
 				HDMACopyBlock(mHDMASource, mVRAMBankOffset + mHDMADestination);
 				mHDMAControl--;
@@ -419,7 +419,7 @@ void Graphics::DMAStep(int clockDelta)
 
 	//In double speed mode OAM DMA runs faster
 	int bytesToCopy = 0;
-	if (GBC() && mConfig->doubleSpeed)
+	if (GBC(mConfig) && mConfig->doubleSpeed)
 	{
 		bytesToCopy = mOAMDMAClockCounter / 2;
 		mOAMDMAClockCounter %= 2;
@@ -511,7 +511,7 @@ void Graphics::LYCChanged(byte value)
 
 void Graphics::VBKChanged(byte value)
 { 
-	if (GBC())
+	if (GBC(mConfig))
 	{
 		mVBK = value; 
 		mVRAMBankOffset = VRAMBankSize * (mVBK & 0x1);
@@ -522,31 +522,31 @@ void Graphics::VBKChanged(byte value)
 
 void Graphics::HDMA1Changed(byte value) 
 { 
-	if (!GBC()) return;
+	if (!GBC(mConfig)) return;
 	mHDMASource = ((word) value << 8) | (mHDMASource & 0xFF);
 }
 
 void Graphics::HDMA2Changed(byte value) 
 { 
-	if (!GBC()) return;
+	if (!GBC(mConfig)) return;
 	mHDMASource = (mHDMASource & 0xFF00) | (value & 0xF0);
 }
 
 void Graphics::HDMA3Changed(byte value)
 {
-	if (!GBC()) return;
+	if (!GBC(mConfig)) return;
 	mHDMADestination = (((word)(value & 0x1F)) << 8) | (mHDMADestination & 0xF0);
 }
 
 void Graphics::HDMA4Changed(byte value)
 {
-	if (!GBC()) return;
+	if (!GBC(mConfig)) return;
 	mHDMADestination = (mHDMADestination & 0xFF00) | (value & 0xF0);
 }
 
 void Graphics::HDMA5Changed(byte value)
 {
-	if (!GBC()) return;
+	if (!GBC(mConfig)) return;
 	mHDMAControl = value & 0x7F;
 
 	if (mHDMAActive)
@@ -587,7 +587,7 @@ void Graphics::HDMA5Changed(byte value)
 
 void Graphics::BGPDChanged(byte value) 
 {
-	if (!GBC()) return;
+	if (!GBC(mConfig)) return;
     
 	byte index   = mBGPI & 0x3F;
 	mBGPD[index] = value;
@@ -601,7 +601,7 @@ void Graphics::BGPDChanged(byte value)
 
 void Graphics::OBPDChanged(byte value) 
 {
-	if (!GBC()) return;
+	if (!GBC(mConfig)) return;
 
 	byte index   = mOBPI & 0x3F;
 	mOBPD[index] = value;
@@ -622,7 +622,7 @@ void Graphics::renderScanline()
 
 void Graphics::renderBackground()
 {
-    if (((mLCDC & 0x01) || GBC()) && mBackgroundGlobalToggle)
+    if (((mLCDC & 0x01) || GBC(mConfig)) && mBackgroundGlobalToggle)
 	{
 		word tileMapAddr  = (mLCDC & 0x8) ? 0x1C00 : 0x1800;
 		word tileDataAddr = (mLCDC & 0x10) ? 0x0 : 0x800;
@@ -645,7 +645,7 @@ void Graphics::renderBackground()
 				tileIdx = (signed char)mVRAM[tileAddr] + 128;
 			}
 
-			if (GBC())
+			if (GBC(mConfig))
 			{
 				byte tileAttributes = mVRAM[VRAMBankSize + tileAddr];
 
@@ -744,7 +744,7 @@ void Graphics::renderWindow()
 					tileIdx = (signed char)mVRAM[tileIdxAddr] + 128;
 				}
 				
-				if (GBC())
+				if (GBC(mConfig))
 				{
 					byte tileAttributes = mVRAM[VRAMBankSize + tileIdxAddr];
 
@@ -858,13 +858,13 @@ void Graphics::renderSprites()
 			}
 
 			// If sprite priority is
-			if ((mOAM[spriteAddr + 3] & 0x80) && (!GBC() || (mLCDC & 0x1)))
+			if ((mOAM[spriteAddr + 3] & 0x80) && (!GBC(mConfig) || (mLCDC & 0x1)))
 			{
 				// sprites are hidden only behind non-zero colors of the background and window
 				byte colorIdx;
 				for (int x = spriteX; x < spriteX + 8 && x < 160; x++, spritePixelX += dx)
 				{
-					if (GBC())
+					if (GBC(mConfig))
 					{
 						colorIdx = GET_TILE_PIXEL(cgbTileMapOffset + (mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
 					}
@@ -881,12 +881,12 @@ void Graphics::renderSprites()
                     
 					// If CGB game and priority flag of current background tile is set - background and window on top of sprites
 					// Master priority on LCDC can override this but here it's set and 
-					if (GBC() && (mNativeBuffer[mLY * SCREEN_WIDTH_PIXELS + x] & 0x80))
+					if (GBC(mConfig) && (mNativeBuffer[mLY * SCREEN_WIDTH_PIXELS + x] & 0x80))
 					{
 						continue;
 					}
 
-					if (GBC())
+					if (GBC(mConfig))
 					{
 						word color;
 						memcpy(&color, cgbPalette + colorIdx * 2, 2);
@@ -921,7 +921,7 @@ void Graphics::renderSprites()
 				byte colorIdx;
 				for (int x = spriteX; x < spriteX + 8 && x < 160; x++, spritePixelX += dx)
 				{
-					if (GBC())
+					if (GBC(mConfig))
 					{
 						colorIdx = GET_TILE_PIXEL(cgbTileMapOffset + (mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
 					}
@@ -933,7 +933,7 @@ void Graphics::renderSprites()
                     //sprite color 0 is transparent
 					if (colorIdx == 0) continue;
 						
-					if (GBC())
+					if (GBC(mConfig))
 					{
 						word color;
 						memcpy(&color, cgbPalette + colorIdx * 2, 2);
@@ -1007,7 +1007,7 @@ void Graphics::prepareSpriteQueue()
 
 		// In CGB mode sprites always ordered according to OAM ordering
 		// In DMG mode sprites ordered accroging to X coorinate and OAM ordering (for sprites with equal X coordinate)
-		if (!GBC() && mSpriteQueue.size())
+		if (!GBC(mConfig) && mSpriteQueue.size())
 			std::sort(mSpriteQueue.begin(), mSpriteQueue.end(), std::less<int>());
 	}
 }

@@ -63,7 +63,7 @@ void SoundUnit4::emulateBIOS()
 //Sound length
 void SoundUnit4::NR41Changed(byte value, bool override)
 {
-	if (GBC() && !mSoundController.isSoundEnabled() && !override)
+	if (GBC(mConfig) && !mSoundController.isSoundEnabled() && !override)
 		return;
 
 	//While all sound off only length can be written
@@ -118,7 +118,7 @@ void SoundUnit4::NR52Changed(byte value)
 	{
 		mStatusBit = 0;
 
-		if (GBC())
+		if (GBC(mConfig))
 			NR41Changed(0, true);
 		
 		NR42Changed(0, true);

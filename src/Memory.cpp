@@ -55,6 +55,7 @@ void Memory::reset()
     memset(mMiscRAM + 0x80, 0x00, 0x40);
     mMiscRAM[INTERRUPT_REQUEST_REGISTER - 0xFF00] = 0xE1;
     mMiscRAM[INTERRUPT_ENABLED_REGISTER - 0xFF00] = 0x00;
+    mMiscRAM[0xFF4D - 0xFF00] = 0x00;
     
     // TODO Reset cartridge too?
 }
@@ -88,6 +89,17 @@ byte Memory::read(const word address) const
         data = 0x00;
     }
 
+    // Handle double speed
+    else if (address == 0xFF4D)
+    {
+        // The first bit indicates if a speed switch has been prepared.
+        // The last bit indicates whether or not we are currently in double speed mode
+        byte ret = 0x7E;
+        ret |= mMiscRAM[address - 0xFF00];
+        ret |= ((mConfig->doubleSpeed ? 1 : 0) << 7);
+        return ret;
+    }
+    
     // Read from misc RAM - This statement is a touch convoluted, but it's required
     // for gcc to compile without a warning about the limited range of unsigned shorts
     else if ((address >= 0xFF00 && address <= 0xFFFE) || (address == 0xFFFF))
@@ -143,6 +155,13 @@ void Memory::write(const word address, const byte data)
     // bits are always set.
     else if (address == 0xFF0F)
         mMiscRAM[address - 0xFF00] = (data | 0xE0);
+    
+    // Handle double speed
+    else if (address == 0xFF4D)
+    {
+        // We only care about the last bit for GBC speed switches
+        mMiscRAM[address - 0xFF00] = (data & 0x01);
+    }
     
     // Write to misc RAM - This statement is a touch convoluted, but it's required
     // for gcc to compile without a warning about the limited range of unsigned shorts

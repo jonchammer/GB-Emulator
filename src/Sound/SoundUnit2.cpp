@@ -61,7 +61,7 @@ void SoundUnit2::emulateBIOS()
 //Wave pattern duty, Sound length
 void SoundUnit2::NR21Changed(byte value, bool override)
 {
-	if (GBC() && !mSoundController.isSoundEnabled() && !override)
+	if (GBC(mConfig) && !mSoundController.isSoundEnabled() && !override)
 		return;
 	
 	if (!mSoundController.isSoundEnabled() && !override)
@@ -125,7 +125,7 @@ void SoundUnit2::NR52Changed(byte value)
 	{
 		mStatusBit = 0;
 
-		if (GBC())
+		if (GBC(mConfig))
 			NR21Changed(0, true);
 		else
 			NR21Changed(mNR21 & mLengthCounter.getLengthMask(), true);
