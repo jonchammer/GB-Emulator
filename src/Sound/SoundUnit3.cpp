@@ -1,8 +1,8 @@
 #include "SoundUnit3.h"
 
-SoundUnit3::SoundUnit3(const bool &_CGB, Sound &soundController):
-    mCGB(_CGB),
+SoundUnit3::SoundUnit3(Sound &soundController, EmulatorConfiguration* configuration):
     mSoundController(soundController),
+    mConfig(configuration),
     mLengthCounter(0xFF, mStatusBit)
 {
 	reset();
@@ -100,7 +100,7 @@ byte SoundUnit3::getWaveRAM(byte pos)
 { 
 	if (mStatusBit)
 	{
-		if (mCGB || mClockCounter == 1)
+		if (GBC() || mClockCounter == 1)
 			return mWaveRAM[mSampleIndex >> 1];
 		
         else return 0xFF;
@@ -113,7 +113,7 @@ void SoundUnit3::waveRAMChanged(byte pos, byte value)
 { 
 	if (mStatusBit)
 	{
-		if (mCGB || mClockCounter == 1)
+		if (GBC() || mClockCounter == 1)
 			mWaveRAM[mSampleIndex >> 1] = value;
 	}
     
@@ -135,7 +135,7 @@ void SoundUnit3::NR30Changed(byte value, bool override)
 //Sound length
 void SoundUnit3::NR31Changed(byte value, bool override)
 {
-	if (mCGB && !mSoundController.isSoundEnabled() && !override)
+	if (GBC() && !mSoundController.isSoundEnabled() && !override)
 		return;
 
 	//While all sound off only length can be written
@@ -174,7 +174,7 @@ void SoundUnit3::NR34Changed(byte value, bool override)
 	if (value & mNR30 & 0x80)
 	{
 		//Triggering while channel is enabled leads to wave pattern RAM corruption
-		if (!mCGB && mClockCounter == 3)
+		if (!GBC() && mClockCounter == 3)
 		{
 			int waveRAMPos = ((mSampleIndex + 1) & 0x1F) >> 1;
 			if (waveRAMPos < 4)
@@ -202,7 +202,7 @@ void SoundUnit3::NR52Changed(byte value)
 		
 		NR30Changed(0, true);
         
-		if (mCGB)
+		if (GBC())
 			NR31Changed(0, true);
 
 		NR32Changed(0, true);

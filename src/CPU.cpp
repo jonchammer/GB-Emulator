@@ -7,12 +7,12 @@
 
 #include "CPU.h"
 
-CPU::CPU(Emulator* emulator, Memory* memory, bool skipBIOS) : mEmulator(emulator), mMemory(memory), mDebugger(NULL)
+CPU::CPU(Emulator* emulator, Memory* memory, EmulatorConfiguration* configuration) : mEmulator(emulator), mMemory(memory), mDebugger(NULL), mConfig(configuration)
 {
-    reset(skipBIOS);
+    reset();
 }
 
-void CPU::reset(bool skipBIOS)
+void CPU::reset()
 {
     mProgramCounter   = 0x0;
     mStackPointer.reg = 0xFFFE;
@@ -28,7 +28,7 @@ void CPU::reset(bool skipBIOS)
     mPendingInterruptEnabled  = 0;
     mPendingInterruptDisabled = 0;
     
-    if (skipBIOS)
+    if (mConfig->skipBIOS)
     {
         mProgramCounter = 0x0100;
         mRegisters.af   = 0x01B0; // Or 0x11B0 for GBC

@@ -1,8 +1,8 @@
 #include "SoundUnit4.h"
 
-SoundUnit4::SoundUnit4(const bool &_CGB, Sound &soundController):
-    mCGB(_CGB),
+SoundUnit4::SoundUnit4(Sound &soundController, EmulatorConfiguration* configuration):
     mSoundController(soundController),
+    mConfig(configuration),
     mLengthCounter(0x3F, mStatusBit, 0xFF)
 {
 	reset();
@@ -63,7 +63,7 @@ void SoundUnit4::emulateBIOS()
 //Sound length
 void SoundUnit4::NR41Changed(byte value, bool override)
 {
-	if (mCGB && !mSoundController.isSoundEnabled() && !override)
+	if (GBC() && !mSoundController.isSoundEnabled() && !override)
 		return;
 
 	//While all sound off only length can be written
@@ -118,7 +118,7 @@ void SoundUnit4::NR52Changed(byte value)
 	{
 		mStatusBit = 0;
 
-		if (mCGB)
+		if (GBC())
 			NR41Changed(0, true);
 		
 		NR42Changed(0, true);

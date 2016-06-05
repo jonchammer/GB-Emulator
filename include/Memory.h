@@ -29,9 +29,9 @@ public:
      * Creates a new Gameboy memory unit.
      * 
      * @param emulator. A pointer to the hosting emulator.
-     * @param skipBIOS. When true, the BIOS will be skipped.
+     * @param configuration. The system configuration.
      */
-    Memory(Emulator* emulator, bool skipBIOS);
+    Memory(Emulator* emulator, EmulatorConfiguration* configuration);
     
     /**
      * Destructor
@@ -59,10 +59,8 @@ public:
      * Resets the contents of the memory to its default values. This also
      * unloads any currently loaded ROMs, so loadCartridge() will have to
      * be called again.
-     * 
-     * @param skipBIOS. When true, the BIOS will be skipped.
      */
-    void reset(bool skipBIOS);
+    void reset();
     
     // Cartridge manipulation
     void loadCartridge(Cartridge* cartridge);
@@ -75,9 +73,10 @@ private:
     // Allow the debugger read only access to the state of the memory
     friend class Debugger;
     
-    Emulator* mEmulator;
-    Debugger* mDebugger;          // A pointer to the debugger (can be NULL)
-    Cartridge* mLoadedCartridge;
+    Emulator* mEmulator;            // The hosting emulator
+    Debugger* mDebugger;            // A pointer to the debugger (can be NULL)
+    Cartridge* mLoadedCartridge;    // The current loaded cartridge
+    EmulatorConfiguration* mConfig; // The current emulation configuration
     
     word mComponentAddresses[30]; // Holds start, end addresses for the components (interlaced)
     Component* mComponentMap[15]; // Holds pointers to the actual components

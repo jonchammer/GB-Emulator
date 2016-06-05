@@ -83,6 +83,35 @@ const int LIGHT_GRAY = 0xFFAAAAAA;
 const int DARK_GRAY  = 0xFF555555;
 const int BLACK      = 0xFF000000;
 
+enum GameboyPalette
+{
+    GRAYSCALE = 0,
+    REAL      = 1
+};
+
+struct EmulatorConfiguration
+{
+    enum System {GB, GBC, AUTOMATIC};
+    
+    System system;                // Which hardware we are emulating. When AUTOMATIC is chosen,
+                                  // this will be changed to one of the other values when the
+                                  // cartridge is loaded.
+    bool skipBIOS;                // When true, the BIOS screen will be skipped
+    GameboyPalette palette;       // Adjust the colors of Gameboy games
+    int soundSampleRate;          // Sample rate for synthesized sound
+    int soundSampleBufferLength;  // The size of the sound system's sample buffer (in samples)
+    bool doubleSpeed;             // When true, GBC double speed mode is activated
+    
+    // Default constructor initializes each field to reasonable default values
+    EmulatorConfiguration() : 
+        system(AUTOMATIC), 
+        skipBIOS(false), 
+        palette(GameboyPalette::GRAYSCALE), 
+        soundSampleRate(44100), 
+        soundSampleBufferLength(1024),
+        doubleSpeed(false) {}
+};
+
 // Bit twiddling routines
 #define testBit(address, bit)   (!!((address) &  (1 << (bit))))
 #define setBit(address, bit)    (   (address) |  (1 << (bit)))
@@ -97,6 +126,9 @@ const int BLACK      = 0xFF000000;
 // Beware, though. Printing 0 with the # flag will ignore the leading '0x'. If that's an issue, 
 // just do something like this instead: "0x%04x". This guarantees the 0x will be printed.
 
+// Shorthand for defining when we are using GBC hardware
+#define GBC() (mConfig->system == EmulatorConfiguration::System::GBC)
+
 class Component
 {
 public:
@@ -105,9 +137,9 @@ public:
 };
 
 // Includes
+#include "Emulator.h"
 #include "Memory.h"
 #include "CPU.h"
-#include "Emulator.h"
 #include "Timers.h"
 #include "Graphics.h"
 #include "Input.h"

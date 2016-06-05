@@ -17,7 +17,7 @@ each waveform taking 8 frequency timer clocks to cycle through.
 class SoundUnit2
 {
 public:
-    SoundUnit2(const bool &_CGB, Sound &soundController);
+    SoundUnit2(Sound &soundController, EmulatorConfiguration* configuration);
     ~SoundUnit2();
 
     void timerStep(int clockDelta);
@@ -63,10 +63,9 @@ public:
 
 private:
 
-    const bool& mCGB;
-
     Sound& mSoundController;
-
+    EmulatorConfiguration* mConfig;
+    
     // Sound 2 I\O registers
     byte mNR21; // Sound Length; Wave Pattern Duty (R/W)
     // Only bits 7-6 can be read.

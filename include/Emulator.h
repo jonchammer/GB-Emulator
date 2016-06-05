@@ -18,6 +18,7 @@ class Graphics;
 class Input;
 class Sound;
 class Debugger;
+class Cartridge;
 class Emulator;
 
 /**
@@ -38,12 +39,10 @@ class Emulator
 public:
     
     /**
-     * Create a new Emulator.
-     * @param skipBIOS. When true, the BIOS will be skipped. This will be
-     *                  necessary for some games (if the Nintendo logo is
-     *                  invalid, for example).
+     * Create a new Emulator using the given configuration. If no configuration
+     * is given, a default one will be used instead.
      */
-    Emulator(bool skipBIOS = false);
+    Emulator(EmulatorConfiguration* configuration = NULL);
     
     /**
      * Destructor.
@@ -60,16 +59,19 @@ public:
     /**
      * Reset the emulator to its default state. Any games that are currently
      * loaded will need to be loaded again, as memory is also cleared.
-     * 
-     * @param skipBIOS. When true, the BIOS will be skipped.
      */
-    void reset(bool skipBIOS = false);
+    void reset();
     
     /**
      * Attach the given debugger to the emulator so the user can monitor code
      * execution. If the pointer is NULL, the debugger is removed.
      */
     void attachDebugger(Debugger* debugger);
+    
+    /**
+     * Load the given cartridge into memory.
+     */
+    void loadCartridge(Cartridge* cartridge);
     
     // Adjust 'paused' state
     void togglePaused()         { mPaused = !mPaused; }
@@ -84,17 +86,24 @@ public:
     Input* getInput()       { return mInput;    }
     Sound* getSound()       { return mSound;    }
     
+    EmulatorConfiguration* getConfiguration() { return mConfig; }
+    
 private:
+    // Hardware components
     CPU* mCPU;           // The simulated CPU
     Memory* mMemory;     // The simulated memory unit
     Timers* mTimers;     // Timer registers
     Graphics* mGraphics; // Handles the scanline rendering
     Input* mInput;       // Handles user input
     Sound* mSound;       // Handles sound processing
-    bool mPaused;        // True if emulation should be frozen
     
-    // Keeps track of how many cycles have been processed this second
-    int mCycleCount;
+    // Configuration
+    EmulatorConfiguration* mConfig;
+    bool mClassOwnsConfig;
+    
+    // Emulator State
+    bool mPaused;    // True if emulation should be frozen
+    int mCycleCount; // Keeps track of how many cycles have been processed this second
     
     // This function is called by the CPU for each part of an instruction.
     // We forward the information to each of the other components.

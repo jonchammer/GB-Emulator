@@ -20,29 +20,35 @@ int main(int argc, char** argv)
     string game = "../roms/Pokemon_Red.gb";
     //string game = "../roms/Super_Mario_Land.gb";
     
-    // Create the game cartridge
+    // Create the system configuration that will be used
+    EmulatorConfiguration config;
+    config.skipBIOS = true;
+    config.system   = EmulatorConfiguration::System::AUTOMATIC;
+    config.palette  = GameboyPalette::REAL;
+    
+    // Create the emulator
+    Emulator emulator(&config);
+    
+    // Create & load the game cartridge
     Cartridge cartridge;
     if (!cartridge.load(game))
     {
         cerr << "Unable to load game: " << game << endl;
         return 1;
     }
-    
-    // Create the emulator and load the ROM
-    Emulator emulator(true);
-    emulator.getMemory()->loadCartridge(&cartridge);
+    emulator.loadCartridge(&cartridge);
     cartridge.printInfo();
   
     // Create and configure debugger
-    Debugger debugger;
-    debugger.setEnabled(true);
+    //Debugger debugger;
+    //debugger.setEnabled(true);
     //debugger.setNumLastInstructions(200);
     //debugger.setBreakpoint(0x6796);
     //debugger.setBreakpoint(0x67AA);
     //debugger.setPaused(true);
     //debugger.setJoypadBreakpoint(BUTTON_START);
     //debugger.setBreakpoint(0x28AA);
-    emulator.attachDebugger(&debugger);
+    //emulator.attachDebugger(&debugger);
     
     // Start the emulation
     startEmulation(argc, argv, &emulator);

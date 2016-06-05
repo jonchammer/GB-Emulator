@@ -86,12 +86,12 @@ class Sound : public Component
 public:
     
     // Constructors / Destructors
-    Sound(Memory* memory, const bool skipBIOS, const bool &_CGB, int sampleRate = 44100, int sampleBufferLength = 1024);
+    Sound(Memory* memory, EmulatorConfiguration* configuration);
     virtual ~Sound();
 
     // Sound lifecycle methods.
     void update(int clockDelta);
-    void reset(const bool skipBIOS);
+    void reset();
     
     // Memory access routines - There are a lot of sound registers, so these handle reading
     // and writing to them, which simplifies the design of the memory unit.
@@ -121,6 +121,8 @@ public:
 
 private:
     
+    EmulatorConfiguration* mConfig;
+    
     // Functions that handle writes to the 3 control registers
     void NR50Changed(byte value, bool override = false);
     void NR51Changed(byte value, bool override = false);
@@ -132,15 +134,12 @@ private:
     SoundUnit3* mSound3;
     SoundUnit4* mSound4;
     
-    const bool& mCGB;              // True if using GBC mode
     soundCallback mSoundCallback;  // The function that will be called when the sound buffer is full.
     void* mSoundCallbackData;      // The data given by the user that will be returned in the callback. (Not touched by the emulator).
-    const int mSampleRate;         // E.g. 44100 Hz
     int mSamplePeriod;             // 2^22 / sample Rate
     
     // Sound buffer information
     short* mSampleBuffer;          // The buffer we use to hold the synthesized sound data
-    const int mSampleBufferLength; // Size of the sample buffer in samples.
     int mSampleBufferPos;          // Where in the sample buffer we are currently
        
     // Synthesis synchronization variables

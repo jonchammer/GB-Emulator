@@ -1,8 +1,8 @@
 #include "SoundUnit1.h"
 
-SoundUnit1::SoundUnit1(const bool &_CGB, Sound &soundController) :
-    mCGB(_CGB),
+SoundUnit1::SoundUnit1(Sound &soundController, EmulatorConfiguration* configuration) :
     mSoundController(soundController),
+    mConfig(configuration),
     mSweep(mNR13, mNR14, mStatusBit, mDuty),
     mLengthCounter(0x3F, mStatusBit)
 {
@@ -84,7 +84,7 @@ void SoundUnit1::NR10Changed(byte value, bool override)
 //Wave pattern duty, Sound length
 void SoundUnit1::NR11Changed(byte value, bool override)
 {
-	if (mCGB && !mSoundController.isSoundEnabled() && !override)
+	if (GBC() && !mSoundController.isSoundEnabled() && !override)
 		return;
 
 	if (!mSoundController.isSoundEnabled() && !override)
@@ -151,7 +151,7 @@ void SoundUnit1::NR52Changed(byte value)
 		
 		NR10Changed(0, true);
         
-		if (mCGB)
+		if (GBC())
 			NR11Changed(0, true);
 		else
 			NR11Changed(mNR11 & mLengthCounter.getLengthMask(), true);

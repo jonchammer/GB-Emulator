@@ -8,12 +8,6 @@ class Memory;
 class Emulator;
 
 const int VRAMBankSize = 0x2000;
-
-enum DMGPalettes
-{
-    RGBPALETTE_BLACKWHITE = 0,
-    RGBPALETTE_REAL = 1
-};
     
 class Graphics : public Component
 {
@@ -76,12 +70,12 @@ public:
     };
 
     // Constructors / Destructors
-    Graphics(Memory* memory, bool skipBIOS, const bool &_CGB, const bool &_CGBDoubleSpeed, DMGPalettes palette = RGBPALETTE_REAL);
+    Graphics(Memory* memory, EmulatorConfiguration* configuration);
     virtual ~Graphics();
     
     // State transitions
     void update(int clockDelta);
-    void reset(bool skipBIOS);
+    void reset();
 
     // Memory access
     byte read(const word address) const;
@@ -97,25 +91,31 @@ public:
 
 private:
     Memory* mMemory;
+    EmulatorConfiguration* mConfig;
     
-    // GPU Microcode
-    void renderScanline();
-    void renderBackground();
-    void renderWindow();
-    void renderSprites();
-    void checkLYC();
-    void prepareSpriteQueue();
-    bool HDMACopyBlock(word source, word dest);
-    int GBCColorToARGB(word color);
-
-    const bool &mCGB;
-    const bool &mCGBDoubleSpeed;
-
     //GPU memory
     byte mVRAM[VRAMBankSize * 2];
     byte mOAM[0xA0 + 0x5F];
     word mVRAMBankOffset;
 
+    int mGB2RGBPalette[4];         // Gameboy palette -> ARGB color
+    int mGBC2RGBPalette[32768];    // GBG color -> ARGB color
+    int mSpriteClocks[11];         // Sprites rendering affects LCD timings
+    byte* mFrontBuffer;            // The pixel data that is currently being shown on the screen
+    byte* mBackBuffer;             // The pixel data that is currently being written
+    byte* mNativeBuffer;           // Holds pixel colors in palette values
+    std::vector<int> mSpriteQueue; // Contains sprites to be rendered in the right order
+
+    // LCD modes loop
+    int mClockCounter;
+    int mClocksToNextState;    // Delay before switching LCD mode
+    int mScrollXClocks;        // Delay for the SCX Gameboy bug
+    bool mLCDCInterrupted;     // Makes sure that only one LCDC Interrupt gets requested per scanline
+    InternalLCDModes mLCDMode;
+
+    byte mWindowLine;
+    int mDelayedWY;
+    
     // GPU I/O ports
     
     // LCD Control (R/W)
@@ -232,24 +232,6 @@ private:
     // Bit 10-14 Blue Intensity  (00-1F)
     byte mOBPD[8 * 8]; 
 
-    int mGB2RGBPalette[4];         // Gameboy palette -> ARGB color
-    int mGBC2RGBPalette[32768];    // GBG color -> ARGB color
-    int mSpriteClocks[11];         // Sprites rendering affects LCD timings
-    byte* mFrontBuffer;            // The pixel data that is currently being shown on the screen
-    byte* mBackBuffer;             // The pixel data that is currently being written
-    byte* mNativeBuffer;           // Holds pixel colors in palette values
-    std::vector<int> mSpriteQueue; // Contains sprites to be rendered in the right order
-
-    // LCD modes loop
-    int mClockCounter;
-    int mClocksToNextState;    // Delay before switching LCD mode
-    int mScrollXClocks;        // Delay for the SCX Gameboy bug
-    bool mLCDCInterrupted;     // Makes sure that only one LCDC Interrupt gets requested per scanline
-    InternalLCDModes mLCDMode;
-
-    byte mWindowLine;
-    int mDelayedWY;
-
     // OAM DMA
     bool mOAMDMAStarted;
     word mOAMDMAProgress;
@@ -266,6 +248,16 @@ private:
     bool mBackgroundGlobalToggle;
     bool mWindowsGlobalToggle;
     bool mSpritesGlobalToggle;
+    
+    // GPU Microcode
+    void renderScanline();
+    void renderBackground();
+    void renderWindow();
+    void renderSprites();
+    void checkLYC();
+    void prepareSpriteQueue();
+    bool HDMACopyBlock(word source, word dest);
+    int GBCColorToARGB(word color);
     
     // Getters / Setters for memory access
     void writeVRAM(word addr, byte value);
@@ -286,7 +278,7 @@ private:
 
     void BGPIChanged(byte value)
     {
-        if (mCGB)
+        if (mConfig->system == EmulatorConfiguration::System::GBC)
         {
             mBGPI = value;
         }
@@ -295,7 +287,7 @@ private:
 
     void OBPIChanged(byte value)
     {
-        if (mCGB)
+        if (mConfig->system == EmulatorConfiguration::System::GBC)
         {
             mOBPI = value;
         }

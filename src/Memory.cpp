@@ -28,7 +28,7 @@ const byte BIOS[] =
     0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50
 };
 
-Memory::Memory(Emulator* emulator, bool skipBIOS) : mEmulator(emulator), mDebugger(NULL)
+Memory::Memory(Emulator* emulator, EmulatorConfiguration* configuration) : mEmulator(emulator), mDebugger(NULL), mConfig(configuration)
 {
     // Internal RAM is 8 KB
     mInternalRAM = new byte[0x2000];
@@ -37,7 +37,7 @@ Memory::Memory(Emulator* emulator, bool skipBIOS) : mEmulator(emulator), mDebugg
     mMiscRAM = new byte[0x100];
     
     mComponentIndex = 0;
-    reset(skipBIOS);
+    reset();
 }
 
 Memory::~Memory()
@@ -46,10 +46,10 @@ Memory::~Memory()
     delete[] mMiscRAM;
 }
 
-void Memory::reset(bool skipBIOS)
+void Memory::reset()
 {
     // Start out in the BIOS
-    mInBIOS = !skipBIOS;
+    mInBIOS = !mConfig->skipBIOS;
     
     memset(mMiscRAM, 0xFF, 0x7F);
     memset(mMiscRAM + 0x80, 0x00, 0x40);

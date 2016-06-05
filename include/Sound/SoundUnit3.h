@@ -16,7 +16,7 @@ class Sound;
 class SoundUnit3
 {
 public:
-    SoundUnit3(const bool &_CGB, Sound &soundController);
+    SoundUnit3(Sound &soundController, EmulatorConfiguration* configuration);
     ~SoundUnit3();
 
     void timerStep(int clockDelta);
@@ -75,10 +75,9 @@ private:
         mPeriod = (2048 - (((mNR34 & 0x7) << 8) | mNR33)) * 2;
     }
 
-    const bool& mCGB;
-
     Sound& mSoundController;
-
+    EmulatorConfiguration* mConfig;
+    
     // Sound 3 I\O registers
     byte mNR30; // Sound on/off (R/W)
     // Only bit 7 can be read

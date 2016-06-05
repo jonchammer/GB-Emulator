@@ -19,7 +19,7 @@ class Sound;
 class SoundUnit1
 {
 public:
-    SoundUnit1(const bool &_CGB, Sound &soundController);
+    SoundUnit1(Sound &soundController, EmulatorConfiguration* configuration);
     ~SoundUnit1();
 
     void timerStep(int clockDelta);
@@ -71,10 +71,9 @@ public:
 
 private:
 
-    const bool& mCGB;
-
     Sound& mSoundController;
-
+    EmulatorConfiguration* mConfig;
+    
     // Sound 1 I\O registers
     byte mNR11; // Sound length/Wave pattern duty (R/W)
     // Only Bits 7-6 can be read.

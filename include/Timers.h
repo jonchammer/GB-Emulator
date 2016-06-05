@@ -18,7 +18,7 @@ class Timers : public Component
 public:
     
     // Constructors
-    Timers(Memory* memory, bool skipBIOS);
+    Timers(Memory* memory, EmulatorConfiguration* configuration);
     virtual ~Timers() {}
     
     // Memory access
@@ -27,11 +27,13 @@ public:
     
     // State
     void update(int cycles);
-    void reset(bool skipBIOS);
+    void reset();
     
 private:
     
     Memory* mMemory;     // A pointer to the memory unit for this emulator
+    EmulatorConfiguration* mConfig;
+    
     int mTimerPeriod;    // Keeps track of the rate at which the timer updates
     int mTimerCounter;   // Current state of the timer
     int mDividerCounter; // Keeps track of the rate at which the divider register updates

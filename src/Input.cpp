@@ -7,14 +7,14 @@
 
 #include "Input.h"
 
-Input::Input(Memory* memory, bool skipBIOS) : mMemory(memory), mDebugger(NULL)
+Input::Input(Memory* memory, EmulatorConfiguration* configuration) : mMemory(memory), mDebugger(NULL), mConfig(configuration)
 {
     // Attach this component to the memory at the correct locations
     mMemory->attachComponent(this, JOYPAD_STATUS_ADDRESS, JOYPAD_STATUS_ADDRESS);
-    reset(skipBIOS);
+    reset();
 }
 
-void Input::reset(bool /*skipBIOS*/)
+void Input::reset()
 {
     mJoypadState = 0xFF;
     mJoypadReg   = 0xCF;

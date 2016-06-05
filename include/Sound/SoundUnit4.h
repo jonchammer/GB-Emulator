@@ -22,7 +22,7 @@ class Sound;
 class SoundUnit4
 {
 public:
-    SoundUnit4(const bool& CGB, Sound& soundController);
+    SoundUnit4(Sound& soundController, EmulatorConfiguration* configuration);
     ~SoundUnit4();
 
     void timerStep(int clockDelta);
@@ -68,10 +68,9 @@ public:
 
 private:
 
-    const bool& mCGB;
-
     Sound& mSoundController;
-
+    EmulatorConfiguration* mConfig;
+    
     // Sound 4 I\O registers
     byte mNR44; // Only bit 6 can be read.
     // Bit 7 - Initial (when set, sound restarts)

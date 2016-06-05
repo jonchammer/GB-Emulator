@@ -19,7 +19,7 @@ public:
      * 
      * @param memory.   A pointer to the memory unit of the Gameboy.
      */
-    Input(Memory* memory, bool skipBIOS);
+    Input(Memory* memory, EmulatorConfiguration* configuration);
     
     /**
      * Destructor.
@@ -49,7 +49,7 @@ public:
     /**
      * Resets the current state of the Input component to its original value.
      */
-    void reset(bool skipBIOS);
+    void reset();
     
     void attachDebugger(Debugger* debugger) { mDebugger = debugger; }
     
@@ -59,6 +59,8 @@ private:
     
     Memory* mMemory;      // Pointer to the main memory unit.
     Debugger* mDebugger;  // A pointer to the debugger (can be NULL)
+    EmulatorConfiguration* mConfig;
+            
     byte mJoypadState;    // Contains the current state of each button (1 per bit). 0 is pressed.
     byte mJoypadReg;      // The register that contains the information sent to the game
 };

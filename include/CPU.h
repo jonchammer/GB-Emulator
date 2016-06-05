@@ -88,9 +88,9 @@ public:
      * 
      * @param emulator. A pointer to the hosting emulator.
      * @param memory.   A pointer to the memory unit for the emulated gameboy.
-     * @param skipBIOS. When true, the BIOS will be skipped.
+     * @param configuration. The system configuration.
      */
-    CPU(Emulator* emulator, Memory* memory, bool skipBIOS);
+    CPU(Emulator* emulator, Memory* memory, EmulatorConfiguration* configuration);
     
     /**
      * Called during the emulation loop. Executes a single instruction.
@@ -100,10 +100,8 @@ public:
     /**
      * Resets the registers, program counter, and stack pointer to their
      * default values. 
-     * 
-     * @param skipBIOS. When true, the BIOS will be skipped.
      */
-    void reset(bool skipBIOS);
+    void reset();
     
     /**
      * Translates the instruction at the given address into a human readable
@@ -122,6 +120,7 @@ private:
     Emulator* mEmulator;            // A pointer to the hosting emulator
     Memory* mMemory;                // A pointer to main memory
     Debugger* mDebugger;            // A pointer to the debugger (can be NULL)
+    EmulatorConfiguration* mConfig; // A pointer to the emulator's current configuration
     
     Registers mRegisters;           // The registers for the CPU
     word mProgramCounter;           // Range is [0, 0xFFFF]

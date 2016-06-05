@@ -1,10 +1,10 @@
 #include "Timers.h"
 
-Timers::Timers(Memory* memory, bool skipBIOS) : mMemory(memory) 
+Timers::Timers(Memory* memory, EmulatorConfiguration* configuration) : mMemory(memory), mConfig(configuration)
 {
     // Attach this component to the memory at the correct locations
     mMemory->attachComponent(this, 0xFF04, 0xFF07);
-    reset(skipBIOS);
+    reset();
 }
     
 void Timers::write(const word address, const byte data)
@@ -78,7 +78,7 @@ void Timers::update(int cycles)
     }
 }
 
-void Timers::reset(bool skipBIOS)
+void Timers::reset()
 {
     // Initialize timing information
     mDividerCounter  = 0;
@@ -91,10 +91,10 @@ void Timers::reset(bool skipBIOS)
     mTMA        = 0x0;
     mTAC        = 0x0;
     
-    if (skipBIOS)
-    {
-        // Do nothing. The registers are already initialized correctly.
-    }
+//    if (skipBIOS)
+//    {
+//        // Do nothing. The registers are already initialized correctly.
+//    }
 }
 
 void Timers::setClockFrequency()

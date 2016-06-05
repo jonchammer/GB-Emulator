@@ -1,12 +1,10 @@
 #include "Sound.h"
 #include <algorithm>
 
-Sound::Sound(Memory* memory, const bool skipBIOS, const bool &CGB, int sampleRate, int sampleBufferLength):
-    mCGB(CGB),
+Sound::Sound(Memory* memory, EmulatorConfiguration* configuration):
+    mConfig(configuration),
     mSoundCallback(NULL),
     mSoundCallbackData(NULL),
-    mSampleRate(sampleRate),
-    mSampleBufferLength(sampleBufferLength),
     mMasterVolume(1.0),
     mSound1GlobalToggle(1),
     mSound2GlobalToggle(1),
@@ -16,15 +14,15 @@ Sound::Sound(Memory* memory, const bool skipBIOS, const bool &CGB, int sampleRat
     // Attach this component to the memory at the correct locations
     memory->attachComponent(this, 0xFF10, 0xFF3F);
     
-	mSampleBuffer = new short[mSampleBufferLength]();
-	mSamplePeriod = 4194304 / mSampleRate;
+	mSampleBuffer = new short[mConfig->soundSampleBufferLength]();
+	mSamplePeriod = 4194304 / mConfig->soundSampleRate;
 
-	mSound1 = new SoundUnit1(mCGB, *this);
-	mSound2 = new SoundUnit2(mCGB, *this);
-	mSound3 = new SoundUnit3(mCGB, *this);
-	mSound4 = new SoundUnit4(mCGB, *this);
+	mSound1 = new SoundUnit1(*this, mConfig);
+	mSound2 = new SoundUnit2(*this, mConfig);
+	mSound3 = new SoundUnit3(*this, mConfig);
+	mSound4 = new SoundUnit4(*this, mConfig);
 
-	reset(skipBIOS);
+	reset();
 }
 
 Sound::~Sound()
@@ -95,11 +93,11 @@ void Sound::update(int clockDelta)
 
 		// When we fill the buffer, call the sound callback so someone can take
         // care of this data
-		if (mSampleBufferPos >= mSampleBufferLength)
+		if (mSampleBufferPos >= mConfig->soundSampleBufferLength)
 		{
 			mSampleBufferPos = 0;
             if (mSoundCallback != NULL) 
-                mSoundCallback(mSoundCallbackData, mSampleBuffer, mSampleBufferLength);
+                mSoundCallback(mSoundCallbackData, mSampleBuffer, mConfig->soundSampleBufferLength);
 		}
 	}
 }
@@ -203,7 +201,7 @@ byte Sound::read(const word address) const
     }
 }
        
-void Sound::reset(const bool skipBIOS)
+void Sound::reset()
 {
     mSound1->reset();
 	mSound2->reset();
@@ -220,7 +218,7 @@ void Sound::reset(const bool skipBIOS)
 	mSampleBufferPos     = 0;
 
     // Initialize variables differently if we've skipped over the BIOS
-    if (skipBIOS)
+    if (mConfig->skipBIOS)
     {
         mSound1->emulateBIOS();
         mSound2->emulateBIOS();

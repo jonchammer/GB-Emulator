@@ -9,10 +9,9 @@
 #define SET_LCD_MODE(value) {mSTAT &= 0xFC; mSTAT |= (value);}
 #define GET_TILE_PIXEL(VRAMAddr, x, y) ((((mVRAM[(VRAMAddr) + (y) * 2 + 1] >> (7 - (x))) & 0x1) << 1) | ((mVRAM[(VRAMAddr) + (y) * 2] >> (7 - (x))) & 0x1))
 
-Graphics::Graphics(Memory* memory, bool skipBIOS, const bool &_CGB, const bool &_CGBDoubleSpeed, DMGPalettes palette) :
+Graphics::Graphics(Memory* memory, EmulatorConfiguration* configuration) :
     mMemory(memory),
-    mCGB(_CGB),
-    mCGBDoubleSpeed(_CGBDoubleSpeed),
+    mConfig(configuration),
     mBackgroundGlobalToggle(true),
     mWindowsGlobalToggle(true),
     mSpritesGlobalToggle(true)
@@ -31,9 +30,9 @@ Graphics::Graphics(Memory* memory, bool skipBIOS, const bool &_CGB, const bool &
     mBackBuffer   = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4];
     mNativeBuffer = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS];
     
-	reset(skipBIOS);
+	reset();
 
-	if (palette == RGBPALETTE_REAL)
+	if (mConfig->palette == GameboyPalette::REAL)
 	{
 		//Green palette
 		mGB2RGBPalette[0] = 0xFFD1F7E1;
@@ -142,7 +141,7 @@ void Graphics::update(int clockDelta)
 			}
 
 			//HDMA block copy
-			if (mCGB && mHDMAActive)
+			if (GBC() && mHDMAActive)
 			{
 				HDMACopyBlock(mHDMASource, mVRAMBankOffset + mHDMADestination);
 				mHDMAControl--;
@@ -233,7 +232,7 @@ void Graphics::update(int clockDelta)
 	}
 }
 
-void Graphics::reset(bool skipBIOS)
+void Graphics::reset()
 {
 	memset(mVRAM, 0x0, VRAMBankSize * 2);
 	memset(mOAM, 0x0, 0xFF);
@@ -282,7 +281,7 @@ void Graphics::reset(bool skipBIOS)
 	mOAMDMASource       = 0;
 	mOAMDMAProgress     = 0;
         
-    if (skipBIOS)
+    if (mConfig->skipBIOS)
     {
         mLCDC = 0x91;
         mSTAT = 0x85;
@@ -420,7 +419,7 @@ void Graphics::DMAStep(int clockDelta)
 
 	//In double speed mode OAM DMA runs faster
 	int bytesToCopy = 0;
-	if (mCGB && mCGBDoubleSpeed)
+	if (GBC() && mConfig->doubleSpeed)
 	{
 		bytesToCopy = mOAMDMAClockCounter / 2;
 		mOAMDMAClockCounter %= 2;
@@ -512,7 +511,7 @@ void Graphics::LYCChanged(byte value)
 
 void Graphics::VBKChanged(byte value)
 { 
-	if (mCGB)
+	if (GBC())
 	{
 		mVBK = value; 
 		mVRAMBankOffset = VRAMBankSize * (mVBK & 0x1);
@@ -523,31 +522,31 @@ void Graphics::VBKChanged(byte value)
 
 void Graphics::HDMA1Changed(byte value) 
 { 
-	if (!mCGB) return;
+	if (!GBC()) return;
 	mHDMASource = ((word) value << 8) | (mHDMASource & 0xFF);
 }
 
 void Graphics::HDMA2Changed(byte value) 
 { 
-	if (!mCGB) return;
+	if (!GBC()) return;
 	mHDMASource = (mHDMASource & 0xFF00) | (value & 0xF0);
 }
 
 void Graphics::HDMA3Changed(byte value)
 {
-	if (!mCGB) return;
+	if (!GBC()) return;
 	mHDMADestination = (((word)(value & 0x1F)) << 8) | (mHDMADestination & 0xF0);
 }
 
 void Graphics::HDMA4Changed(byte value)
 {
-	if (!mCGB) return;
+	if (!GBC()) return;
 	mHDMADestination = (mHDMADestination & 0xFF00) | (value & 0xF0);
 }
 
 void Graphics::HDMA5Changed(byte value)
 {
-	if (!mCGB) return;
+	if (!GBC()) return;
 	mHDMAControl = value & 0x7F;
 
 	if (mHDMAActive)
@@ -588,7 +587,7 @@ void Graphics::HDMA5Changed(byte value)
 
 void Graphics::BGPDChanged(byte value) 
 {
-	if (!mCGB) return;
+	if (!GBC()) return;
     
 	byte index   = mBGPI & 0x3F;
 	mBGPD[index] = value;
@@ -602,7 +601,7 @@ void Graphics::BGPDChanged(byte value)
 
 void Graphics::OBPDChanged(byte value) 
 {
-	if (!mCGB) return;
+	if (!GBC()) return;
 
 	byte index   = mOBPI & 0x3F;
 	mOBPD[index] = value;
@@ -623,7 +622,7 @@ void Graphics::renderScanline()
 
 void Graphics::renderBackground()
 {
-    if (((mLCDC & 0x01) || mCGB) && mBackgroundGlobalToggle)
+    if (((mLCDC & 0x01) || GBC()) && mBackgroundGlobalToggle)
 	{
 		word tileMapAddr  = (mLCDC & 0x8) ? 0x1C00 : 0x1800;
 		word tileDataAddr = (mLCDC & 0x10) ? 0x0 : 0x800;
@@ -646,7 +645,7 @@ void Graphics::renderBackground()
 				tileIdx = (signed char)mVRAM[tileAddr] + 128;
 			}
 
-			if (mCGB)
+			if (GBC())
 			{
 				byte tileAttributes = mVRAM[VRAMBankSize + tileAddr];
 
@@ -745,7 +744,7 @@ void Graphics::renderWindow()
 					tileIdx = (signed char)mVRAM[tileIdxAddr] + 128;
 				}
 				
-				if (mCGB)
+				if (GBC())
 				{
 					byte tileAttributes = mVRAM[VRAMBankSize + tileIdxAddr];
 
@@ -859,13 +858,13 @@ void Graphics::renderSprites()
 			}
 
 			// If sprite priority is
-			if ((mOAM[spriteAddr + 3] & 0x80) && (!mCGB || (mLCDC & 0x1)))
+			if ((mOAM[spriteAddr + 3] & 0x80) && (!GBC() || (mLCDC & 0x1)))
 			{
 				// sprites are hidden only behind non-zero colors of the background and window
 				byte colorIdx;
 				for (int x = spriteX; x < spriteX + 8 && x < 160; x++, spritePixelX += dx)
 				{
-					if (mCGB)
+					if (GBC())
 					{
 						colorIdx = GET_TILE_PIXEL(cgbTileMapOffset + (mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
 					}
@@ -882,12 +881,12 @@ void Graphics::renderSprites()
                     
 					// If CGB game and priority flag of current background tile is set - background and window on top of sprites
 					// Master priority on LCDC can override this but here it's set and 
-					if (mCGB && (mNativeBuffer[mLY * SCREEN_WIDTH_PIXELS + x] & 0x80))
+					if (GBC() && (mNativeBuffer[mLY * SCREEN_WIDTH_PIXELS + x] & 0x80))
 					{
 						continue;
 					}
 
-					if (mCGB)
+					if (GBC())
 					{
 						word color;
 						memcpy(&color, cgbPalette + colorIdx * 2, 2);
@@ -922,7 +921,7 @@ void Graphics::renderSprites()
 				byte colorIdx;
 				for (int x = spriteX; x < spriteX + 8 && x < 160; x++, spritePixelX += dx)
 				{
-					if (mCGB)
+					if (GBC())
 					{
 						colorIdx = GET_TILE_PIXEL(cgbTileMapOffset + (mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
 					}
@@ -934,7 +933,7 @@ void Graphics::renderSprites()
                     //sprite color 0 is transparent
 					if (colorIdx == 0) continue;
 						
-					if (mCGB)
+					if (GBC())
 					{
 						word color;
 						memcpy(&color, cgbPalette + colorIdx * 2, 2);
@@ -1008,7 +1007,7 @@ void Graphics::prepareSpriteQueue()
 
 		// In CGB mode sprites always ordered according to OAM ordering
 		// In DMG mode sprites ordered accroging to X coorinate and OAM ordering (for sprites with equal X coordinate)
-		if (!mCGB && mSpriteQueue.size())
+		if (!GBC() && mSpriteQueue.size())
 			std::sort(mSpriteQueue.begin(), mSpriteQueue.end(), std::less<int>());
 	}
 }

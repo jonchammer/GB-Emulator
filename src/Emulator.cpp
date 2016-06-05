@@ -7,15 +7,22 @@
 
 #include "Emulator.h"
 
-Emulator::Emulator(bool skipBIOS) : mPaused(false)
+Emulator::Emulator(EmulatorConfiguration* configuration) : mConfig(configuration), mClassOwnsConfig(false), mPaused(false)
 {
+    if (mConfig == NULL)
+    {
+        cout << "No configuration given. Using default instead." << endl;
+        mConfig          = new EmulatorConfiguration();
+        mClassOwnsConfig = true;
+    }
+    
     // Create the various components we need
-    mMemory   = new Memory(this, skipBIOS);
-    mCPU      = new CPU(this, mMemory, skipBIOS); 
-    mTimers   = new Timers(mMemory, skipBIOS);
-    mGraphics = new Graphics(mMemory, skipBIOS, false, false, RGBPALETTE_BLACKWHITE);
-    mInput    = new Input(mMemory, skipBIOS);
-    mSound    = new Sound(mMemory, skipBIOS, false, 44100, 1024);
+    mMemory   = new Memory(this, mConfig);
+    mCPU      = new CPU(this, mMemory, mConfig); 
+    mTimers   = new Timers(mMemory, mConfig);
+    mGraphics = new Graphics(mMemory, mConfig);
+    mInput    = new Input(mMemory, mConfig);
+    mSound    = new Sound(mMemory, mConfig);
 }
 
 Emulator::~Emulator()
@@ -26,16 +33,23 @@ Emulator::~Emulator()
     delete mGraphics;
     delete mInput;
     delete mSound;
+    
+    // If we created a configuration, we need to be the ones to clean it up.
+    if (mClassOwnsConfig)
+    {
+        delete mConfig;
+        mConfig = NULL;
+    }
 }
 
-void Emulator::reset(bool skipBIOS)
+void Emulator::reset()
 {
-    mMemory->reset(skipBIOS);
-    mCPU->reset(skipBIOS);
-    mTimers->reset(skipBIOS);
-    mGraphics->reset(skipBIOS);
-    mInput->reset(skipBIOS);
-    mSound->reset(skipBIOS);
+    mMemory->reset();
+    mCPU->reset();
+    mTimers->reset();
+    mGraphics->reset();
+    mInput->reset();
+    mSound->reset();
 }
 
 // Should be called 60x / second
@@ -64,6 +78,21 @@ void Emulator::attachDebugger(Debugger* debugger)
     debugger->attachCPU(mCPU);
     debugger->attachMemory(mMemory);
     debugger->attachInput(mInput);
+}
+
+void Emulator::loadCartridge(Cartridge* cartridge)
+{
+    mMemory->loadCartridge(cartridge);
+    
+    // Set the system correctly. AUTOMATIC means we will use
+    // a gameboy if the cartridge is a gameboy cartridge and
+    // a gameboy color if the cartridge is a gameboy color cartridge.
+    if (mConfig->system == EmulatorConfiguration::System::AUTOMATIC)
+    {
+        if (cartridge->getCartridgeInfo().gbc)
+            mConfig->system = EmulatorConfiguration::System::GBC;
+        else mConfig->system = EmulatorConfiguration::System::GB;
+    }
 }
 
 void Emulator::sync(int cycles)
