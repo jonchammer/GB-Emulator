@@ -11,6 +11,8 @@
 #include "Common.h"
 #include "Memory.h"
 
+const word JOYPAD_STATUS_ADDRESS = 0xFF00;
+
 class Input : public Component
 {
 public:

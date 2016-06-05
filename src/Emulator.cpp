@@ -87,11 +87,11 @@ void Emulator::loadCartridge(Cartridge* cartridge)
     // Set the system correctly. AUTOMATIC means we will use
     // a gameboy if the cartridge is a gameboy cartridge and
     // a gameboy color if the cartridge is a gameboy color cartridge.
-    if (mConfig->system == EmulatorConfiguration::System::AUTOMATIC)
+    if (mConfig->system == System::AUTOMATIC)
     {
         if (cartridge->getCartridgeInfo().gbc)
-            mConfig->system = EmulatorConfiguration::System::GBC;
-        else mConfig->system = EmulatorConfiguration::System::GB;
+            mConfig->system = System::GBC;
+        else mConfig->system = System::GB;
     }
 }
 

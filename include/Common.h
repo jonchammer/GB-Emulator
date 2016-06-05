@@ -5,8 +5,8 @@
  * Created on April 9, 2016, 9:25 AM
  */
 
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef COMMON_H
+#define COMMON_H
 
 #include <iostream>
 #include <iomanip>
@@ -22,12 +22,6 @@ typedef short signedWord;
 const int SCREEN_WIDTH_PIXELS  = 160;
 const int SCREEN_HEIGHT_PIXELS = 144;
 
-// Flag definitions - used with the 'f' register
-const int FLAG_ZERO  = 7; // Set when result is 0
-const int FLAG_NEG   = 6; // Set when op is a subtraction
-const int FLAG_HALF  = 5; // Set when overflow from lower nibble to upper nibble
-const int FLAG_CARRY = 4; // Set when overflow occurs
-
 // Interrupt bit definitions
 const int INTERRUPT_VBLANK = 0; // Signals when the emulator reaches the Vertical Blank period
 const int INTERRUPT_LCD    = 1; // Signals an LCD status change
@@ -35,37 +29,14 @@ const int INTERRUPT_TIMER  = 2; // Signals a TIMA overflow
 const int INTERRUPT_SERIAL = 3; // Signals a serial transfer completion
 const int INTERRUPT_JOYPAD = 4; // Signals a change in the joypad state (button pressed/released)
 
-// Locations of important sections in memory
-const word DIVIDER_REGISTER = 0xFF04; // Location of the divider register in memory
-const word TIMA             = 0xFF05; // Location of timer in memory
-const word TMA              = 0xFF06; // Location of timer reset value, which will probably be 0
-const word TAC              = 0xFF07; // Location of timer frequency
-
-const word SCANLINE_ADDRESS     = 0xFF44;
-const word COINCIDENCE_ADDRESS  = 0xFF45;
-const word LCD_STATUS_ADDRESS   = 0xFF41;
-const word LCD_CONTROL_REGISTER = 0xFF40;
-
-const word SCROLL_Y        = 0xFF42;  // Y position of background
-const word SCROLL_X        = 0xFF43;  // x position of background
-const word WINDOW_Y        = 0xFF4A;  // y position of viewing area
-const word WINDOW_X        = 0xFF4B;  // x position -7 of viewing area
-
-const word BACKGROUND_PALETTE_ADDRESS = 0xFF47;  // Location of the background color palette in memory
-const word SPRITE_PALETTE_ADDRESS1    = 0xFF48;  // Location of the first sprite color palette in memory
-const word SPRITE_PALETTE_ADDRESS2    = 0xFF49;  // Location of the second sprite color palette in memory
-
+// Interrupt registers & service registers
 const word INTERRUPT_ENABLED_REGISTER = 0xFFFF; // IE
 const word INTERRUPT_REQUEST_REGISTER = 0xFF0F; // IF
-
-const word INTERRUPT_SERVICE_VBLANK = 0x0040;
-const word INTERRUPT_SERVICE_LCD    = 0x0048;
-const word INTERRUPT_SERVICE_TIMER  = 0x0050;
-const word INTERRUPT_SERVICE_SERIAL = 0x0058;
-const word INTERRUPT_SERVICE_JOYPAD = 0x0060;
-
-const word JOYPAD_STATUS_ADDRESS = 0xFF00;
-const word DMA_TRANSFER_ADDRESS  = 0xFF46;
+const word INTERRUPT_SERVICE_VBLANK   = 0x0040;
+const word INTERRUPT_SERVICE_LCD      = 0x0048;
+const word INTERRUPT_SERVICE_TIMER    = 0x0050;
+const word INTERRUPT_SERVICE_SERIAL   = 0x0058;
+const word INTERRUPT_SERVICE_JOYPAD   = 0x0060;
 
 // Input keys
 const int BUTTON_RIGHT  = 0;
@@ -77,38 +48,34 @@ const int BUTTON_B      = 5;
 const int BUTTON_SELECT = 6;
 const int BUTTON_START  = 7;
 
-// Colors (ARGB)
-const int WHITE      = 0xFFFFFFFF;
-const int LIGHT_GRAY = 0xFFAAAAAA;
-const int DARK_GRAY  = 0xFF555555;
-const int BLACK      = 0xFF000000;
-
+// Defines the colors that are shown when in Gameboy mode
 enum GameboyPalette
 {
     GRAYSCALE = 0,
     REAL      = 1
 };
 
+enum System {GB, GBC, AUTOMATIC};
+
 struct EmulatorConfiguration
 {
-    enum System {GB, GBC, AUTOMATIC};
-    
     System system;                // Which hardware we are emulating. When AUTOMATIC is chosen,
                                   // this will be changed to one of the other values when the
                                   // cartridge is loaded.
-    bool skipBIOS;                // When true, the BIOS screen will be skipped
     GameboyPalette palette;       // Adjust the colors of Gameboy games
     int soundSampleRate;          // Sample rate for synthesized sound
     int soundSampleBufferLength;  // The size of the sound system's sample buffer (in samples)
-    bool doubleSpeed;             // When true, GBC double speed mode is activated
+    bool skipBIOS;                // When true, the BIOS screen will be skipped
+    bool doubleSpeed;             // When true, GBC double speed mode is activated. This should
+                                  // not be set by the user. It will be used internally.
     
     // Default constructor initializes each field to reasonable default values
     EmulatorConfiguration() : 
-        system(AUTOMATIC), 
-        skipBIOS(false), 
+        system(System::AUTOMATIC), 
         palette(GameboyPalette::GRAYSCALE), 
         soundSampleRate(44100), 
         soundSampleBufferLength(1024),
+        skipBIOS(false), 
         doubleSpeed(false) {}
 };
 
@@ -127,8 +94,9 @@ struct EmulatorConfiguration
 // just do something like this instead: "0x%04x". This guarantees the 0x will be printed.
 
 // Shorthand for defining when we are using GBC hardware
-#define GBC() (mConfig->system == EmulatorConfiguration::System::GBC)
+#define GBC() (mConfig->system == System::GBC)
 
+// Components are classes that are capable of being read from or written to.
 class Component
 {
 public:
@@ -146,5 +114,5 @@ public:
 #include "Sound.h"
 #include "Debugger.h"
 
-#endif /* TYPES_H */
+#endif /* COMMON_H */
 

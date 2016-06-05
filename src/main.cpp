@@ -23,7 +23,7 @@ int main(int argc, char** argv)
     // Create the system configuration that will be used
     EmulatorConfiguration config;
     config.skipBIOS = true;
-    config.system   = EmulatorConfiguration::System::AUTOMATIC;
+    config.system   = System::AUTOMATIC;
     config.palette  = GameboyPalette::REAL;
     
     // Create the emulator

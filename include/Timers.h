@@ -13,6 +13,11 @@
 // Forward Declarations
 class Memory;
 
+const word DIVIDER_REGISTER = 0xFF04; // Location of the divider register in memory
+const word TIMA             = 0xFF05; // Location of timer in memory
+const word TMA              = 0xFF06; // Location of timer reset value, which will probably be 0
+const word TAC              = 0xFF07; // Location of timer frequency
+
 class Timers : public Component
 {
 public:

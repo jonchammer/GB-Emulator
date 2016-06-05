@@ -79,6 +79,12 @@ union StackPointer
     word reg;
 };
 
+// Flag definitions - used with the 'f' register
+const int FLAG_ZERO  = 7; // Set when result is 0
+const int FLAG_NEG   = 6; // Set when op is a subtraction
+const int FLAG_HALF  = 5; // Set when overflow from lower nibble to upper nibble
+const int FLAG_CARRY = 4; // Set when overflow occurs
+
 class CPU 
 {
 public:

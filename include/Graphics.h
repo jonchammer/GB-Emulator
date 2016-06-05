@@ -278,7 +278,7 @@ private:
 
     void BGPIChanged(byte value)
     {
-        if (mConfig->system == EmulatorConfiguration::System::GBC)
+        if (GBC())
         {
             mBGPI = value;
         }
@@ -287,7 +287,7 @@ private:
 
     void OBPIChanged(byte value)
     {
-        if (mConfig->system == EmulatorConfiguration::System::GBC)
+        if (GBC())
         {
             mOBPI = value;
         }
