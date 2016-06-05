@@ -83,10 +83,9 @@ void Graphics::update(int clockDelta)
 {
 	mClockCounter += clockDelta;
 	
+    // Take care of DMA transfers
 	if (mOAMDMAStarted)
-	{
 		DMAStep(clockDelta);
-	}
 
 	while (mClockCounter >= mClocksToNextState)
 	{
@@ -263,7 +262,6 @@ void Graphics::reset(bool skipBIOS)
 	mLYC  = 0x00;
     
 	mSpriteQueue.clear();
-	mNewFrameReady      = false;
 	mClockCounter       = 0;
 	mClocksToNextState  = 0x0;
 	mScrollXClocks      = 0x0;
@@ -466,7 +464,6 @@ void Graphics::LCDCChanged(byte value)
 	else if ((value & 0x80) && !LCD_ON())
 	{
 		mSpriteQueue.clear();
-		mNewFrameReady   = false;
 		mClockCounter    = 0;
 		mScrollXClocks   = 0;
 		mLCDCInterrupted = false;

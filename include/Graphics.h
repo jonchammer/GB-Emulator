@@ -235,7 +235,6 @@ private:
     int mGB2RGBPalette[4];         // Gameboy palette -> ARGB color
     int mGBC2RGBPalette[32768];    // GBG color -> ARGB color
     int mSpriteClocks[11];         // Sprites rendering affects LCD timings
-    bool mNewFrameReady;           // Indicates that new frame rendered
     byte* mFrontBuffer;            // The pixel data that is currently being shown on the screen
     byte* mBackBuffer;             // The pixel data that is currently being written
     byte* mNativeBuffer;           // Holds pixel colors in palette values

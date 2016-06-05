@@ -85,7 +85,6 @@ byte Memory::read(const word address) const
     else if (address >= 0xFEA0 && address <= 0xFEFF)
     {
         cout << "RESTRICTED READ: "; printHex(cout, address); cout << endl;
-        //return mMainMemory[address];
         data = 0x00;
     }
 
@@ -133,8 +132,10 @@ void Memory::write(const word address, const byte data)
     else if (address >= 0xFEA0 && address <= 0xFEFF)
     {
         if (data != 0x0)
+        {
             printf("Restricted Write: %#04x = %#04x\n", address, data);
-        //cout << "RESTRICTED WRITE: "; printHex(cout, address); cout << endl;
+        }
+        
         //mMainMemory[address] = data;
     }
 
