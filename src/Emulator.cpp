@@ -97,7 +97,7 @@ void Emulator::loadCartridge(Cartridge* cartridge)
 
 void Emulator::sync(int cycles)
 {
-    if (mConfig->doubleSpeed)
+    if (GBC(mConfig) && mConfig->doubleSpeed)
         cycles >>= 1;
     
     mGraphics->update(cycles);

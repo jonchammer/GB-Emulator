@@ -17,13 +17,13 @@ using namespace std;
 int main(int argc, char** argv)
 {
     //string game = "../roms/tests/MemoryTiming/mem_timing.gb";
-    string game = "../roms/Pokemon_Red.gb";
+    string game = "../roms/Pokemon_Crystal.gbc";
     //string game = "../roms/Super_Mario_Land.gb";
     
     // Create the system configuration that will be used
     EmulatorConfiguration config;
     config.skipBIOS = true;
-    config.system   = System::AUTOMATIC;
+    config.system   = System::GBC;
     config.palette  = GameboyPalette::REAL;
     
     // Create the emulator

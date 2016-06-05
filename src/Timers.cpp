@@ -51,6 +51,10 @@ byte Timers::read(const word address) const
 
 void Timers::update(int cycles)
 {
+    // In double speed mode, the timers operate twice as fast
+    if (GBC(mConfig) && mConfig->doubleSpeed)
+        cycles *= 2;
+    
     handleDividerRegister(cycles);
     
     // The clock must be enabled for it to be updated
