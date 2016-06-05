@@ -251,9 +251,12 @@ private:
     
     // GPU Microcode
     void renderScanline();
-    void renderBackground();
-    void renderWindow();
-    void renderSprites();
+    void renderBackgroundGBC();
+    void renderBackgroundGB();
+    void renderWindowGBC();
+    void renderWindowGB();
+    void renderSpritesGBC();
+    void renderSpritesGB();
     void checkLYC();
     void prepareSpriteQueue();
     bool HDMACopyBlock(word source, word dest);

@@ -615,90 +615,74 @@ void Graphics::OBPDChanged(byte value)
 
 void Graphics::renderScanline()
 {
-	renderBackground();
-    renderWindow();
-    renderSprites();
+    if (GBC(mConfig))
+    {
+        renderBackgroundGBC();
+        renderWindowGBC();
+        renderSpritesGBC();
+    }
+	else
+    {
+        renderBackgroundGB();
+        renderWindowGB();
+        renderSpritesGB();
+    }
 }
 
-void Graphics::renderBackground()
+void Graphics::renderBackgroundGBC()
 {
-    if (((mLCDC & 0x01) || GBC(mConfig)) && mBackgroundGlobalToggle)
-	{
-		word tileMapAddr  = (mLCDC & 0x8) ? 0x1C00 : 0x1800;
-		word tileDataAddr = (mLCDC & 0x10) ? 0x0 : 0x800;
+    if (mBackgroundGlobalToggle)
+    {
+        word tileMapAddr  = (mLCDC & 0x8) ? 0x1C00 : 0x1800;
+        word tileDataAddr = (mLCDC & 0x10) ? 0x0 : 0x800;
 
-		word tileMapX     = mSCX >> 3;					// Converting absolute coorditates to tile coordinates i.e. integer division by 8
-		word tileMapY     = ((mSCY + mLY) >> 3) & 0x1F;	// then clamping to 0-31 range i.e. wrapping background
-		byte tileMapTileX = mSCX & 0x7;				    //
-		byte tileMapTileY = (mSCY + mLY) & 0x7;		    //
+        word tileMapX     = mSCX >> 3;					// Converting absolute coordinates to tile coordinates i.e. integer division by 8
+        word tileMapY     = ((mSCY + mLY) >> 3) & 0x1F;	// then clamping to 0-31 range i.e. wrapping background
+        byte tileMapTileX = mSCX & 0x7;				    //
+        byte tileMapTileY = (mSCY + mLY) & 0x7;		    //
 
-		int tileIdx;
-		for (word x = 0; x < 160; x++)
-		{
-			word tileAddr = tileMapAddr + tileMapX + tileMapY * 32;
-			if (mLCDC & 0x10)
-			{
-				tileIdx = mVRAM[tileAddr];
-			}
-			else
-			{
-				tileIdx = (signed char)mVRAM[tileAddr] + 128;
-			}
+        int tileIdx;
+        for (word x = 0; x < 160; x++)
+        {
+            word tileAddr = tileMapAddr + tileMapX + tileMapY * 32;
+            if (mLCDC & 0x10)
+                tileIdx = mVRAM[tileAddr];
+            else
+                tileIdx = (signed char)mVRAM[tileAddr] + 128;
 
-			if (GBC(mConfig))
-			{
-				byte tileAttributes = mVRAM[VRAMBankSize + tileAddr];
+            byte tileAttributes = mVRAM[VRAMBankSize + tileAddr];
 
-				byte flippedTileX = tileMapTileX;
-				byte flippedTileY = tileMapTileY;
-                
-                //Horizontal flip
-				if (tileAttributes & 0x20)
-				{
-					flippedTileX = 7 - flippedTileX;
-				}
-                
-                //Vertical flip
-				if (tileAttributes & 0x40)
-				{
-					flippedTileY = 7 - flippedTileY;
-				}
+            byte flippedTileX = tileMapTileX;
+            byte flippedTileY = tileMapTileY;
 
-				byte colorIdx = GET_TILE_PIXEL(VRAMBankSize * ((tileAttributes >> 3) & 0x1) + tileDataAddr + tileIdx * 16, flippedTileX, flippedTileY);
-				word color;
-				memcpy(&color, mBGPD + (tileAttributes & 0x7) * 8 + colorIdx * 2, 2);
+            //Horizontal flip
+            if (tileAttributes & 0x20)
+                flippedTileX = 7 - flippedTileX;
 
-                // Storing pallet index with BG-to-OAM priority - sprites will need both
-                int index = mLY * SCREEN_WIDTH_PIXELS + x;
-				mNativeBuffer[index] = (tileAttributes & 0x80) | colorIdx;
-                
-                int c  = mGBC2RGBPalette[color & 0x7FFF];
-                index *= 4;
-                mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
-                mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                mBackBuffer[index + 3] = 0xFF;             // Alpha
-			}
-			else
-			{
-				byte palIdx = GET_TILE_PIXEL(tileDataAddr + tileIdx * 16, tileMapTileX, tileMapTileY);
+            //Vertical flip
+            if (tileAttributes & 0x40)
+                flippedTileY = 7 - flippedTileY;
 
-                int index = mLY * SCREEN_WIDTH_PIXELS + x;
-				mNativeBuffer[index] = (mBGP >> (palIdx * 2)) & 0x3;
-                
-                int c  = mGB2RGBPalette[mNativeBuffer[index]];
-                index *= 4;
-                mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
-                mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                mBackBuffer[index + 3] = 0xFF;             // Alpha
-			}
-			 
-			tileMapX     = (tileMapX + ((tileMapTileX + 1) >> 3)) & 0x1F;
-			tileMapTileX = (tileMapTileX + 1) & 0x7;
-		}
-	}
-	else
+            byte colorIdx = GET_TILE_PIXEL(VRAMBankSize * ((tileAttributes >> 3) & 0x1) + tileDataAddr + tileIdx * 16, flippedTileX, flippedTileY);
+            word color;
+            memcpy(&color, mBGPD + (tileAttributes & 0x7) * 8 + colorIdx * 2, 2);
+
+            // Storing pallet index with BG-to-OAM priority - sprites will need both
+            int index = mLY * SCREEN_WIDTH_PIXELS + x;
+            mNativeBuffer[index] = (tileAttributes & 0x80) | colorIdx;
+
+            int c  = mGBC2RGBPalette[color & 0x7FFF];
+            index *= 4;
+            mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+            mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+            mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+            mBackBuffer[index + 3] = 0xFF;             // Alpha
+
+            tileMapX     = (tileMapX + ((tileMapTileX + 1) >> 3)) & 0x1F;
+            tileMapTileX = (tileMapTileX + 1) & 0x7;
+        }
+    }
+    else
 	{
 		//Clearing current scanline as background covers whole screen
         memset(mBackBuffer + (4 * mLY * SCREEN_WIDTH_PIXELS), 0xFF, 160 * 4);
@@ -706,7 +690,52 @@ void Graphics::renderBackground()
 	}
 }
 
-void Graphics::renderWindow()
+void Graphics::renderBackgroundGB()
+{
+    if ((mLCDC & 0x01) && mBackgroundGlobalToggle)
+    {
+        word tileMapAddr  = (mLCDC & 0x8) ? 0x1C00 : 0x1800;
+        word tileDataAddr = (mLCDC & 0x10) ? 0x0 : 0x800;
+
+        word tileMapX     = mSCX >> 3;					// Converting absolute coordinates to tile coordinates i.e. integer division by 8
+        word tileMapY     = ((mSCY + mLY) >> 3) & 0x1F;	// then clamping to 0-31 range i.e. wrapping background
+        byte tileMapTileX = mSCX & 0x7;				    //
+        byte tileMapTileY = (mSCY + mLY) & 0x7;		    //
+
+        int tileIdx;
+        for (word x = 0; x < 160; x++)
+        {
+            word tileAddr = tileMapAddr + tileMapX + tileMapY * 32;
+            if (mLCDC & 0x10)
+                tileIdx = mVRAM[tileAddr];
+            else
+                tileIdx = (signed char)mVRAM[tileAddr] + 128;
+
+            byte palIdx = GET_TILE_PIXEL(tileDataAddr + tileIdx * 16, tileMapTileX, tileMapTileY);
+
+            int index = mLY * SCREEN_WIDTH_PIXELS + x;
+            mNativeBuffer[index] = (mBGP >> (palIdx * 2)) & 0x3;
+
+            int c  = mGB2RGBPalette[mNativeBuffer[index]];
+            index *= 4;
+            mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+            mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+            mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+            mBackBuffer[index + 3] = 0xFF;             // Alpha
+
+            tileMapX     = (tileMapX + ((tileMapTileX + 1) >> 3)) & 0x1F;
+            tileMapTileX = (tileMapTileX + 1) & 0x7;
+        } 
+    }
+    else
+	{
+		//Clearing current scanline as background covers whole screen
+        memset(mBackBuffer + (4 * mLY * SCREEN_WIDTH_PIXELS), 0xFF, 160 * 4);
+        memset(mNativeBuffer + (mLY * SCREEN_WIDTH_PIXELS), 0x00, 160);
+	}
+}
+
+void Graphics::renderWindowGBC()
 {
     if ((mLCDC & 0x20) && mWindowsGlobalToggle)
 	{
@@ -736,62 +765,41 @@ void Graphics::renderWindow()
 			{
 				word tileIdxAddr = tileMapAddr + tileMapX + tileMapY * 32;
 				if (mLCDC & 0x10)
-				{
 					tileIdx = mVRAM[tileIdxAddr];
-				}
 				else
-				{
 					tileIdx = (signed char)mVRAM[tileIdxAddr] + 128;
-				}
 				
-				if (GBC(mConfig))
-				{
-					byte tileAttributes = mVRAM[VRAMBankSize + tileIdxAddr];
+                byte tileAttributes = mVRAM[VRAMBankSize + tileIdxAddr];
 
-					byte flippedTileX = tileMapTileX;
-					byte flippedTileY = tileMapTileY;
-                    
-                    //Horizontal flip
-					if (tileAttributes & 0x20)
-					{
-						flippedTileX = 7 - flippedTileX;
-					}
-                    
-                    //Vertical flip
-					if (tileAttributes & 0x40)
-					{
-						flippedTileY = 7 - flippedTileY;
-					}
+                byte flippedTileX = tileMapTileX;
+                byte flippedTileY = tileMapTileY;
 
-					byte colorIdx = GET_TILE_PIXEL(VRAMBankSize * ((tileAttributes >> 3) & 0x1) + tileDataAddr + tileIdx * 16, flippedTileX, flippedTileY);
-					word color;
-					memcpy(&color, mBGPD + (tileAttributes & 0x7) * 8 + colorIdx * 2, 2);
-				
-                    //Storing pallet index with BG-to-OAM priority - sprites will need both
-                    int index = mLY * SCREEN_WIDTH_PIXELS + x;
-					mNativeBuffer[index] = (tileAttributes & 0x80) | colorIdx;
-                    
-                    int c = mGBC2RGBPalette[color & 0x7FFF];
-                    index *= 4;
-                    mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
-                    mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                    mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                    mBackBuffer[index + 3] = 0xFF;             // Alpha
-				}
-				else
-				{
-					byte palIdx = GET_TILE_PIXEL(tileDataAddr + tileIdx * 16, tileMapTileX, tileMapTileY);
+                //Horizontal flip
+                if (tileAttributes & 0x20)
+                {
+                    flippedTileX = 7 - flippedTileX;
+                }
 
-                    int index = mLY * SCREEN_WIDTH_PIXELS + x;
-					mNativeBuffer[index] = (mBGP >> (palIdx * 2)) & 0x3;
-                    
-					int c = mGB2RGBPalette[mNativeBuffer[index]];
-                    index *= 4;
-                    mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
-                    mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                    mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                    mBackBuffer[index + 3] = 0xFF;             // Alpha
-				}
+                //Vertical flip
+                if (tileAttributes & 0x40)
+                {
+                    flippedTileY = 7 - flippedTileY;
+                }
+
+                byte colorIdx = GET_TILE_PIXEL(VRAMBankSize * ((tileAttributes >> 3) & 0x1) + tileDataAddr + tileIdx * 16, flippedTileX, flippedTileY);
+                word color;
+                memcpy(&color, mBGPD + (tileAttributes & 0x7) * 8 + colorIdx * 2, 2);
+
+                //Storing pallet index with BG-to-OAM priority - sprites will need both
+                int index = mLY * SCREEN_WIDTH_PIXELS + x;
+                mNativeBuffer[index] = (tileAttributes & 0x80) | colorIdx;
+
+                int c = mGBC2RGBPalette[color & 0x7FFF];
+                index *= 4;
+                mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                mBackBuffer[index + 3] = 0xFF;             // Alpha
 				
 				tileMapX     = (tileMapX + ((tileMapTileX + 1) >> 3)) & 0x1F;
 				tileMapTileX = (tileMapTileX + 1) & 0x7;
@@ -802,7 +810,177 @@ void Graphics::renderWindow()
 	}
 }
 
-void Graphics::renderSprites()
+void Graphics::renderWindowGB()
+{
+    if ((mLCDC & 0x20) && mWindowsGlobalToggle)
+	{
+        // Checking window visibility on the whole screen and in the scanline
+		if (mWX <= 166 && mWY <= 143 && mWindowLine <= 143 && mLY >= mWY)
+		{
+			word tileMapAddr  = (mLCDC & 0x40) ? 0x1C00 : 0x1800;
+			word tileDataAddr = (mLCDC & 0x10) ? 0x0 : 0x800;
+
+			int windowX       = (signed int)mWX - 7;
+			word tileMapX     = 0;
+			word tileMapY     = (mWindowLine >> 3) & 0x1F;
+			byte tileMapTileX = 0;
+			byte tileMapTileY = mWindowLine & 0x7;
+
+			// Skipping if window lies outside the screen
+			if (windowX < 0)
+			{
+				int offset   = -windowX;
+				tileMapX     = (tileMapX + ((tileMapTileX + offset) >> 3)) & 0x1F;
+				tileMapTileX = (tileMapTileX + offset) & 0x7;
+				windowX      = 0;
+			}
+
+			int tileIdx;
+			for (int x = windowX; x < 160; x++)
+			{
+				word tileIdxAddr = tileMapAddr + tileMapX + tileMapY * 32;
+				if (mLCDC & 0x10)
+					tileIdx = mVRAM[tileIdxAddr];
+				else
+					tileIdx = (signed char)mVRAM[tileIdxAddr] + 128;
+
+                byte palIdx = GET_TILE_PIXEL(tileDataAddr + tileIdx * 16, tileMapTileX, tileMapTileY);
+
+                int index = mLY * SCREEN_WIDTH_PIXELS + x;
+                mNativeBuffer[index] = (mBGP >> (palIdx * 2)) & 0x3;
+
+                int c = mGB2RGBPalette[mNativeBuffer[index]];
+                index *= 4;
+                mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                mBackBuffer[index + 3] = 0xFF;             // Alpha
+				
+				tileMapX     = (tileMapX + ((tileMapTileX + 1) >> 3)) & 0x1F;
+				tileMapTileX = (tileMapTileX + 1) & 0x7;
+			}
+
+			mWindowLine++;
+		}
+	}
+}
+
+void Graphics::renderSpritesGBC()
+{
+    if ((mLCDC & 0x02) && mSpritesGlobalToggle)
+	{
+		byte spriteHeight;
+		byte tileIdxMask;
+		if (mLCDC & 0x04)
+		{
+			spriteHeight = 16;
+			tileIdxMask  = 0xFE;
+		}
+		else
+		{
+			spriteHeight = 8;
+			tileIdxMask  = 0xFF;
+		}
+
+		for (int i = mSpriteQueue.size() - 1; i >= 0; i--)
+		{
+			byte spriteAddr = mSpriteQueue[i] & 0xFF;
+
+			//Sprites that are hidden by X coordinate still affect sprite queue
+			if (mOAM[spriteAddr + 1] == 0 || mOAM[spriteAddr + 1] >= 168)
+				continue;
+
+			byte *cgbPalette      = &mOBPD[(mOAM[spriteAddr + 3] & 0x7) * 8];
+			word cgbTileMapOffset = mVRAMBankOffset * ((mOAM[spriteAddr + 3] >> 3) & 0x1);
+
+			int spriteX      = mOAM[spriteAddr + 1] - 8;
+			int spritePixelX = 0;
+			int spritePixelY = mLY - (mOAM[spriteAddr] - 16);
+			int dx           = 1;
+
+			if (spriteX < 0)
+			{
+				spritePixelX = (byte)(spriteX * -1);
+				spriteX      = 0;
+			}
+
+            // X flip
+			if (mOAM[spriteAddr + 3] & 0x20)
+			{
+				spritePixelX = 7 - spritePixelX;
+				dx = -1;
+			}
+            
+            //Y flip
+			if (mOAM[spriteAddr + 3] & 0x40)
+				spritePixelY = spriteHeight - 1 - spritePixelY;
+
+			// If sprite priority is
+			if ((mOAM[spriteAddr + 3] & 0x80) && (mLCDC & 0x1))
+			{
+				// sprites are hidden only behind non-zero colors of the background and window
+				byte colorIdx;
+				for (int x = spriteX; x < spriteX + 8 && x < 160; x++, spritePixelX += dx)
+				{
+					colorIdx = GET_TILE_PIXEL(cgbTileMapOffset + (mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
+
+					if (colorIdx == 0 ||				    //sprite color 0 is transparent
+						(mNativeBuffer[mLY * SCREEN_WIDTH_PIXELS + x] & 0x7) > 0)	//Sprite hidden behind colors 1-3
+					{
+						continue;
+					}
+                    
+					// If CGB game and priority flag of current background tile is set - background and window on top of sprites
+					// Master priority on LCDC can override this but here it's set and 
+					if (mNativeBuffer[mLY * SCREEN_WIDTH_PIXELS + x] & 0x80)
+					{
+						continue;
+					}
+
+                    word color;
+                    memcpy(&color, cgbPalette + colorIdx * 2, 2);
+
+                    int index = mLY * SCREEN_WIDTH_PIXELS + x;
+                    mNativeBuffer[index] = colorIdx;
+
+                    int c = mGBC2RGBPalette[color & 0x7FFF];
+                    index *= 4;
+                    mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                    mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                    mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                    mBackBuffer[index + 3] = 0xFF;             // Alpha
+				}
+			}
+			else
+			{
+				// Sprites are on top of the background and window
+				byte colorIdx;
+				for (int x = spriteX; x < spriteX + 8 && x < 160; x++, spritePixelX += dx)
+				{
+                    colorIdx = GET_TILE_PIXEL(cgbTileMapOffset + (mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
+
+                    //sprite color 0 is transparent
+					if (colorIdx == 0) continue;
+						
+                    word color;
+                    memcpy(&color, cgbPalette + colorIdx * 2, 2);
+
+                    int index = mLY * SCREEN_WIDTH_PIXELS + x;
+                    mNativeBuffer[index] = colorIdx;
+
+                    int c  = mGBC2RGBPalette[color & 0x7FFF];
+                    index *= 4;
+                    mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                    mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                    mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                    mBackBuffer[index + 3] = 0xFF;             // Alpha
+				}
+			}
+		}
+	}
+}
+
+void Graphics::renderSpritesGB()
 {
     if ((mLCDC & 0x02) && mSpritesGlobalToggle)
 	{
@@ -829,10 +1007,7 @@ void Graphics::renderSprites()
 			if (mOAM[spriteAddr + 1] == 0 || mOAM[spriteAddr + 1] >= 168)
 				continue;
 
-			byte dmgPalette       = dmgPalettes[(mOAM[spriteAddr + 3] >> 4) & 0x1];
-			byte *cgbPalette      = &mOBPD[(mOAM[spriteAddr + 3] & 0x7) * 8];
-			word cgbTileMapOffset = mVRAMBankOffset * ((mOAM[spriteAddr + 3] >> 3) & 0x1);
-
+			byte dmgPalette  = dmgPalettes[(mOAM[spriteAddr + 3] >> 4) & 0x1];
 			int spriteX      = mOAM[spriteAddr + 1] - 8;
 			int spritePixelX = 0;
 			int spritePixelY = mLY - (mOAM[spriteAddr] - 16);
@@ -858,61 +1033,27 @@ void Graphics::renderSprites()
 			}
 
 			// If sprite priority is
-			if ((mOAM[spriteAddr + 3] & 0x80) && (!GBC(mConfig) || (mLCDC & 0x1)))
+			if (mOAM[spriteAddr + 3] & 0x80)
 			{
 				// sprites are hidden only behind non-zero colors of the background and window
 				byte colorIdx;
 				for (int x = spriteX; x < spriteX + 8 && x < 160; x++, spritePixelX += dx)
 				{
-					if (GBC(mConfig))
-					{
-						colorIdx = GET_TILE_PIXEL(cgbTileMapOffset + (mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
-					}
-					else
-					{
-						colorIdx = GET_TILE_PIXEL((mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
-					}
+					colorIdx = GET_TILE_PIXEL((mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
 
 					if (colorIdx == 0 ||				    //sprite color 0 is transparent
 						(mNativeBuffer[mLY * SCREEN_WIDTH_PIXELS + x] & 0x7) > 0)	//Sprite hidden behind colors 1-3
-					{
 						continue;
-					}
                     
-					// If CGB game and priority flag of current background tile is set - background and window on top of sprites
-					// Master priority on LCDC can override this but here it's set and 
-					if (GBC(mConfig) && (mNativeBuffer[mLY * SCREEN_WIDTH_PIXELS + x] & 0x80))
-					{
-						continue;
-					}
+                    int index = mLY * SCREEN_WIDTH_PIXELS + x;
+                    mNativeBuffer[index] = (dmgPalette >> (colorIdx * 2)) & 0x3;
 
-					if (GBC(mConfig))
-					{
-						word color;
-						memcpy(&color, cgbPalette + colorIdx * 2, 2);
-
-                        int index = mLY * SCREEN_WIDTH_PIXELS + x;
-						mNativeBuffer[index] = colorIdx;
-                        
-                        int c = mGBC2RGBPalette[color & 0x7FFF];
-                        index *= 4;
-                        mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
-                        mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                        mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                        mBackBuffer[index + 3] = 0xFF;             // Alpha
-					}
-					else
-					{
-                        int index = mLY * SCREEN_WIDTH_PIXELS + x;
-						mNativeBuffer[index] = (dmgPalette >> (colorIdx * 2)) & 0x3;
-                        
-						int c  = mGB2RGBPalette[mNativeBuffer[index]];
-                        index *= 4;
-                        mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
-                        mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                        mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                        mBackBuffer[index + 3] = 0xFF;             // Alpha
-					}
+                    int c  = mGB2RGBPalette[mNativeBuffer[index]];
+                    index *= 4;
+                    mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                    mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                    mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                    mBackBuffer[index + 3] = 0xFF;             // Alpha
 				}
 			}
 			else
@@ -921,45 +1062,20 @@ void Graphics::renderSprites()
 				byte colorIdx;
 				for (int x = spriteX; x < spriteX + 8 && x < 160; x++, spritePixelX += dx)
 				{
-					if (GBC(mConfig))
-					{
-						colorIdx = GET_TILE_PIXEL(cgbTileMapOffset + (mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
-					}
-					else
-					{
-						colorIdx = GET_TILE_PIXEL((mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
-					}
+                    colorIdx = GET_TILE_PIXEL((mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
 					
                     //sprite color 0 is transparent
 					if (colorIdx == 0) continue;
 						
-					if (GBC(mConfig))
-					{
-						word color;
-						memcpy(&color, cgbPalette + colorIdx * 2, 2);
+                    int index = mLY * SCREEN_WIDTH_PIXELS + x;
+                    mNativeBuffer[index] = (dmgPalette >> (colorIdx * 2)) & 0x3;
 
-                        int index = mLY * SCREEN_WIDTH_PIXELS + x;
-						mNativeBuffer[index] = colorIdx;
-                        
-                        int c  = mGBC2RGBPalette[color & 0x7FFF];
-                        index *= 4;
-                        mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
-                        mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                        mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                        mBackBuffer[index + 3] = 0xFF;             // Alpha
-					}
-					else
-					{
-                        int index = mLY * SCREEN_WIDTH_PIXELS + x;
-						mNativeBuffer[index] = (dmgPalette >> (colorIdx * 2)) & 0x3;
-                        
-						int c  = mGB2RGBPalette[mNativeBuffer[index]];
-                        index *= 4;
-                        mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
-                        mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                        mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                        mBackBuffer[index + 3] = 0xFF;             // Alpha
-					}
+                    int c  = mGB2RGBPalette[mNativeBuffer[index]];
+                    index *= 4;
+                    mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
+                    mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
+                    mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
+                    mBackBuffer[index + 3] = 0xFF;             // Alpha
 				}
 			}
 		}
