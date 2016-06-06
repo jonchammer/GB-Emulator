@@ -12,7 +12,11 @@ Sound::Sound(Memory* memory, EmulatorConfiguration* configuration):
     mSound4GlobalToggle(1)
 {
     // Attach this component to the memory at the correct locations
-    memory->attachComponent(this, 0xFF10, 0xFF3F);
+    memory->attachComponent(this, 0xFF10, 0xFF14);
+    memory->attachComponent(this, 0xFF16, 0xFF19);
+    memory->attachComponent(this, 0xFF1A, 0xFF1E);
+    memory->attachComponent(this, 0xFF20, 0xFF26);
+    memory->attachComponent(this, 0xFF30, 0xFF3F);
     
 	mSampleBuffer = new short[mConfig->soundSampleBufferLength]();
 	mSamplePeriod = 4194304 / mConfig->soundSampleRate;
