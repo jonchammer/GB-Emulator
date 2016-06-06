@@ -22,6 +22,7 @@
 class CPU;
 class Memory;
 class Timers;
+class Graphics;
 class Input;
 class Sound;
 class Debugger;

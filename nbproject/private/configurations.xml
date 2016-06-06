@@ -46,6 +46,7 @@
       <in>GBCGraphics.cpp</in>
       <in>GBGraphics.cpp</in>
       <in>GL_Render.cpp</in>
+      <in>Graphics.cpp</in>
       <in>Input.cpp</in>
       <in>MBC.cpp</in>
       <in>Memory.cpp</in>

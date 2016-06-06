@@ -1,26 +1,15 @@
 #include "GBCGraphics.h"
 
 GBCGraphics::GBCGraphics(Memory* memory, EmulatorConfiguration* configuration) :
-    mMemory(memory),
-    mConfig(configuration)
+    Graphics(memory, configuration)
 {
     // Attach this component to the memory at the correct locations
-    mMemory->attachComponent(this, 0x8000, 0x9FFF); // VRAM
-    mMemory->attachComponent(this, 0xFE00, 0xFE9F); // OAM
-    mMemory->attachComponent(this, 0xFF40, 0xFF4B); // Graphics I/O ports
     mMemory->attachComponent(this, 0xFF4F, 0xFF4F); // VBK
     mMemory->attachComponent(this, 0xFF51, 0xFF55); // HDMA
     mMemory->attachComponent(this, 0xFF68, 0xFF6B); // GBC Registers
     mMemory->attachComponent(this, 0xFF57, 0xFF67); // ??? - Included by Gomeboy, but don't seem to be useful
     mMemory->attachComponent(this, 0xFF6C, 0xFF6F); // ???
     
-    mFrontBuffer  = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4];
-    mBackBuffer   = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4];
-    mNativeBuffer = new byte[SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS];
-    
-	mSpriteQueue = std::vector<int>();
-	mSpriteQueue.reserve(40);
-
 	for (int i = 0; i < 32768; i++)
 	{
 		byte r = (i & 0x1F) << 3;
@@ -31,12 +20,6 @@ GBCGraphics::GBCGraphics(Memory* memory, EmulatorConfiguration* configuration) :
 	}
     
     reset();
-}
-
-GBCGraphics::~GBCGraphics()
-{
-    delete[] mFrontBuffer;
-    delete[] mNativeBuffer;
 }
 
 void GBCGraphics::update(int clockDelta)
@@ -74,7 +57,7 @@ void GBCGraphics::update(int clockDelta)
 			}
 
 			// LYC=LY checked in the beginning of scanline
-			checkLYC();
+			checkCoincidenceFlag();
 			
 			mScrollXClocks     = (mSCX & 0x4) ? 4 : 0;
 			mLCDMode           = LCDMODE_LYXX_OAMRAM;
@@ -83,6 +66,7 @@ void GBCGraphics::update(int clockDelta)
 
 		case LCDMODE_LYXX_OAMRAM:
 			prepareSpriteQueue();
+            
 			SET_LCD_MODE(GBLCDMODE_OAMRAM);
 
 			mLCDMode           = LCDMODE_LYXX_HBLANK;
@@ -145,7 +129,7 @@ void GBCGraphics::update(int clockDelta)
 			}
 
 			// Checking LYC=LY in the beginning of scanline
-			checkLYC();
+			checkCoincidenceFlag();
 
 			mLCDMode           = LCDMODE_LY9X_VBLANK_INC;
 			mClocksToNextState = 452;
@@ -166,7 +150,7 @@ void GBCGraphics::update(int clockDelta)
             
 			// Checking LYC=LY in the beginning of scanline
 			// Here LY = 153
-			checkLYC();
+			checkCoincidenceFlag();
 			
 			mLY                = 0;
 			mLCDMode           = LCDMODE_LY00_HBLANK;
@@ -177,13 +161,6 @@ void GBCGraphics::update(int clockDelta)
 			SET_LCD_MODE(GBLCDMODE_HBLANK);
 
 			mLCDCInterrupted = false;
-
-			if (mDelayedWY > -1)
-			{
-				mWY = mDelayedWY;
-				mDelayedWY = -1;
-			}
-
             std::swap(mFrontBuffer, mBackBuffer);
 			mWindowLine        = 0;
 			mLCDMode           = LCDMODE_LYXX_OAM;
@@ -195,8 +172,9 @@ void GBCGraphics::update(int clockDelta)
 
 void GBCGraphics::reset()
 {
+    Graphics::reset();
+    
 	memset(mVRAM, 0x0, VRAMBankSize * 2);
-	memset(mOAM, 0x0, 0xA0);
     memset(mBackBuffer, 0xFF, 160 * 144 * 4 * sizeof(mBackBuffer[0]));
     memset(mNativeBuffer, 0x00, 160 * 144 * sizeof(mNativeBuffer[0]));
 
@@ -209,26 +187,10 @@ void GBCGraphics::reset()
 		mOBPD[i] = rand() % 0x100;
 
     // LCDC cannot be 0 initially or some games (like Pokemon Red) won't load.
-	mLCDC = 0x00;
-	mSTAT = 0x00;
-	mSCY  = 0x00;
-	mSCX  = 0x00;
 	mBGP  = 0x00;
 	mOBP0 = 0x00;
-	mOBP1 = 0x00;
-	mWY   = 0x00;
-	mWX   = 0x00;
-    mLY   = 0x00;
-	mLYC  = 0x00;
-    
-	mSpriteQueue.clear();
-	mClockCounter       = 0;
-	mClocksToNextState  = 0x0;
-	mScrollXClocks      = 0x0;
-	mLCDCInterrupted    = false;
-	mLCDMode            = LCDMODE_LYXX_OAM;
-	mDelayedWY          = -1;
-	mWindowLine         = 0;
+	mOBP1 = 0x00;  
+	
 	mVRAMBankOffset     = 0;
 	mHDMAActive         = false;
 	mHDMASource         = 0;
@@ -237,24 +199,12 @@ void GBCGraphics::reset()
 	mVBK                = 0;
 	mBGPI               = 0;
 	mOBPI               = 0;
-	mOAMDMAStarted      = false;
-	mOAMDMAClockCounter = 0;
-	mOAMDMASource       = 0;
-	mOAMDMAProgress     = 0;
         
     if (mConfig->skipBIOS)
     {
-        mLCDC = 0x91;
-        mSTAT = 0x85;
-        mSCY  = 0x0;
-        mSCX  = 0x0;
-        mLY   = 0x0;
-        mLYC  = 0x0;
         mBGP  = 0xFC;
         mOBP0 = 0xFF;
         mOBP1 = 0xFF;
-        mWY   = 0x0;
-        mWX   = 0x0;
     }
 }
 
@@ -331,9 +281,9 @@ void GBCGraphics::write(word address, byte data)
         case HDMA3: HDMA3Changed(data); break;
         case HDMA4: HDMA4Changed(data); break;
         case HDMA5: HDMA5Changed(data); break;
-        case BGPI:  BGPIChanged(data);  break;
+        case BGPI:  mBGPI = data;       break;
         case BGPD:  BGPDChanged(data);  break;
-        case OBPI:  OBPIChanged(data);  break;
+        case OBPI:  mOBPI = data;       break;
         case OBPD:  OBPDChanged(data);  break;
         
         default:    
@@ -352,122 +302,12 @@ void GBCGraphics::writeVRAM(word addr, byte value)
 	}
 }
 
-void GBCGraphics::writeOAM(byte addr, byte value)
-{
-	if (GET_LCD_MODE() == GBLCDMODE_HBLANK || GET_LCD_MODE() == GBLCDMODE_VBLANK || !LCD_ON())
-		mOAM[addr] = value;
-}
-
 byte GBCGraphics::readVRAM(word addr) const
 {
 	if (GET_LCD_MODE() != GBLCDMODE_OAMRAM || !LCD_ON())
 		return mVRAM[mVRAMBankOffset + addr];
     
 	else return 0xFF;
-}
-
-byte GBCGraphics::readOAM(byte addr) const
-{
-	if (GET_LCD_MODE() == GBLCDMODE_HBLANK || GET_LCD_MODE() == GBLCDMODE_VBLANK || !LCD_ON())
-		return mOAM[addr];
-	
-	else return 0xFF;
-}
-
-void GBCGraphics::DMAStep(int clockDelta)
-{
-	mOAMDMAClockCounter += clockDelta;
-
-	//In double speed mode OAM DMA runs faster
-	int bytesToCopy = 0;
-	if (GBC(mConfig) && mConfig->doubleSpeed)
-	{
-		bytesToCopy = mOAMDMAClockCounter / 2;
-		mOAMDMAClockCounter %= 2;
-	}
-	else
-	{
-		bytesToCopy = mOAMDMAClockCounter / 5;
-		mOAMDMAClockCounter %= 5;
-	}
-
-	if (mOAMDMAProgress + bytesToCopy >= 0xA0)
-	{
-		mOAMDMAStarted = false;
-		bytesToCopy = 0xA0 - mOAMDMAProgress;
-	}
-
-	for (int i = 0; i < bytesToCopy; i++, mOAMDMAProgress++)
-	{
-        mOAM[mOAMDMAProgress] = mMemory->read(mOAMDMASource | mOAMDMAProgress);
-	}
-}
-
-void GBCGraphics::DMAChanged(byte value)
-{
-	mOAMDMAStarted      = true;
-	mOAMDMASource       = value << 8;
-	mOAMDMAClockCounter = 0;
-	mOAMDMAProgress     = 0;
-}
-
-void GBCGraphics::LCDCChanged(byte value)
-{
-	// If LCD is being turned off
-	if (!(value & 0x80))
-	{
-		mSTAT &= ~0x3;
-		mLY = 0;
-	}
-    
-	// If LCD is being turned on
-	else if ((value & 0x80) && !LCD_ON())
-	{
-		mSpriteQueue.clear();
-		mClockCounter    = 0;
-		mScrollXClocks   = 0;
-		mLCDCInterrupted = false;
-
-		mLY = 0;
-		checkLYC();
-
-		// When LCD turned on, H-blank is active instead of OAM for 80 cycles
-		SET_LCD_MODE(GBLCDMODE_HBLANK);
-		mLCDMode = LCDMODE_LYXX_OAMRAM;
-		mClocksToNextState = 80;
-	}
-
-	if (!(mLCDC & 0x20) && (value & 0x20))
-	{
-		mWindowLine = 144;
-	}
-
-	mLCDC = value;
-}
-
-void GBCGraphics::STATChanged(byte value)
-{
-	// Coincidence flag and mode flag are read-only
-	mSTAT = (mSTAT & 0x7) | (value & 0x78); 
-
-	// STAT bug
-	if (LCD_ON() && 
-		(GET_LCD_MODE() == GBLCDMODE_HBLANK || GET_LCD_MODE() == GBLCDMODE_VBLANK))
-	{
-        mMemory->requestInterrupt(INTERRUPT_LCD);
-	}
-}
-
-void GBCGraphics::LYCChanged(byte value) 
-{
-	if (mLYC != value)
-	{
-		mLYC = value;
-		if (mLCDMode != LCDMODE_LYXX_HBLANK_INC && mLCDMode != LCDMODE_LY9X_VBLANK_INC)
-			checkLYC();
-	}
-    
-	else mLYC = value;
 }
 
 void GBCGraphics::VBKChanged(byte value)
@@ -815,49 +655,6 @@ void GBCGraphics::renderSprites()
 				}
 			}
 		}
-	}
-}
-
-void GBCGraphics::checkLYC()
-{
-	if (mLYC == mLY)
-	{
-		mSTAT |= 0x4;
-        
-        // LYC=LY coincidence interrupt selected
-		if ((mSTAT & 0x40) && !mLCDCInterrupted)
-		{
-            mMemory->requestInterrupt(INTERRUPT_LCD);
-			mLCDCInterrupted = true;
-		}
-	}
-    
-	else mSTAT &= 0xFB;
-}
-
-void GBCGraphics::prepareSpriteQueue()
-{
-	mSpriteQueue.clear();
-
-	if (LCD_ON() && (mLCDC & 0x2))
-	{
-		int spriteHeight = (mLCDC & 0x4) ? 16 : 8;
-
-		// Building sprite queue
-		for (byte i = 0; i < 160; i += 4)
-		{
-            // Sprite on a current scanline
-			if ((mOAM[i] - 16) <= mLY && mLY < (mOAM[i] - 16 + spriteHeight))
-			{
-                // Building ID that corresponds to the sprite priority
-				mSpriteQueue.push_back((mOAM[i + 1] << 8) | i);
-
-				// Max 10 sprites per scanline
-				if (mSpriteQueue.size() == 10) break;
-			}
-		}
-
-		// In CGB mode sprites always ordered according to OAM ordering
 	}
 }
 

@@ -25,6 +25,7 @@
       <in>Emulator.cpp</in>
       <in>GBCGraphics.cpp</in>
       <in>GBGraphics.cpp</in>
+      <in>Graphics.cpp</in>
       <in>Input.cpp</in>
       <in>MBC.cpp</in>
       <in>Memory.cpp</in>
@@ -102,6 +103,8 @@
       <item path="src/GBCGraphics.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/GBGraphics.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Graphics.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Input.cpp" ex="false" tool="1" flavor2="0">
       </item>
