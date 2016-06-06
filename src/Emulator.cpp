@@ -92,6 +92,10 @@ void Emulator::loadCartridge(Cartridge* cartridge)
         if (cartridge->getCartridgeInfo().gbc)
             mConfig->system = System::GBC;
         else mConfig->system = System::GB;
+        
+        // Some components need to be made aware that there has been
+        // a configuration change
+        reset();
     }
 }
 
