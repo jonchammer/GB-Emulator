@@ -9,6 +9,7 @@
 #define TIMERS_H
 
 #include "Common.h"
+#include "Memory.h"
 
 // Forward Declarations
 class Memory;

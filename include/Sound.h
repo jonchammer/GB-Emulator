@@ -1,6 +1,8 @@
 #ifndef SOUND_H
 #define SOUND_H
 
+#include "Common.h"
+#include "Memory.h"
 #include "Sound/SoundUnit1.h"
 #include "Sound/SoundUnit2.h"
 #include "Sound/SoundUnit3.h"

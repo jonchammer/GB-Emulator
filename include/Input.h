@@ -10,8 +10,12 @@
 
 #include "Common.h"
 #include "Memory.h"
+#include "Debugger.h"
 
 const word JOYPAD_STATUS_ADDRESS = 0xFF00;
+
+class Memory;
+class Debugger;
 
 class Input : public Component
 {

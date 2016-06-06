@@ -13,6 +13,8 @@
 #include <vector>
 #include "Common.h"
 #include "Cartridge.h"
+#include "Emulator.h"
+#include "Debugger.h"
 
 using namespace std;
 

@@ -5,8 +5,9 @@
  * Created on April 15, 2016, 7:47 PM
  */
 
-#include "Common.h"
 #include "SDL.h"
+#include "Common.h"
+#include "Emulator.h"
 #include "Sound/StreamingAudioQueue.h"
 
 const int DEFAULT_WINDOW_WIDTH  = SCREEN_WIDTH_PIXELS  * 4;

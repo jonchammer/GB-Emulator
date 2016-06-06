@@ -13,7 +13,15 @@
 #include <algorithm>
 #include <sstream>
 #include "Common.h"
+#include "CPU.h"
+#include "Memory.h"
+#include "Input.h"
+
 using namespace std;
+
+class CPU;
+class Memory;
+class Input;
 
 struct Instruction
 {

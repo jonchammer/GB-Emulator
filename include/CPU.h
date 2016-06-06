@@ -13,6 +13,10 @@
 #include <fstream>
 #include <cstdlib>
 #include "Common.h"
+#include "Debugger.h"
+#include "Emulator.h"
+#include "Memory.h"
+
 using namespace std;
 
 // Forward declaration of necessary classes

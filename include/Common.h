@@ -104,15 +104,5 @@ public:
     virtual byte read(const word address) const = 0;
 };
 
-// Includes
-#include "Emulator.h"
-#include "Memory.h"
-#include "CPU.h"
-#include "Timers.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Sound.h"
-#include "Debugger.h"
-
 #endif /* COMMON_H */
 

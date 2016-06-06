@@ -9,12 +9,19 @@
 #define EMULATOR_H
 
 #include "Common.h"
+#include "CPU.h"
+#include "Memory.h"
+#include "Timers.h"
+#include "Graphics.h"
+#include "Input.h"
+#include "Sound.h"
+#include "Debugger.h"
+#include "Cartridge.h"
 
 // Forward declaration of necessary classes
 class CPU;
 class Memory;
 class Timers;
-class Graphics;
 class Input;
 class Sound;
 class Debugger;

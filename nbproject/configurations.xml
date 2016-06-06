@@ -7,6 +7,8 @@
       </df>
       <in>Cartridge.h</in>
       <in>Debugger.h</in>
+      <in>GBCGraphics.h</in>
+      <in>GBGraphics.h</in>
       <in>MBC.h</in>
       <in>Timers.h</in>
     </df>
@@ -21,7 +23,8 @@
       <in>Cartridge.cpp</in>
       <in>Debugger.cpp</in>
       <in>Emulator.cpp</in>
-      <in>Graphics.cpp</in>
+      <in>GBCGraphics.cpp</in>
+      <in>GBGraphics.cpp</in>
       <in>Input.cpp</in>
       <in>MBC.cpp</in>
       <in>Memory.cpp</in>
@@ -75,6 +78,10 @@
       </item>
       <item path="include/Debugger.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/GBCGraphics.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/GBGraphics.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/MBC.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/Sound/StreamingAudioQueue.h"
@@ -92,7 +99,9 @@
       </item>
       <item path="src/Emulator.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/Graphics.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/GBCGraphics.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/GBGraphics.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Input.cpp" ex="false" tool="1" flavor2="0">
       </item>

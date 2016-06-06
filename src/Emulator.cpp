@@ -6,6 +6,8 @@
  */
 
 #include "Emulator.h"
+#include "GBGraphics.h"
+#include "GBCGraphics.h"
 
 Emulator::Emulator(EmulatorConfiguration* configuration) : mConfig(configuration), mClassOwnsConfig(false), mPaused(false)
 {
@@ -20,9 +22,9 @@ Emulator::Emulator(EmulatorConfiguration* configuration) : mConfig(configuration
     mMemory   = new Memory(this, mConfig);
     mCPU      = new CPU(this, mMemory, mConfig); 
     mTimers   = new Timers(mMemory, mConfig);
-    mGraphics = new Graphics(mMemory, mConfig);
     mInput    = new Input(mMemory, mConfig);
     mSound    = new Sound(mMemory, mConfig);
+    mGraphics = NULL;
 }
 
 Emulator::~Emulator()
@@ -90,8 +92,15 @@ void Emulator::loadCartridge(Cartridge* cartridge)
     if (mConfig->system == System::AUTOMATIC)
     {
         if (cartridge->getCartridgeInfo().gbc)
+        {
             mConfig->system = System::GBC;
-        else mConfig->system = System::GB;
+            mGraphics = new GBCGraphics(mMemory, mConfig);
+        }
+        else 
+        {
+            mConfig->system = System::GB;
+            mGraphics = new GBGraphics(mMemory, mConfig);
+        }
         
         // Some components need to be made aware that there has been
         // a configuration change

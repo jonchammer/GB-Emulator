@@ -17,8 +17,8 @@ using namespace std;
 int main(int argc, char** argv)
 {
     //string game = "../roms/tests/MemoryTiming/mem_timing.gb";
-    //string game = "../roms/Pokemon_Crystal.gbc";
-    string game = "../roms/Tetris.gb";
+    string game = "../roms/Pokemon_Crystal.gbc";
+    //string game = "../roms/Links_Awakening.gb";
     
     // Create the system configuration that will be used
     EmulatorConfiguration config;
