@@ -84,7 +84,8 @@ private:
     Component* mComponentMap[50];  // Holds pointers to the actual components
     int mComponentIndex;           // The index of the last element in the component map
    
-    byte* mInternalRAM;   // Size is 8 KB, range is [0xC000, 0xDFFF] and [0xE000, 0xFDFF] (echo)
+    byte* mInternalRAM;   // Size is 8 KB (GB) or 32 KB (GBC), range is [0xC000, 0xDFFF] and [0xE000, 0xFDFF] (echo)
+    int mCurrentRAMBank;  // Used for GBC mode to select the RAM bank for [0xD000, 0xDFFF]. Each bank is 0x1000 (4 KB)
     byte* mMiscRAM;       // Size is 256 B, range is [0xFF00, 0xFFFF]. Used for unused I/O Ports, Stack Area, and Interrupts    
     bool mInBIOS;         // True if we are in the BIOS.
     

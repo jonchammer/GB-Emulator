@@ -30,8 +30,9 @@ const byte BIOS[] =
 
 Memory::Memory(Emulator* emulator, EmulatorConfiguration* configuration) : mEmulator(emulator), mDebugger(NULL), mConfig(configuration)
 {
-    // Internal RAM is 8 KB
-    mInternalRAM = new byte[0x2000];
+    // Internal RAM is 8 KB for GB and 32 KB for GBC.
+    // We just allocate 32 KB to cover both cases
+    mInternalRAM = new byte[0x8000];
     
     // 256 bytes. Used for unused I/O ports, stack space, and interrupts
     mMiscRAM = new byte[0x100];
@@ -53,10 +54,28 @@ void Memory::reset()
     
     memset(mMiscRAM, 0xFF, 0x7F);
     memset(mMiscRAM + 0x80, 0x00, 0x40);
+    
+    // Specific initializations
     mMiscRAM[INTERRUPT_REQUEST_REGISTER - 0xFF00] = 0xE1;
     mMiscRAM[INTERRUPT_ENABLED_REGISTER - 0xFF00] = 0x00;
     mMiscRAM[0xFF4D - 0xFF00] = 0x00;
     
+    if (GBC(mConfig))
+    {
+        // Initialize undocumented registers
+        mMiscRAM[0xFF6C - 0xFF00] = 0xFE;
+        mMiscRAM[0xFF72 - 0xFF00] = 0x00;
+        mMiscRAM[0xFF73 - 0xFF00] = 0x00;
+        mMiscRAM[0xFF74 - 0xFF00] = 0x00;
+        mMiscRAM[0xFF75 - 0xFF00] = 0x8F;
+        mMiscRAM[0xFF76 - 0xFF00] = 0x00;
+        mMiscRAM[0xFF77 - 0xFF00] = 0x00;
+    }
+    
+    // The current RAM bank starts out at 1, regardless of whether
+    // we are in GB or GBC mode.
+    mCurrentRAMBank = 1;
+        
     // TODO Reset cartridge too?
 }
 
@@ -74,14 +93,21 @@ byte Memory::read(const word address) const
     else if ((component = getComponentForAddress(address)) != NULL)
         data = component->read(address);
     
-    // Read from internal RAM
-    else if (address >= 0xC000 && address <= 0xDFFF)
+    // Read from internal RAM - Bank 0
+    else if (address >= 0xC000 && address <= 0xCFFF)
         data = mInternalRAM[address - 0xC000];
-
+    
+    // Read from internal RAM - Current RAM bank
+    // Current RAM bank is always 1 for GB
+    else if (address >= 0xD000 && address <= 0xDFFF)
+    {
+        data = mInternalRAM[(mCurrentRAMBank * 0x1000) + (address - 0xD000)];
+    }
+    
     // Read from echo RAM, which uses the same storage as the internal RAM
     else if (address >= 0xE000 && address <= 0xFDFF)
         data = mInternalRAM[address - 0xE000];
-       
+    
     // This area is restricted
     else if (address >= 0xFEA0 && address <= 0xFEFF)
     {
@@ -100,8 +126,12 @@ byte Memory::read(const word address) const
         return ret;
     }
     
+    // Handle RAM bank reads in GBC mode
+    else if (address == 0xFF70 && GBC(mConfig))
+        return 0xF8 | mCurrentRAMBank;
+    
     // Read from misc RAM - This statement is a touch convoluted, but it's required
-    // for gcc to compile without a warning about the limited range of unsigned shorts
+    // for g++ to compile without a warning about the limited range of unsigned shorts
     else if ((address >= 0xFF00 && address <= 0xFFFE) || (address == 0xFFFF))
         data = mMiscRAM[address - 0xFF00];
     
@@ -132,10 +162,15 @@ void Memory::write(const word address, const byte data)
     else if ((component = getComponentForAddress(address)) != NULL)
         component->write(address, data);
     
-    // Write to working RAM (also used for echo RAM)
-    else if (address >= 0xC000 && address <= 0xDFFF)
+    // Write to internal RAM - Bank 0
+    else if (address >= 0xC000 && address <= 0xCFFF)
         mInternalRAM[address - 0xC000] = data;
-    
+
+    // Write to internal RAM - Current RAM bank
+    // Current RAM bank is always 1 for GB
+    else if (address >= 0xD000 && address <= 0xDFFF)
+        mInternalRAM[(mCurrentRAMBank * 0x1000) + (address - 0xD000)] = data;
+        
     // Write to echo RAM (also used for working RAM)
     else if (address >= 0xE000 && address <= 0xFDFF)
         mInternalRAM[address - 0xE000] = data;
@@ -144,9 +179,7 @@ void Memory::write(const word address, const byte data)
     else if (address >= 0xFEA0 && address <= 0xFEFF)
     {
         if (data != 0x0)
-        {
             printf("Restricted Write: %#04x = %#04x\n", address, data);
-        }
         
         //mMainMemory[address] = data;
     }
@@ -163,8 +196,19 @@ void Memory::write(const word address, const byte data)
         mMiscRAM[address - 0xFF00] = (data & 0x01);
     }
     
+    // Handle RAM bank changes in GBC mode
+    else if (address == 0xFF70 && GBC(mConfig))
+    {
+        // Isolate the lower 3 bits
+        mCurrentRAMBank = data & 0x07;
+        
+        // A value of 0 is illegal. Change it to 1 instead.
+        if (mCurrentRAMBank == 0)
+            mCurrentRAMBank = 1;
+    }
+        
     // Write to misc RAM - This statement is a touch convoluted, but it's required
-    // for gcc to compile without a warning about the limited range of unsigned shorts
+    // for g++ to compile without a warning about the limited range of unsigned shorts
     else if ((address >= 0xFF00 && address <= 0xFFFE) || (address == 0xFFFF))     
         mMiscRAM[address - 0xFF00] = data;
     
