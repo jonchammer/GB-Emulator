@@ -12,8 +12,8 @@ GBCGraphics::GBCGraphics(Memory* memory, EmulatorConfiguration* configuration) :
     
 	for (int i = 0; i < 32768; i++)
 	{
-		byte r = (i & 0x1F) << 3;
-		byte g = ((i >> 5) & 0x1F) << 3;
+		byte r = ( i        & 0x1F) << 3;
+		byte g = ((i >>  5) & 0x1F) << 3;
 		byte b = ((i >> 10) & 0x1F) << 3;
         
 		mGBC2RGBPalette[i] = 0xFF000000 | (r << 16) | (g << 8) | b;
