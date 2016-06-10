@@ -21,7 +21,7 @@ public:
     
     const static int VRAMBankSize = 0x2000;
     
-    // Important memory locations
+    // Platform independent memory addresses
     const static word VRAM_START = 0x8000;
     const static word VRAM_END   = 0x9FFF;
     const static word OAM_START  = 0xFE00;
@@ -33,21 +33,8 @@ public:
     const static word LY         = 0xFF44;
     const static word LYC        = 0xFF45;
     const static word DMA        = 0xFF46;
-    const static word BGP        = 0xFF47;
-    const static word OBP0       = 0xFF48;
-    const static word OBP1       = 0xFF49;
     const static word WY         = 0xFF4A;
     const static word WX         = 0xFF4B;
-    const static word VBK        = 0xFF4F;
-    const static word HDMA1      = 0xFF51;
-    const static word HDMA2      = 0xFF52;
-    const static word HDMA3      = 0xFF53;
-    const static word HDMA4      = 0xFF54;
-    const static word HDMA5      = 0xFF55;
-    const static word BGPI       = 0xFF68;
-    const static word BGPD       = 0xFF69;
-    const static word OBPI       = 0xFF6A;
-    const static word OBPD       = 0xFF6B;
     
     // LCD controller modes in the STAT register
     enum GameboyLCDModes

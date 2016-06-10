@@ -7,7 +7,8 @@ Graphics::Graphics(Memory* memory, EmulatorConfiguration* configuration) :
     // Attach this component to the memory at the correct locations
     mMemory->attachComponent(this, 0x8000, 0x9FFF); // VRAM
     mMemory->attachComponent(this, 0xFE00, 0xFE9F); // OAM
-    mMemory->attachComponent(this, 0xFF40, 0xFF4B); // GBGraphics I/O ports
+    mMemory->attachComponent(this, 0xFF40, 0xFF46); // GBGraphics I/O ports
+    mMemory->attachComponent(this, 0xFF4A, 0xFF4B); // WX, WY
     
 	mSpriteQueue.reserve(40); 
     

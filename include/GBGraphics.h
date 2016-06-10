@@ -24,6 +24,11 @@ class GBGraphics : public Graphics
 {
 public:
 
+    // GB-specific memory addresses
+    const static word BGP  = 0xFF47;
+    const static word OBP0 = 0xFF48;
+    const static word OBP1 = 0xFF49;
+    
     // Constructors / Destructors
     GBGraphics(Memory* memory, EmulatorConfiguration* configuration);
     

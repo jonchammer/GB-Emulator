@@ -3,6 +3,8 @@
 GBGraphics::GBGraphics(Memory* memory, EmulatorConfiguration* configuration) :
     Graphics(memory, configuration)
 {
+    mMemory->attachComponent(this, 0xFF47, 0xFF49); // Gameboy specific ports
+    
 	if (mConfig->palette == GameboyPalette::REAL)
 	{
 		//Green palette

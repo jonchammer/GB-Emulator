@@ -186,11 +186,7 @@ void GBCGraphics::reset()
 	for (int i = 0; i < 64; i++)
 		mOBPD[i] = rand() % 0x100;
 
-    // LCDC cannot be 0 initially or some games (like Pokemon Red) won't load.
-	mBGP  = 0x00;
-	mOBP0 = 0x00;
-	mOBP1 = 0x00;  
-	
+    // LCDC cannot be 0 initially or some games (like Pokemon Red) won't load.	
 	mVRAMBankOffset     = 0;
 	mHDMAActive         = false;
 	mHDMASource         = 0;
@@ -202,9 +198,7 @@ void GBCGraphics::reset()
         
     if (mConfig->skipBIOS)
     {
-        mBGP  = 0xFC;
-        mOBP0 = 0xFF;
-        mOBP1 = 0xFF;
+        // Nothing to do
     }
 }
 
@@ -223,9 +217,6 @@ byte GBCGraphics::read(const word address) const
         case SCX:   return mSCX;
         case LY:    return mLY;
         case LYC:   return mLYC;
-        case BGP:   return mBGP;
-        case OBP0:  return mOBP0;
-        case OBP1:  return mOBP1;
         case WY:    return mWY;
         case WX:    return mWX;
         case VBK:   return mVBK | 0xFE;
@@ -270,9 +261,6 @@ void GBCGraphics::write(word address, byte data)
         case LY:    mLY = 0;            break;
         case LYC:   LYCChanged(data);   break;
         case DMA:   DMAChanged(data);   break;
-        case BGP:   mBGP = data;        break;
-        case OBP0:  mOBP0 = data;       break;
-        case OBP1:  mOBP1 = data;       break;
         case WY:    mWY = data;         break;
         case WX:    mWX = data;         break;
         case VBK:   VBKChanged(data);   break;

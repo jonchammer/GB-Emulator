@@ -23,7 +23,19 @@ class Emulator;
 class GBCGraphics : public Graphics
 {
 public:
-
+    
+    // GBC-specific memory addresses
+    const static word VBK   = 0xFF4F;
+    const static word HDMA1 = 0xFF51;
+    const static word HDMA2 = 0xFF52;
+    const static word HDMA3 = 0xFF53;
+    const static word HDMA4 = 0xFF54;
+    const static word HDMA5 = 0xFF55;
+    const static word BGPI  = 0xFF68;
+    const static word BGPD  = 0xFF69;
+    const static word OBPI  = 0xFF6A;
+    const static word OBPD  = 0xFF6B;
+    
     // Constructors / Destructors
     GBCGraphics(Memory* memory, EmulatorConfiguration* configuration);
     
@@ -42,22 +54,7 @@ private:
     int mGBC2RGBPalette[32768];    // GBG color -> ARGB color
     
     // GPU I/O ports
-
-    // BG & Window Palette Data (R/W)
-    // Bit 7-6 - Data for Dot Data 11 (Normally darkest color)
-    // Bit 5-4 - Data for Dot Data 10
-    // Bit 3-2 - Data for Dot Data 01
-    // Bit 1-0 - Data for Dot Data 00 (Normally lightest color)
-    byte mBGP; 
-
-    // Object Palette 0 Data (R/W)
-    // This selects the colors for sprite palette 0. It works exactly as BGP except each value of 0 is transparent
-    byte mOBP0; 
-
-    // Object Palette 1 Data (R/W)
-    // This selects the colors for sprite palette 1. It works exactly as OBP0
-    byte mOBP1; 
-    
+   
     // Current Video Memory (VRAM) Bank
     // Bit 0 - VRAM Bank (0-1)
     byte mVBK; 
