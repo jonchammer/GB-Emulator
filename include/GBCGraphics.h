@@ -50,7 +50,6 @@ public:
 private:
     
     byte mVRAM[VRAMBankSize * 2];
-    word mVRAMBankOffset;
     int mGBC2RGBPalette[32768];    // GBG color -> ARGB color
     
     // GPU I/O ports
@@ -98,7 +97,6 @@ private:
     void writeVRAM(word addr, byte value);
     byte readVRAM(word addr) const;
     
-    void VBKChanged(byte value);
     void HDMA1Changed(byte value);
     void HDMA2Changed(byte value);
     void HDMA3Changed(byte value);

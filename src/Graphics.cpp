@@ -72,18 +72,28 @@ void Graphics::prepareSpriteQueue()
 {
 	mSpriteQueue.clear();
 
+    // Bit 1 determines if sprites are rendered
 	if (LCD_ON() && testBit(mLCDC, 1))
 	{
+        // Work out the size of the sprites
 		int spriteHeight = (testBit(mLCDC, 2) ? 16 : 8);
 
+        const int OAM_SIZE = 160;
+        
 		// Building sprite queue
-		for (byte i = 0; i < 160; i += 4)
+		for (byte i = 0; i < OAM_SIZE; i += 4)
 		{
-            // Sprite on a current scanline
-			if ((mOAM[i] - 16) <= mLY && mLY < (mOAM[i] - 16 + spriteHeight))
+            // First value in OAM is y position - 16.
+            // second is x position - 8. Since all sprites have an implied -8,
+            // we don't need to deal with it explicitly though
+            byte spriteY = mOAM[i] - 16;
+            byte spriteX = mOAM[i + 1];
+            
+            // Is this sprite supposed to be drawn on this scanline?
+			if (mLY >= spriteY && mLY < (spriteY + spriteHeight))
 			{
-                // Building ID that corresponds to the sprite priority
-				mSpriteQueue.push_back((mOAM[i + 1] << 8) | i);
+                // Build an ID that corresponds to the sprite priority
+				mSpriteQueue.push_back(spriteX << 8 | i);
 
 				// Max 10 sprites per scanline
 				if (mSpriteQueue.size() == 10) break;
@@ -150,9 +160,7 @@ void Graphics::LCDCChanged(byte value)
 	}
 
 	if (!(mLCDC & 0x20) && (value & 0x20))
-	{
 		mWindowLine = 144;
-	}
 
 	mLCDC = value;
 }
