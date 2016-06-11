@@ -17,14 +17,14 @@ using namespace std;
 int main(int argc, char** argv)
 {
     //string game = "../roms/tests/MemoryTiming/mem_timing.gb";
-    string game = "../roms/Pokemon_Crystal.gbc";
+    string game = "../roms/Links_Awakening_DX.gbc";
     //string game = "../roms/Links_Awakening.gb";
     
     // Create the system configuration that will be used
     EmulatorConfiguration config;
-    config.skipBIOS = true;
-    config.system   = System::AUTOMATIC;
-    config.palette  = GameboyPalette::REAL;
+    config.skipBIOS   = true;
+    config.system     = System::AUTOMATIC;
+    config.gbPalette  = GameboyPalette::REAL;
     
     // Create the emulator
     Emulator emulator(&config);
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
     }
     emulator.loadCartridge(&cartridge);
     cartridge.printInfo();
-  
+        
     // Create and configure debugger
     //Debugger debugger;
     //debugger.setEnabled(true);

@@ -1,4 +1,99 @@
 #include "GBCGraphics.h"
+#include <cmath>
+
+void RGBToHSL(byte red, byte green, byte blue, double& h, double& s, double& l)
+{
+    double r = red   / 255.0;
+    double g = green / 255.0;
+    double b = blue  / 255.0;
+    
+    double r2, g2, b2;
+
+    h = 0.0, s = 0.0, l = 0.0; // default to black
+    double maxRGB = max(max(r, g), b);
+    double minRGB = min(min(r, g), b);
+
+    l = (minRGB + maxRGB) / 2.0;
+    if (l <= 0.0) return;
+
+    double vm = maxRGB - minRGB;
+    s = vm;
+    if (s <= 0.0) return;
+    
+    s /= ((l <= 0.5) ? (maxRGB + minRGB ) : (2.0 - maxRGB - minRGB));
+
+    r2 = (maxRGB - r) / vm;
+    g2 = (maxRGB - g) / vm;
+    b2 = (maxRGB - b) / vm;
+    
+    if (r == maxRGB)
+          h = (g == minRGB ? 5.0 + b2 : 1.0 - g2);
+    else if (g == maxRGB)
+          h = (b == minRGB ? 1.0 + r2 : 3.0 - b2);
+    else
+          h = (r == minRGB ? 3.0 + g2 : 5.0 - r2);
+ 
+    h /= 6.0;
+}
+
+void HSLToRGB(double h, double s, double l, byte& red, byte& green, byte& blue)
+{
+    double r = l, g = l, b = l;   // default to gray
+    double v = ((l <= 0.5) ? (l * (1.0 + s)) : (l + s - l * s));
+    
+    if (v > 0)
+    {
+        double m  = l + l - v;
+        double sv = (v - m ) / v;
+        
+        h *= 6.0;
+        
+        int sextant  = (int)h;
+        double fract = h - sextant;
+        double vsf   = v * sv * fract;
+        double mid1  = m + vsf;
+        double mid2  = v - vsf;
+        
+        switch (sextant)
+        {
+            case 0:
+                r = v;
+                g = mid1;
+                b = m;
+                break;
+            case 1:
+                r = mid2;
+                g = v;
+                b = m;
+                break;
+            case 2:
+                r = m;
+                g = v;
+                b = mid1;
+                break;
+            case 3:
+                r = m;
+                g = mid2;
+                b = v;
+                break;
+            case 4:
+                r = mid1;
+                g = m;
+                b = v;
+                break;
+            case 5:
+                r = v;
+                g = m;
+                b = mid2;
+                break;
+          }
+    }
+    
+    // Convert from [0, 1] to [0, 255]
+    red   = r * 255;
+    green = g * 255;
+    blue  = b * 255;
+}
 
 GBCGraphics::GBCGraphics(Memory* memory, EmulatorConfiguration* configuration) :
     Graphics(memory, configuration)
@@ -9,16 +104,7 @@ GBCGraphics::GBCGraphics(Memory* memory, EmulatorConfiguration* configuration) :
     mMemory->attachComponent(this, 0xFF68, 0xFF6B); // GBC Registers
     mMemory->attachComponent(this, 0xFF57, 0xFF67); // ??? - Included by Gomeboy, but don't seem to be useful
     mMemory->attachComponent(this, 0xFF6C, 0xFF6F); // ???
-    
-	for (int i = 0; i < 32768; i++)
-	{
-		byte r = ( i        & 0x1F) << 3;
-		byte g = ((i >>  5) & 0x1F) << 3;
-		byte b = ((i >> 10) & 0x1F) << 3;
         
-		mGBC2RGBPalette[i] = 0xFF000000 | (r << 16) | (g << 8) | b;
-	}
-    
     reset();
 }
 
@@ -186,6 +272,30 @@ void GBCGraphics::reset()
 	for (int i = 0; i < 64; i++)
 		mOBPD[i] = rand() % 0x100;
 
+    // Initialize the colors that will be used
+    double h, s, l;
+    double gamma = 1.0 / mConfig->gbcDisplayGamma;
+    
+    for (int i = 0; i < 32768; i++)
+	{
+		byte b = ( i        & 0x1F) << 3;
+		byte g = ((i >>  5) & 0x1F) << 3;
+		byte r = ((i >> 10) & 0x1F) << 3;
+                
+        // Convert the color to HSL so we can manipulate it easier
+        RGBToHSL(r, g, b, h, s, l);
+        
+        // Apply corrections to make the color look more like a real GBC
+        // (as long as the configuration says to do so)
+        s *= mConfig->gbcDisplayColor;
+        l = pow(l, gamma);
+        
+        // Convert the color back to RGB
+        HSLToRGB(h, s, l, r, g, b);
+        
+		mGBC2RGBPalette[i] = 0xFF000000 | (r << 16) | (g << 8) | b;
+	}
+    
     // LCDC cannot be 0 initially or some games (like Pokemon Red) won't load.	
 	mVRAMBankOffset     = 0;
 	mHDMAActive         = false;
@@ -369,10 +479,10 @@ void GBCGraphics::BGPDChanged(byte value)
 	byte index   = mBGPI & 0x3F;
 	mBGPD[index] = value;
 
-	if (mBGPI & 0x80)
+	if (testBit(mBGPI, 7))
 	{
 		index++;
-		mBGPI = (mBGPI & 0xC0) | (index & 0x3F);
+		mBGPI = (mBGPI & 0xC0) | index;
 	}
 }
 
@@ -381,10 +491,10 @@ void GBCGraphics::OBPDChanged(byte value)
 	byte index   = mOBPI & 0x3F;
 	mOBPD[index] = value;
 
-	if (mOBPI & 0x80)
+	if (testBit(mOBPI, 7))
 	{
 		index++;
-		mOBPI = (mOBPI & 0xC0) | (index & 0x3F);
+		mOBPI = (mOBPI & 0xC0) | index;
 	}
 }
 
