@@ -174,7 +174,7 @@ void GBCGraphics::update(int clockDelta)
 			//HDMA block copy
 			if (mHDMAActive)
 			{
-				HDMACopyBlock(mHDMASource, mVRAMBankOffset + mHDMADestination);
+				HDMACopyBlock(mHDMASource, mVBK * VRAMBankSize + mHDMADestination);
 				mHDMAControl--;
 				mHDMADestination += 0x10;
 				mHDMASource      += 0x10;
@@ -297,7 +297,6 @@ void GBCGraphics::reset()
 	}
     
     // LCDC cannot be 0 initially or some games (like Pokemon Red) won't load.	
-	mVRAMBankOffset     = 0;
 	mHDMAActive         = false;
 	mHDMASource         = 0;
 	mHDMADestination    = 0;
@@ -373,7 +372,7 @@ void GBCGraphics::write(word address, byte data)
         case DMA:   DMAChanged(data);   break;
         case WY:    mWY = data;         break;
         case WX:    mWX = data;         break;
-        case VBK:   VBKChanged(data);   break;
+        case VBK:   mVBK = (data & 0x1);break;
         case HDMA1: HDMA1Changed(data); break;
         case HDMA2: HDMA2Changed(data); break;
         case HDMA3: HDMA3Changed(data); break;
@@ -396,22 +395,16 @@ void GBCGraphics::writeVRAM(word addr, byte value)
 {
 	if (GET_LCD_MODE() != GBLCDMODE_OAMRAM || !LCD_ON())
 	{
-		mVRAM[mVRAMBankOffset + addr] = value;
+        mVRAM[mVBK * VRAMBankSize + addr] = value;
 	}
 }
 
 byte GBCGraphics::readVRAM(word addr) const
 {
 	if (GET_LCD_MODE() != GBLCDMODE_OAMRAM || !LCD_ON())
-		return mVRAM[mVRAMBankOffset + addr];
+        return mVRAM[mVBK * VRAMBankSize + addr];
     
 	else return 0xFF;
-}
-
-void GBCGraphics::VBKChanged(byte value)
-{ 
-    mVBK = value; 
-    mVRAMBankOffset = VRAMBankSize * (mVBK & 0x1);
 }
 
 void GBCGraphics::HDMA1Changed(byte value) 
@@ -460,7 +453,7 @@ void GBCGraphics::HDMA5Changed(byte value)
 			mHDMAActive = false;
 
 			word sourceAddr = mHDMASource;
-			word destAddr   = mVRAMBankOffset + mHDMADestination;
+			word destAddr   = mVBK * VRAMBankSize + mHDMADestination;
 			for (; (mHDMAControl & 0x7F) != 0x7F; mHDMAControl--, destAddr += 0x10, sourceAddr += 0x10)
 			{
 				if (HDMACopyBlock(sourceAddr, destAddr))
@@ -468,7 +461,7 @@ void GBCGraphics::HDMA5Changed(byte value)
 			}
 
 			mHDMASource      = sourceAddr;
-			mHDMADestination = destAddr - mVRAMBankOffset;
+			mHDMADestination = destAddr - (mVBK * VRAMBankSize);
 			mHDMAControl     = 0xFF;
 		}
 	}
@@ -643,11 +636,13 @@ void GBCGraphics::renderWindow()
 
 void GBCGraphics::renderSprites()
 {
-    if ((mLCDC & 0x02) && mSpritesGlobalToggle)
+    // Bit 1 determines if sprites should be rendered
+    if (testBit(mLCDC, 1) && mSpritesGlobalToggle)
 	{
+        // Figure out if we're drawing 8x8 sprites or 8x16 sprites
 		byte spriteHeight;
 		byte tileIdxMask;
-		if (mLCDC & 0x04)
+		if (testBit(mLCDC, 2))
 		{
 			spriteHeight = 16;
 			tileIdxMask  = 0xFE;
@@ -658,84 +653,95 @@ void GBCGraphics::renderSprites()
 			tileIdxMask  = 0xFF;
 		}
 
+        // The sprite queue tells us which sprites to render in which order. We
+        // go in reverse order because we want sprites with higher priority (those
+        // at the front) to be rendered on top of those with lower priority
 		for (int i = mSpriteQueue.size() - 1; i >= 0; i--)
 		{
+            // The lower byte of the sprite queue tells the OAM offset where
+            // the sprite can be found. This address, as well as the next
+            // 3 define the properties of this sprite
 			byte spriteAddr = mSpriteQueue[i] & 0xFF;
-
-			//Sprites that are hidden by X coordinate still affect sprite queue
+            
+			// Sprites that are hidden because of their X coordinate affect the
+            // sprite queue, but they aren't drawn
 			if (mOAM[spriteAddr + 1] == 0 || mOAM[spriteAddr + 1] >= 168)
 				continue;
 
-			byte *cgbPalette      = &mOBPD[(mOAM[spriteAddr + 3] & 0x7) * 8];
-			word cgbTileMapOffset = mVRAMBankOffset * ((mOAM[spriteAddr + 3] >> 3) & 0x1);
+            // Retrieve the sprite properties from OAM.
+            //  0 - Sprite y coordinate - 16
+            //  1 - Sprite x coordinate - 8
+            //  2 - Sprite tile number. In 8x16 mode, the lower bit is ignored
+            //  3 - Sprite attributes (priority / x flip / y flip / tile VRAM bank / palette number)
+            int spriteY           = mOAM[spriteAddr] - 16;
+            int spriteX           = mOAM[spriteAddr + 1] - 8;
+            int spriteTileNumber  = mOAM[spriteAddr + 2] & tileIdxMask;
+            byte spriteAttributes = mOAM[spriteAddr + 3];
+            
+            // The lowest 3 bits of the sprite attributes define the palette number
+			byte *cgbPalette      = &mOBPD[(spriteAttributes & 0x7) * 8];
+            
+            // Bit 3 tells which VRAM bank to use. This offset will either be 0 or VRAMBankSize
+			word cgbTileMapOffset = VRAMBankSize * testBit(spriteAttributes, 3);
 
-			int spriteX      = mOAM[spriteAddr + 1] - 8;
+			// Determine where this sprite should be placed on the screen
 			int spritePixelX = 0;
-			int spritePixelY = mLY - (mOAM[spriteAddr] - 16);
-			int dx           = 1;
-
+			int spritePixelY = mLY - spriteY;
 			if (spriteX < 0)
 			{
 				spritePixelX = (byte)(spriteX * -1);
 				spriteX      = 0;
 			}
 
-            // X flip
-			if (mOAM[spriteAddr + 3] & 0x20)
-			{
+            // Apply X flip
+			if (testBit(spriteAttributes, 5))
 				spritePixelX = 7 - spritePixelX;
-				dx = -1;
-			}
             
-            //Y flip
-			if (mOAM[spriteAddr + 3] & 0x40)
+            // Apply Y flip
+			if (testBit(spriteAttributes, 6))
 				spritePixelY = spriteHeight - 1 - spritePixelY;
 
-			// If sprite priority is
-			if ((mOAM[spriteAddr + 3] & 0x80) && (mLCDC & 0x1))
+            // Figure out if we need to go left to right or right to left
+            int dx = (testBit(spriteAttributes, 5) ? -1 : 1);
+            
+			// Determine if sprite is behind the background
+			if (testBit(spriteAttributes, 7) && testBit(mLCDC, 0))
 			{
-				// sprites are hidden only behind non-zero colors of the background and window
+				// Sprites are hidden only behind non-zero colors of the background and window
 				byte colorIdx;
 				for (int x = spriteX; x < spriteX + 8 && x < 160; x++, spritePixelX += dx)
 				{
-					colorIdx = GET_TILE_PIXEL(cgbTileMapOffset + (mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
+                    int screenIndex = mLY * SCREEN_WIDTH_PIXELS + x;
+					colorIdx        = GET_TILE_PIXEL(cgbTileMapOffset + spriteTileNumber * 16, spritePixelX, spritePixelY);
 
-					if (colorIdx == 0 ||				    //sprite color 0 is transparent
-						(mNativeBuffer[mLY * SCREEN_WIDTH_PIXELS + x] & 0x7) > 0)	//Sprite hidden behind colors 1-3
-					{
-						continue;
-					}
+					if ((colorIdx == 0) ||				                                // Sprite color 0 is transparent
+                        ((mNativeBuffer[screenIndex] & 0x7) > 0) ||	// Sprite hidden behind colors 1-3
+                        (mNativeBuffer[screenIndex] & 0x80))          // Sprite is under the background
+                            continue;
                     
-					// If CGB game and priority flag of current background tile is set - background and window on top of sprites
-					// Master priority on LCDC can override this but here it's set and 
-					if (mNativeBuffer[mLY * SCREEN_WIDTH_PIXELS + x] & 0x80)
-					{
-						continue;
-					}
-
                     word color;
                     memcpy(&color, cgbPalette + colorIdx * 2, 2);
 
-                    int index = mLY * SCREEN_WIDTH_PIXELS + x;
-                    mNativeBuffer[index] = colorIdx;
-
+                    mNativeBuffer[screenIndex] = colorIdx;
+                    screenIndex *= 4;
+                    
                     int c = mGBC2RGBPalette[color & 0x7FFF];
-                    index *= 4;
-                    mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
-                    mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-                    mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
-                    mBackBuffer[index + 3] = 0xFF;             // Alpha
+                    mBackBuffer[screenIndex]     = (c >> 16) & 0xFF; // Red
+                    mBackBuffer[screenIndex + 1] = (c >>  8) & 0xFF; // Green
+                    mBackBuffer[screenIndex + 2] = (c      ) & 0xFF; // Blue
+                    mBackBuffer[screenIndex + 3] = 0xFF;             // Alpha
 				}
 			}
+            
+            // This sprite should be above the background and the window
 			else
 			{
-				// Sprites are on top of the background and window
 				byte colorIdx;
 				for (int x = spriteX; x < spriteX + 8 && x < 160; x++, spritePixelX += dx)
 				{
-                    colorIdx = GET_TILE_PIXEL(cgbTileMapOffset + (mOAM[spriteAddr + 2] & tileIdxMask) * 16, spritePixelX, spritePixelY);
+                    colorIdx = GET_TILE_PIXEL(cgbTileMapOffset + spriteTileNumber * 16, spritePixelX, spritePixelY);
 
-                    //sprite color 0 is transparent
+                    // Sprite color 0 is transparent
 					if (colorIdx == 0) continue;
 						
                     word color;
@@ -743,9 +749,9 @@ void GBCGraphics::renderSprites()
 
                     int index = mLY * SCREEN_WIDTH_PIXELS + x;
                     mNativeBuffer[index] = colorIdx;
-
-                    int c  = mGBC2RGBPalette[color & 0x7FFF];
                     index *= 4;
+                    
+                    int c  = mGBC2RGBPalette[color & 0x7FFF];
                     mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
                     mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
                     mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
@@ -758,10 +764,8 @@ void GBCGraphics::renderSprites()
 
 bool GBCGraphics::HDMACopyBlock(word source, word dest)
 {
-	if (dest >= mVRAMBankOffset + VRAMBankSize || source == 0xFFFF)
-	{
+	if (dest >= (mVBK * VRAMBankSize) + VRAMBankSize || source == 0xFFFF)
 		return true;
-	}
 
 	mVRAM[dest + 0x0] = mMemory->read(source + 0x0);
 	mVRAM[dest + 0x1] = mMemory->read(source + 0x1);
