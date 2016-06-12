@@ -652,7 +652,7 @@ void GBCGraphics::renderSprites()
 			spriteHeight = 8;
 			tileIdxMask  = 0xFF;
 		}
-
+        
         // The sprite queue tells us which sprites to render in which order. We
         // go in reverse order because we want sprites with higher priority (those
         // at the front) to be rendered on top of those with lower priority
@@ -687,12 +687,13 @@ void GBCGraphics::renderSprites()
 			// Determine where this sprite should be placed on the screen
 			int spritePixelX = 0;
 			int spritePixelY = mLY - spriteY;
+            
 			if (spriteX < 0)
 			{
 				spritePixelX = (byte)(spriteX * -1);
 				spriteX      = 0;
 			}
-
+            
             // Apply X flip
 			if (testBit(spriteAttributes, 5))
 				spritePixelX = 7 - spritePixelX;
@@ -706,7 +707,7 @@ void GBCGraphics::renderSprites()
             
 			// Determine if sprite is behind the background
 			if (testBit(spriteAttributes, 7) && testBit(mLCDC, 0))
-			{
+			{               
 				// Sprites are hidden only behind non-zero colors of the background and window
 				byte colorIdx;
 				for (int x = spriteX; x < spriteX + 8 && x < 160; x++, spritePixelX += dx)
@@ -717,7 +718,7 @@ void GBCGraphics::renderSprites()
 					if ((colorIdx == 0) ||				                                // Sprite color 0 is transparent
                         ((mNativeBuffer[screenIndex] & 0x7) > 0) ||	// Sprite hidden behind colors 1-3
                         (mNativeBuffer[screenIndex] & 0x80))          // Sprite is under the background
-                            continue;
+                        continue;
                     
                     word color;
                     memcpy(&color, cgbPalette + colorIdx * 2, 2);
@@ -736,6 +737,8 @@ void GBCGraphics::renderSprites()
             // This sprite should be above the background and the window
 			else
 			{
+                
+                
 				byte colorIdx;
 				for (int x = spriteX; x < spriteX + 8 && x < 160; x++, spritePixelX += dx)
 				{

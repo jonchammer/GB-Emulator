@@ -86,8 +86,8 @@ void Graphics::prepareSpriteQueue()
             // First value in OAM is y position - 16.
             // second is x position - 8. Since all sprites have an implied -8,
             // we don't need to deal with it explicitly though
-            byte spriteY = mOAM[i] - 16;
-            byte spriteX = mOAM[i + 1];
+            int spriteY = mOAM[i] - 16;
+            int spriteX = mOAM[i + 1];
             
             // Is this sprite supposed to be drawn on this scanline?
 			if (mLY >= spriteY && mLY < (spriteY + spriteHeight))
