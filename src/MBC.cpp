@@ -1,5 +1,109 @@
 #include "MBC.h"
 
+MBC::MBC(Cartridge* owner, int numRAMBanks) : 
+    mOwner(owner), mNumRAMBanks(numRAMBanks), mCurrentROMBank(1), mCurrentRAMBank(0), mEnableRAM(false) 
+{
+    // Create the RAM Banks. Use value initialization to make sure all cells
+    // are 0 at the beginning.
+    mRAMBanks = new byte[numRAMBanks * 0x2000]();
+}
+
+MBC::~MBC() 
+{
+    if (mRAMBanks != NULL)
+        delete[] mRAMBanks;
+
+    mRAMBanks = NULL;
+}
+    
+bool MBC::save()
+{
+    if (mUpdateSave) 
+    {
+        mUpdateSave = false;
+        
+        ofstream dout;
+        dout.open(mOwner->getCartridgeInfo().savePath.c_str(), ios::out | ios::binary);
+        if (!dout) return false;
+
+        dout.write((char*) mRAMBanks, mNumRAMBanks * 0x2000);
+        dout.close();
+        return true;
+    }
+    
+    // There is no save to update
+    else return true;
+}
+
+bool MBC::loadSave(const string& filename)
+{
+    ifstream din;
+    din.open(filename.c_str(), ios::binary | ios::ate);
+    if (!din) return false;
+    
+    // Read the length of the file first
+    ifstream::pos_type length = din.tellg();
+    din.seekg(0, ios::beg);
+    
+    // Make sure the length of the file is correct.
+    if (length < mNumRAMBanks * 0x2000)
+        return false;
+    
+    // If the file is larger than we expect, read only the bytes we need
+    din.read((char*) mRAMBanks, mNumRAMBanks * 0x2000);
+    din.close();
+    return true;
+}
+
+byte MBC::read(word address)
+{
+    if ( (address >= 0xA000) && (address <= 0xBFFF) )
+    {
+        if (mEnableRAM)
+        {
+            if (mCurrentRAMBank < mNumRAMBanks)
+                return mRAMBanks[(address - 0xA000) + (mCurrentRAMBank * 0x2000)];
+            
+            else
+            {
+                cerr << "Illegal RAM bank read. Accessing data from RAM Bank " << mCurrentRAMBank <<
+                " when there are only " << mNumRAMBanks << " banks." << endl;
+                return 0x00;
+            }
+        }
+        
+        else return 0x00;
+    }
+    
+    else return 0x00;
+}
+
+void MBC::defaultRAMWrite(word address, byte data)
+{
+    if ( (address >= 0xA000) && (address < 0xC000) )
+    {
+        if (mEnableRAM)
+        {
+            if (mCurrentRAMBank < mNumRAMBanks)
+            {
+                word newAddress = (address - 0xA000) + (mCurrentRAMBank * 0x2000);
+                mRAMBanks[newAddress] = data;
+            }
+            
+            else 
+            {
+                cerr << "Illegal RAM bank write. Accessing data from RAM Bank " << mCurrentRAMBank <<
+                " when there are only " << mNumRAMBanks << " banks." << endl;
+            }
+        }
+        
+        // Writing here is a signal the game should be saved, assuming the game can
+        // be saved.
+        if (mOwner->getCartridgeInfo().hasBattery)
+            mUpdateSave = true;
+    }
+}
+
 void MBC1::write(word address, byte data)
 {
     // Enable writing to RAM
@@ -62,6 +166,10 @@ void MBC1::write(word address, byte data)
         mROMBanking  = ((data & 0x1) == 0);
     }
     
+    // Write to the current RAM Bank, but only if RAM banking has been enabled.
+    else if ((address >= 0xA000) && (address < 0xC000))
+        defaultRAMWrite(address, data);
+    
     else
     {
         cerr << "Address "; printHex(cerr, address); 
@@ -93,6 +201,10 @@ void MBC2::write(word address, byte data)
     {
         // Do nothing
     }
+    
+    // Write to the current RAM Bank, but only if RAM banking has been enabled.
+    else if ((address >= 0xA000) && (address < 0xC000))
+        defaultRAMWrite(address, data);
     
     else
     {
@@ -136,6 +248,10 @@ void MBC3::write(word address, byte data)
         // TODO: RTC Stuff
     }
     
+    // Write to the current RAM Bank, but only if RAM banking has been enabled.
+    else if ((address >= 0xA000) && (address < 0xC000))
+        defaultRAMWrite(address, data);
+    
     else
     {
         cerr << "Address "; printHex(cerr, address); 
@@ -178,6 +294,10 @@ void MBC5::write(word address, byte data)
     {
         // Do nothing
     }
+    
+    // Write to the current RAM Bank, but only if RAM banking has been enabled.
+    else if ((address >= 0xA000) && (address < 0xC000))
+        defaultRAMWrite(address, data);
     
     else
     {

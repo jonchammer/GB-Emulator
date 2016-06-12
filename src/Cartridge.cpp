@@ -1,6 +1,6 @@
 #include "Cartridge.h"
 
-Cartridge::Cartridge() : mData(NULL), mDataSize(0), mRAMBanks(NULL), mMBC(NULL), mUpdateSave(false)
+Cartridge::Cartridge() : mData(NULL), mDataSize(0), mMBC(NULL)
 {
     reset();
 }
@@ -13,40 +13,10 @@ Cartridge::~Cartridge()
 
 void Cartridge::write(const word address, const byte data)
 {
-    // An attempt to write to ROM means that we're dealing with
-    // a bank issue. We need to handle it.
-    if (address < 0x8000)
-        mMBC->write(address, data);
-    
-    // Write to the current RAM Bank, but only if RAM banking has been enabled.
-    else if ( (address >= 0xA000) && (address < 0xC000) )
-    {
-        if (mMBC->isRAMEnabled())
-        {
-            if (mMBC->getCurrentRAMBank() < mInfo.numRAMBanks)
-            {
-                word newAddress = (address - 0xA000) + (mMBC->getCurrentRAMBank() * 0x2000);
-                mRAMBanks[newAddress] = data;
-            }
-            
-            else 
-            {
-                cerr << "Illegal RAM bank write. Accessing data from RAM Bank " << mMBC->getCurrentRAMBank() <<
-                " when there are only " << mInfo.numRAMBanks << " banks." << endl;
-            }
-        }
-        
-        // Writing here is a signal the game should be saved, assuming the game can
-        // be saved.
-        if (mInfo.hasBattery)
-            mUpdateSave = true;
-    }
-    
-    else
-    {
-        cerr << "Address "; printHex(cerr, address); 
-        cerr << " does not belong to Cartridge." << endl;
-    }
+    // Any writes need to be handled by the MBC. It's either a write to the ROM
+    // area, in which case the MBC needs to handle banking, or a write to RAM
+    // which the MBC also handles.
+    mMBC->write(address, data);
 }
 
 byte Cartridge::read(const word address) const
@@ -71,22 +41,7 @@ byte Cartridge::read(const word address) const
     
     // Read from the correct RAM memory bank, but only if RAM has been enabled
     else if ( (address >= 0xA000) && (address <= 0xBFFF) )
-    {
-        if (mMBC->isRAMEnabled())
-        {
-            if (mMBC->getCurrentRAMBank() < mInfo.numRAMBanks)
-                return mRAMBanks[(address - 0xA000) + (mMBC->getCurrentRAMBank() * 0x2000)];
-            
-            else
-            {
-                cerr << "Illegal RAM bank read. Accessing data from RAM Bank " << mMBC->getCurrentRAMBank() <<
-                " when there are only " << mInfo.numRAMBanks << " banks." << endl;
-                return 0x00;
-            }
-        }
-        
-        else return 0x00;
-    }
+        return mMBC->read(address);
     
     else
     {
@@ -99,14 +54,11 @@ byte Cartridge::read(const word address) const
 void Cartridge::reset()
 {
     if (mData     != NULL) delete[] mData;
-    if (mRAMBanks != NULL) delete[] mRAMBanks;
     if (mMBC      != NULL) delete mMBC;
     
     mData       = NULL;
-    mRAMBanks   = NULL;
     mMBC        = NULL;
     mDataSize   = 0;
-    mUpdateSave = false;
     
     memset(&mInfo, 0, sizeof(CartridgeInfo));
 }
@@ -125,21 +77,17 @@ bool Cartridge::load(const string& filename, const string* saveFilename)
         // Assign an MBC unit
         switch (mInfo.type)
         {
-            case TYPE_ROM_ONLY: mMBC = new MBC0(this); break;
-            case TYPE_MBC1:     mMBC = new MBC1(this); break;
-            case TYPE_MBC2:     mMBC = new MBC2(this); break;
-            case TYPE_MBC3:     mMBC = new MBC3(this); break;
-            case TYPE_MBC5:     mMBC = new MBC5(this); break;
+            case TYPE_ROM_ONLY: mMBC = new MBC0(this, mInfo.numRAMBanks); break;
+            case TYPE_MBC1:     mMBC = new MBC1(this, mInfo.numRAMBanks); break;
+            case TYPE_MBC2:     mMBC = new MBC2(this, mInfo.numRAMBanks); break;
+            case TYPE_MBC3:     mMBC = new MBC3(this, mInfo.numRAMBanks); break;
+            case TYPE_MBC5:     mMBC = new MBC5(this, mInfo.numRAMBanks); break;
         }
-        
-        // Create the RAM Banks. Use value initialization to make sure all cells
-        // are 0 at the beginning.
-        mRAMBanks = new byte[mInfo.numRAMBanks * 0x2000]();
-         
+
         // Try to load the save (but only if this cartridge actually supports saving)
         if (mInfo.hasBattery)
         {
-            if (!loadSave(mInfo.savePath))
+            if (!mMBC->loadSave(mInfo.savePath))
                 cerr << "Unable to load save file: " << mInfo.savePath << endl;
             else cout << "Save file loaded: " << mInfo.savePath << endl;
         }
@@ -152,21 +100,7 @@ bool Cartridge::load(const string& filename, const string* saveFilename)
 
 bool Cartridge::save()
 {
-    if (mUpdateSave) 
-    {
-        mUpdateSave = false;
-        
-        ofstream dout;
-        dout.open(mInfo.savePath.c_str(), ios::out | ios::binary);
-        if (!dout) return false;
-
-        dout.write((char*) mRAMBanks, mInfo.numRAMBanks * 0x2000);
-        dout.close();
-        return true;
-    }
-    
-    // There is no save to update
-    else return true;
+    return mMBC->save();
 }
 
 bool Cartridge::loadData(const string& filename)
@@ -185,26 +119,6 @@ bool Cartridge::loadData(const string& filename)
     
     // Read the whole block at once
     din.read( (char*) mData, length);
-    din.close();
-    return true;
-}
-
-bool Cartridge::loadSave(const string& filename)
-{
-    ifstream din;
-    din.open(filename.c_str(), ios::binary | ios::ate);
-    if (!din) return false;
-    
-    // Read the length of the file first
-    ifstream::pos_type length = din.tellg();
-    din.seekg(0, ios::beg);
-    
-    // Make sure the length of the file is correct.
-    if (length < mInfo.numRAMBanks * 0x2000)
-        return false;
-    
-    // If the file is larger than we expect, read only the bytes we need
-    din.read((char*) mRAMBanks, mInfo.numRAMBanks * 0x2000);
     din.close();
     return true;
 }

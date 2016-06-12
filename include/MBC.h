@@ -18,26 +18,41 @@ class Cartridge;
 class MBC
 {
 public:
-    MBC(Cartridge* owner) : mOwner(owner), mCurrentROMBank(1), mCurrentRAMBank(0), mEnableRAM(false) {}
-    virtual ~MBC() {}
+    // Constructors / Destructors
+    MBC(Cartridge* owner, int numRAMBanks);
+    virtual ~MBC();
     
+    // Read / Write access
+    virtual byte read(word address);
     virtual void write(word address, byte data) = 0;
     
     virtual word getCurrentROMBank() { return mCurrentROMBank; }
     virtual word getCurrentRAMBank() { return mCurrentRAMBank; }
     virtual bool isRAMEnabled()      { return mEnableRAM;      }
+    
+    // Save and load the contents of the RAM
+    bool save();
+    bool loadSave(const string& filename);
+    
 protected:
     Cartridge* mOwner;
-    word mCurrentROMBank;
-    word mCurrentRAMBank;
-    bool mEnableRAM;
+    byte* mRAMBanks;      // The contents of the RAM banks
+    int mNumRAMBanks;     // The number of RAM banks this MBC supports
+    word mCurrentROMBank; // The currently selected ROM Bank
+    word mCurrentRAMBank; // The currently selected RAM Bank
+    bool mEnableRAM;      // True when writing to RAM has been enabled
+    bool mUpdateSave;     // True when the save file can be updated.
+    
+    // Most MBCs use the same procedure when writing to the RAM inside
+    // the cartridge
+    void defaultRAMWrite(word address, byte data);
 };
 
 // "Dummy" MBC. Used for games like Tetris that don't actually use banking at all
 class MBC0 : public MBC
 {
 public:
-    MBC0(Cartridge* owner) : MBC(owner) {}
+    MBC0(Cartridge* owner, int numRAMBanks) : MBC(owner, numRAMBanks) {}
     void write(word, byte) {}
 };
 
@@ -45,7 +60,7 @@ public:
 class MBC1 : public MBC
 {
 public:
-    MBC1(Cartridge* owner) : MBC(owner), mROMBanking(true) {}
+    MBC1(Cartridge* owner, int numRAMBanks) : MBC(owner, numRAMBanks), mROMBanking(true) {}
     void write(word address, byte data);
     
     word getCurrentROMBank()
@@ -69,7 +84,7 @@ private:
 class MBC2 : public MBC
 {
 public:
-    MBC2(Cartridge* owner) : MBC(owner) {}
+    MBC2(Cartridge* owner, int numRAMBanks) : MBC(owner, numRAMBanks) {}
     void write(word address, byte data);
 };
 
@@ -77,15 +92,23 @@ public:
 class MBC3 : public MBC
 {
 public:
-    MBC3(Cartridge* owner) : MBC(owner) {}
+    MBC3(Cartridge* owner, int numRAMBanks) : MBC(owner, numRAMBanks) {}
+    
+    //byte read(word address);
     void write(word address, byte data);
+private:
+    byte mSeconds;
+    byte mMinutes;
+    byte mHours;
+    byte mDaysLow;
+    byte mDaysHigh;
 };
 
 // MBC 5 - Like MBC 3, but no RTC. Can access up to 64Mbit ROM/1 Mbit RAM
 class MBC5 : public MBC
 {
 public:
-    MBC5(Cartridge* owner) : MBC(owner) {}
+    MBC5(Cartridge* owner, int numRAMBanks) : MBC(owner, numRAMBanks) {}
     void write(word address, byte data);
 };
 

@@ -61,13 +61,10 @@ private:
     CartridgeInfo mInfo;  // Information about this ROM.
     byte* mData;          // The contents of the ROM
     int mDataSize;        // The number of elements in the 'mData' array
-    byte* mRAMBanks;      // The contents of the RAM banks
     MBC* mMBC;            // The MBC that handles banking.
-    bool mUpdateSave;     // True when the save file can be updated.
     
     // Helpers
     bool loadData(const string& filename);
-    bool loadSave(const string& filename);
     void fillInfo(const string& filename, const string* saveFilename);
 };
 
