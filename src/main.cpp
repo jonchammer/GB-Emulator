@@ -17,7 +17,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
     //string game = "../roms/tests/sprite_test_01/sprite_test_01.gb";
-    string game = "../roms/Links_Awakening_DX.gbc";
+    string game = "../roms/Pokemon_Crystal.gbc";
     //string game = "../roms/Super_Mario_Land.gb";
     
     // Create the system configuration that will be used

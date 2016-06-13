@@ -31,8 +31,8 @@ public:
     virtual bool isRAMEnabled()      { return mEnableRAM;      }
     
     // Save and load the contents of the RAM
-    bool save();
-    bool loadSave(const string& filename);
+    virtual bool save();
+    virtual bool loadSave(const string& filename);
     
 protected:
     Cartridge* mOwner;
@@ -92,16 +92,24 @@ public:
 class MBC3 : public MBC
 {
 public:
-    MBC3(Cartridge* owner, int numRAMBanks) : MBC(owner, numRAMBanks) {}
+    MBC3(Cartridge* owner, int numRAMBanks) : MBC(owner, numRAMBanks), mRTCReg(-1), mLastLatchWrite(0xFF), mBaseTime(0), mHaltTime(0) {}
     
-    //byte read(word address);
+    byte read(word address);
     void write(word address, byte data);
+    
+    // Save and load the contents of the RAM
+    bool save();
+    bool loadSave(const string& filename);
+    
 private:
-    byte mSeconds;
-    byte mMinutes;
-    byte mHours;
-    byte mDaysLow;
-    byte mDaysHigh;
+    byte mRTCRegisters[5];
+    int mRTCReg;
+    byte mLastLatchWrite;
+    std::time_t mBaseTime;
+    std::time_t mHaltTime;
+    
+    void latchRTCData();
+    void RAMRTCWrite(word address, byte data);
 };
 
 // MBC 5 - Like MBC 3, but no RTC. Can access up to 64Mbit ROM/1 Mbit RAM
