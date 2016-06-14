@@ -10,6 +10,7 @@
       <in>GBCGraphics.h</in>
       <in>GBGraphics.h</in>
       <in>MBC.h</in>
+      <in>RTC.h</in>
       <in>Timers.h</in>
     </df>
     <df root="src" name="1">
@@ -29,6 +30,7 @@
       <in>Input.cpp</in>
       <in>MBC.cpp</in>
       <in>Memory.cpp</in>
+      <in>RTC.cpp</in>
       <in>SDL_Environment.cpp</in>
       <in>Sound.cpp</in>
       <in>Timers.cpp</in>
@@ -85,6 +87,8 @@
       </item>
       <item path="include/MBC.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/RTC.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/Sound/StreamingAudioQueue.h"
             ex="false"
             tool="3"
@@ -111,6 +115,8 @@
       <item path="src/MBC.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Memory.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/RTC.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/SDL_Environment.cpp" ex="false" tool="1" flavor2="0">
       </item>

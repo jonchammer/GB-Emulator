@@ -29,6 +29,7 @@
       <in>Input.h</in>
       <in>MBC.h</in>
       <in>Memory.h</in>
+      <in>RTC.h</in>
       <in>Sound.h</in>
       <in>Timers.h</in>
     </df>
@@ -50,6 +51,7 @@
       <in>Input.cpp</in>
       <in>MBC.cpp</in>
       <in>Memory.cpp</in>
+      <in>RTC.cpp</in>
       <in>SDL_Environment.cpp</in>
       <in>Sound.cpp</in>
       <in>Timers.cpp</in>
@@ -81,8 +83,6 @@
         <gdb_interceptlist>
           <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
         </gdb_interceptlist>
-        <gdb_signals>
-        </gdb_signals>
         <gdb_options>
           <DebugOptions>
           </DebugOptions>
