@@ -224,3 +224,9 @@ void Graphics::DMAChanged(byte value)
 	mOAMDMAClockCounter = 0;
 	mOAMDMAProgress     = 0;
 }
+
+bool Graphics::dumpVRAM(const string& filename)
+{
+    int vramSize;
+    return (saveBinaryFile(filename, getVRAM(vramSize), vramSize));
+}

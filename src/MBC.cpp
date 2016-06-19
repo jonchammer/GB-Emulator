@@ -22,14 +22,7 @@ bool MBC::save()
     if (mUpdateSave) 
     {
         mUpdateSave = false;
-        
-        ofstream dout;
-        dout.open(mOwner->getCartridgeInfo().savePath.c_str(), ios::out | ios::binary);
-        if (!dout) return false;
-
-        dout.write((char*) mRAMBanks, mNumRAMBanks * 0x2000);
-        dout.close();
-        return true;
+        return saveBinaryFile(mOwner->getCartridgeInfo().savePath.c_str(), mRAMBanks, mNumRAMBanks * 0x2000);
     }
     
     // There is no save to update

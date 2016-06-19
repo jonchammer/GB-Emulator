@@ -79,6 +79,8 @@ public:
     void toggleBackground() { mBackgroundGlobalToggle = !mBackgroundGlobalToggle; }
     void toggleWindow()     { mWindowsGlobalToggle    = !mWindowsGlobalToggle;    }
     void toggleSprites()    { mSpritesGlobalToggle    = !mSpritesGlobalToggle;    }
+    virtual byte* getVRAM(int& vramSize) = 0;
+    bool dumpVRAM(const string& filename);
     
 protected:
     

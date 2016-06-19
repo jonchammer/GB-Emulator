@@ -392,7 +392,13 @@ void GBCGraphics::write(word address, byte data)
 }
     
 void GBCGraphics::writeVRAM(word addr, byte value)
-{
+{   
+    if (addr == (0x9B00-0x8000)/* && value == 0x54)*/)
+    {
+        printf("%d:0x%04x\n", mVBK, value);
+        cout.flush();
+    }
+    
 	if (GET_LCD_MODE() != GBLCDMODE_OAMRAM || !LCD_ON())
 	{
         mVRAM[mVBK * VRAMBankSize + addr] = value;
@@ -443,10 +449,8 @@ void GBCGraphics::HDMA5Changed(byte value)
 	{
         // H-Blank DMA
 		if (value & 0x80)
-		{
 			mHDMAActive = true;
-		}
-        
+		        
         // General purpose DMA
 		else
 		{
@@ -502,53 +506,86 @@ void GBCGraphics::renderBackground()
 {
     if (mBackgroundGlobalToggle)
     {
-        word tileMapAddr  = (mLCDC & 0x8) ? 0x1C00 : 0x1800;
-        word tileDataAddr = (mLCDC & 0x10) ? 0x0 : 0x800;
+        // Work out where tiles and their data come from
+        word tileMapAddr  = (testBit(mLCDC, 3) ? 0x9C00 : 0x9800);
+        word tileDataAddr = (testBit(mLCDC, 4) ? 0x8000 : 0x8800);
 
-        word tileMapX     = mSCX >> 3;					// Converting absolute coordinates to tile coordinates i.e. integer division by 8
-        word tileMapY     = ((mSCY + mLY) >> 3) & 0x1F;	// then clamping to 0-31 range i.e. wrapping background
-        byte tileMapTileX = mSCX & 0x7;				    //
-        byte tileMapTileY = (mSCY + mLY) & 0x7;		    //
+        // Work out which tile we start out in relative to the background map
+        word tileX = mSCX / 8;				
+        word tileY = ((mSCY + mLY) / 8) & 0x1F;	// Mod 32 to handle wrap around
+
+        // How many pixels into this tile are we? (It's possible to start in the
+        // middle of a tile, for example.)
+        // & 0x7 == % 8
+        byte tileOffsetX = mSCX & 0x7;				    
+        byte tileOffsetY = (mSCY + mLY) & 0x7;		    
 
         int tileIdx;
-        for (word x = 0; x < 160; x++)
+        for (int x = 0; x < 160; x++)
         {
-            word tileAddr = tileMapAddr + tileMapX + tileMapY * 32;
-            if (mLCDC & 0x10)
-                tileIdx = mVRAM[tileAddr];
+            // (x, mLY) is the current pixel we're working on
+            int screenIndex = mLY * SCREEN_WIDTH_PIXELS + x;
+            
+            // Figure out where the data for this tile is in memory
+            // For GBC, the data is in VRAM bank 0
+            word tileAddr = tileMapAddr + (tileY * 32 + tileX);
+            if (testBit(mLCDC, 4))
+                tileIdx = mVRAM[tileAddr - VRAM_START];
             else
-                tileIdx = (signed char)mVRAM[tileAddr] + 128;
+                tileIdx = (signedByte) mVRAM[tileAddr - VRAM_START] + 128;
+                        
+            // The attributes are always in VRAM bank 1
+            byte tileAttributes = mVRAM[VRAMBankSize + (tileAddr - VRAM_START)];
+            
+            // TEMPORARY: Zelda DX HACK
+//            {
+//                if (tileX == 0 && tileY == 24 && tileAddr == 0x9B00)
+//                {
+//                    tileIdx = 0x54 + 128;
+//                    tileAttributes = 0x01;
+//                }
+//                if (tileX == 1 && tileY == 24 && tileAddr == 0x9B01)
+//                {
+//                    tileIdx = 0x55 + 128;
+//                    tileAttributes = 0x01;
+//                }
+//            }
+            
+            byte correctedX = tileOffsetX;
+            byte correctedY = tileOffsetY;
 
-            byte tileAttributes = mVRAM[VRAMBankSize + tileAddr];
+            // Apply X flip
+            if (testBit(tileAttributes, 5))
+                correctedX = 7 - correctedX;
 
-            byte flippedTileX = tileMapTileX;
-            byte flippedTileY = tileMapTileY;
+            // Apply Y flip
+            if (testBit(tileAttributes, 6))
+                correctedY = 7 - correctedY;
 
-            //Horizontal flip
-            if (tileAttributes & 0x20)
-                flippedTileX = 7 - flippedTileX;
-
-            //Vertical flip
-            if (tileAttributes & 0x40)
-                flippedTileY = 7 - flippedTileY;
-
-            byte colorIdx = GET_TILE_PIXEL(VRAMBankSize * ((tileAttributes >> 3) & 0x1) + tileDataAddr + tileIdx * 16, flippedTileX, flippedTileY);
+            // Figure out where the color for this tile is
+            int VBankOffset = VRAMBankSize * getBit(tileAttributes, 3);
+            int address     = VBankOffset + tileDataAddr + (tileIdx * 16);
+            byte colorIdx   = GET_TILE_PIXEL(address - VRAM_START, correctedX, correctedY);
+            
             word color;
             memcpy(&color, mBGPD + (tileAttributes & 0x7) * 8 + colorIdx * 2, 2);
 
-            // Storing pallet index with BG-to-OAM priority - sprites will need both
-            int index = mLY * SCREEN_WIDTH_PIXELS + x;
-            mNativeBuffer[index] = (tileAttributes & 0x80) | colorIdx;
-
+            // Store pallete index with BG-to-OAM priority. When the sprites
+            // are rendered, they can use this information to determine whether
+            // they should be rendered on top of the background or not
+            mNativeBuffer[screenIndex] = (tileAttributes & 0x80) | colorIdx;
+            screenIndex *= 4;
+            
             int c  = mGBC2RGBPalette[color & 0x7FFF];
-            index *= 4;
-            mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
-            mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
-            mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
-            mBackBuffer[index + 3] = 0xFF;             // Alpha
+            mBackBuffer[screenIndex]     = (c >> 16) & 0xFF; // Red
+            mBackBuffer[screenIndex + 1] = (c >>  8) & 0xFF; // Green
+            mBackBuffer[screenIndex + 2] = (c      ) & 0xFF; // Blue
+            mBackBuffer[screenIndex + 3] = 0xFF;             // Alpha
 
-            tileMapX     = (tileMapX + ((tileMapTileX + 1) >> 3)) & 0x1F;
-            tileMapTileX = (tileMapTileX + 1) & 0x7;
+            // Move to the next pixel in this tile (possibly moving to the
+            // next tile if we've drawn all the pixels for this tile already)
+            tileX       = (tileX + ((tileOffsetX + 1) >> 3)) & 0x1F;
+            tileOffsetX = (tileOffsetX + 1) & 0x7;
         }
     }
     else
@@ -737,8 +774,6 @@ void GBCGraphics::renderSprites()
             // This sprite should be above the background and the window
 			else
 			{
-                
-                
 				byte colorIdx;
 				for (int x = spriteX; x < spriteX + 8 && x < 160; x++, spritePixelX += dx)
 				{

@@ -105,22 +105,7 @@ bool Cartridge::save()
 
 bool Cartridge::loadData(const string& filename)
 {
-    ifstream din;
-    din.open(filename.c_str(), ios::binary | ios::ate);
-    if (!din) return false;
-    
-    // Read the length of the file first
-    ifstream::pos_type length = din.tellg();
-    din.seekg(0, ios::beg);
-    
-    // Create the array that holds the contents of the ROM
-    mData      = new byte[length];
-    mDataSize  = length;
-    
-    // Read the whole block at once
-    din.read( (char*) mData, length);
-    din.close();
-    return true;
+    return loadBinaryFile(filename, mData, mDataSize);
 }
 
 void Cartridge::fillInfo(const string& filename, const string* saveFilename)

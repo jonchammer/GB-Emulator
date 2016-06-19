@@ -10,6 +10,7 @@
 
 #include "Common.h"
 #include "MBC.h"
+#include "FileIO.h"
 #include <fstream>
 #include <cstring>
 using namespace std;

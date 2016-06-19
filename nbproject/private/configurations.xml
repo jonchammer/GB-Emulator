@@ -23,6 +23,7 @@
       <in>Common.h</in>
       <in>Debugger.h</in>
       <in>Emulator.h</in>
+      <in>FileIO.h</in>
       <in>GBCGraphics.h</in>
       <in>GBGraphics.h</in>
       <in>Graphics.h</in>
@@ -44,6 +45,7 @@
       <in>Cartridge.cpp</in>
       <in>Debugger.cpp</in>
       <in>Emulator.cpp</in>
+      <in>FileIO.cpp</in>
       <in>GBCGraphics.cpp</in>
       <in>GBGraphics.cpp</in>
       <in>GL_Render.cpp</in>
