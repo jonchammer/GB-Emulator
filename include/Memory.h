@@ -12,6 +12,7 @@
 #include <fstream>
 #include <vector>
 #include "Common.h"
+#include "EmulatorConfiguration.h"
 #include "Cartridge.h"
 #include "Emulator.h"
 #include "Debugger.h"

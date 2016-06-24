@@ -470,3 +470,13 @@ void GBGraphics::renderSprites()
 		}
 	}
 }
+
+byte* GBGraphics::getBackgroundMap(bool printGrid)
+{
+    // Allocate the buffer that will hold the image
+    byte* buffer = new byte[256 * 256 * 4];
+    
+    // TODO Implement
+    
+    return buffer;
+}

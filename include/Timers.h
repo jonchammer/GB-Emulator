@@ -9,6 +9,7 @@
 #define TIMERS_H
 
 #include "Common.h"
+#include "EmulatorConfiguration.h"
 #include "Memory.h"
 
 // Forward Declarations

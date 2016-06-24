@@ -17,12 +17,12 @@ using namespace std;
 
 int main(int argc, char** argv)
 {    
-//    byte* data;
-//    int dataSize;
-//    if(loadBinaryFile("comp.dump", data, dataSize))
-//    {
-//        printHexDump(data, dataSize, 0x8000, 16);
-//    }
+    /*byte* data;
+    int dataSize;
+    if(loadBinaryFile("bgb.dump", data, dataSize))
+    {
+        printHexDump(data, dataSize, 0x8000, 16);
+    }*/
     
     //string game = "../roms/tests/sprite_test_01/sprite_test_01.gb";
     string game = "../roms/Links_Awakening_DX.gbc";

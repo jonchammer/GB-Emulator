@@ -393,9 +393,10 @@ void GBCGraphics::write(word address, byte data)
     
 void GBCGraphics::writeVRAM(word addr, byte value)
 {   
-    if (addr == (0x9B00-0x8000)/* && value == 0x54)*/)
+    //if (addr + 0x8000 > 0x9A00 && addr + 0x8000 <= 0x9BFF)
+    if (addr + 0x8000 == 0x9B33 && mVBK == 0)
     {
-        printf("%d:0x%04x\n", mVBK, value);
+        printf("0x%04x - %d:0x%04x\n", addr + 0x8000, mVBK, value);
         cout.flush();
     }
     
@@ -823,4 +824,87 @@ bool GBCGraphics::HDMACopyBlock(word source, word dest)
 	mVRAM[dest + 0xF] = mMemory->read(source + 0xF);
 
 	return false;
+}
+
+byte* GBCGraphics::getBackgroundMap(bool printGrid)
+{
+    const static int BACKGROUND_WIDTH  = 256;
+    const static int BACKGROUND_HEIGHT = 256;
+    const static int BACKGROUND_TILES  = 32;
+    
+    // Allocate the buffer that will hold the image
+    byte* buffer = new byte[BACKGROUND_WIDTH * BACKGROUND_HEIGHT * 4]();
+    
+    // Work out where tiles and their data come from
+    word tileMapAddr  = (testBit(mLCDC, 3) ? 0x9C00 : 0x9800);
+    word tileDataAddr = (testBit(mLCDC, 4) ? 0x8000 : 0x8800);	
+
+    int tileIdx;
+    for (int y = 0; y < BACKGROUND_HEIGHT; ++y)
+    {
+        for (int x = 0; x < BACKGROUND_WIDTH; ++x)
+        {
+            int tileX       = x / 8;
+            int tileY       = y / 8;
+            int tileOffsetX = x % 8;
+            int tileOffsetY = y % 8;
+            
+            // Figure out where the data for this tile is in memory
+            // For GBC, the data is in VRAM bank 0
+            word tileAddr = tileMapAddr + (tileY * BACKGROUND_TILES + tileX);
+            if (testBit(mLCDC, 4))
+                tileIdx = mVRAM[tileAddr - VRAM_START];
+            else
+                tileIdx = (signedByte) mVRAM[tileAddr - VRAM_START] + 128;
+
+            // The attributes are always in VRAM bank 1
+            byte tileAttributes = mVRAM[VRAMBankSize + (tileAddr - VRAM_START)];
+
+            byte correctedX = tileOffsetX;
+            byte correctedY = tileOffsetY;
+
+            // Apply X flip
+            if (testBit(tileAttributes, 5))
+                correctedX = 7 - correctedX;
+
+            // Apply Y flip
+            if (testBit(tileAttributes, 6))
+                correctedY = 7 - correctedY;
+
+            // Figure out where the color for this tile is
+            int VBankOffset = VRAMBankSize * getBit(tileAttributes, 3);
+            int address     = VBankOffset + tileDataAddr + (tileIdx * 16);
+            byte colorIdx   = GET_TILE_PIXEL(address - VRAM_START, correctedX, correctedY);
+
+            word color;
+            memcpy(&color, mBGPD + (tileAttributes & 0x7) * 8 + colorIdx * 2, 2);
+
+            int c                   = mGBC2RGBPalette[color & 0x7FFF];
+            int screenIndex         = 4 * (y * BACKGROUND_WIDTH + x);
+            buffer[screenIndex]     = (c >> 16) & 0xFF; // Red
+            buffer[screenIndex + 1] = (c >>  8) & 0xFF; // Green
+            buffer[screenIndex + 2] = (c      ) & 0xFF; // Blue
+            buffer[screenIndex + 3] = 0xFF;             // Alpha
+        }
+    }
+    
+    if (printGrid)
+    {
+        for (int y = 0; y < BACKGROUND_HEIGHT; ++y)
+        {
+            for (int x = 0; x < BACKGROUND_WIDTH; ++x)
+            {
+                if (x % 8 == 0 || y % 8 == 0 || x == BACKGROUND_WIDTH - 1 || y == BACKGROUND_HEIGHT - 1)
+                {
+                    int screenIndex         = 4 * (y * BACKGROUND_WIDTH + x);
+                    buffer[screenIndex]     = 0xFF; // Red
+                    buffer[screenIndex + 1] = 0xFF; // Green
+                    buffer[screenIndex + 2] = 0xFF; // Blue
+                    buffer[screenIndex + 3] = 0xFF; // Alpha
+                }
+            }
+        }
+    }
+    
+    return buffer;
 }

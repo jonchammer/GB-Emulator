@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 2.6)
 project(gb_emulator)
 
+# If the user doesn't specify a build type (e.g. with -DCMAKE_BUILD_TYPE=Release),
+# choose Debug as the default value.
+if (NOT CMAKE_BUILD_TYPE)
+	set (CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build Type" FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
 # Add compiler flags here (e.g. -O3, -Wall, etc.)
 # This is also needed to use C++11. "-std=c++11"
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11 -Wall -Wextra -g")

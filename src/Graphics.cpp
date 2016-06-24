@@ -228,5 +228,6 @@ void Graphics::DMAChanged(byte value)
 bool Graphics::dumpVRAM(const string& filename)
 {
     int vramSize;
-    return (saveBinaryFile(filename, getVRAM(vramSize), vramSize));
+    byte* vram = getVRAM(vramSize);
+    return (saveBinaryFile(filename, vram, vramSize));
 }

@@ -15,8 +15,8 @@ using namespace std;
 // Typedefs
 typedef unsigned char byte;
 typedef unsigned short word;
-typedef char signedByte;
-typedef short signedWord;
+typedef signed char signedByte;
+typedef signed short signedWord;
 
 // Constants
 const int SCREEN_WIDTH_PIXELS  = 160;
@@ -62,34 +62,6 @@ const double DISPLAY_GAMMA_GBC  = 1.7;
 const double DISPLAY_COLOR_FULL = 1.0;
 const double DISPLAY_COLOR_GBC  = 0.85;
 
-struct EmulatorConfiguration
-{
-    System system;                // Which hardware we are emulating. When AUTOMATIC is chosen,
-                                  // this will be changed to one of the other values when the
-                                  // cartridge is loaded.
-    int soundSampleRate;          // Sample rate for synthesized sound
-    int soundSampleBufferLength;  // The size of the sound system's sample buffer (in samples)
-    bool skipBIOS;                // When true, the BIOS screen will be skipped
-    GameboyPalette gbPalette;     // Adjust the colors of Gameboy games
-    double gbcDisplayGamma;       // Gamma correction applied to make the display look more like the GBC's. 
-                                  // Can be one of the DISPLAY_GAMMA_XXX constants
-    double gbcDisplayColor;       // [0, 1] - 0 is black/white, 1 is full color
-                                  // Can be one of the DISPLAY_COLOR_XXX constants
-    bool doubleSpeed;             // When true, GBC double speed mode is activated. This should
-                                  // not be set by the user. It will be used internally.
-    
-    // Default constructor initializes each field to reasonable default values
-    EmulatorConfiguration() : 
-        system(System::AUTOMATIC), 
-        soundSampleRate(44100), 
-        soundSampleBufferLength(1024),
-        skipBIOS(false),
-        gbPalette(GameboyPalette::GRAYSCALE), 
-        gbcDisplayGamma(DISPLAY_GAMMA_GBC),
-        gbcDisplayColor(DISPLAY_COLOR_GBC),
-        doubleSpeed(false) {}
-};
-
 // Bit twiddling routines
 #define testBit(address, bit)   (!!((address) &  (1 << (bit))))
 #define setBit(address, bit)    (   (address) |  (1 << (bit)))
@@ -105,7 +77,7 @@ struct EmulatorConfiguration
 // just do something like this instead: "0x%04x". This guarantees the 0x will be printed.
 
 // Shorthand for defining when we are using GBC hardware
-#define GBC(config) ((config)->system == System::GBC)
+#define GBC(config) ((config)->system == GBC)
 
 // Components are classes that are capable of being read from or written to.
 class Component

@@ -17,6 +17,25 @@ const int DEFAULT_WINDOW_HEIGHT = SCREEN_HEIGHT_PIXELS * 4;
 Emulator* em;  // The emulator that is being used
 string title;  // The title of the game (used as the title of the window))
 
+bool saveBackgroundMap()
+{
+    byte* backgroundMap  = em->getGraphics()->getBackgroundMap();
+    SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(backgroundMap, 256, 256, 8 * 4, 256 * 4, 0, 0, 0, 0);
+    if (surface == NULL)
+    {
+        cout << "Unable to create surface." << endl;
+        delete[] backgroundMap;
+        return false;
+    }
+    
+    SDL_SaveBMP(surface, "background.bmp");
+    SDL_FreeSurface(surface);
+    delete[] backgroundMap;
+    cout << "Background map saved: background.bmp" << endl;
+    
+    return true;
+}
+
 // Returns true when the user has chosen to exit the program
 bool handleEvents()
 {
@@ -51,8 +70,10 @@ bool handleEvents()
                     case SDLK_F4: em->getSound()->toggleSound4(); break;
                     
                     // Misc.
-                    case SDLK_p: em->togglePaused(); break;
+                    case SDLK_p:  em->togglePaused(); break;
                     case SDLK_F5: em->getGraphics()->dumpVRAM("vram.dump"); break;
+                    case SDLK_F6: saveBackgroundMap(); break;
+                    case SDLK_F7: cout << endl << endl << endl; break;
                     //case SDLK_g: em->getGraphics()->toggleGrid(); break;
                 }
                 break;

@@ -9,6 +9,7 @@
 #define INPUT_H
 
 #include "Common.h"
+#include "EmulatorConfiguration.h"
 #include "Memory.h"
 #include "Debugger.h"
 

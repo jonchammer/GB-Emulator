@@ -2,6 +2,7 @@
 #define GRAPHICS_H
 
 #include "Common.h"
+#include "EmulatorConfiguration.h"
 #include "Memory.h"
 #include "Emulator.h"
 
@@ -43,11 +44,11 @@ public:
                               // Lasts for (204 - (SCX % 8) - Sprites) cycles
                               // Here LCD controller compensates mode 3 delays so a scanline would take exactly 456 cycles
 
-        GBLCDMODE_VBLANK = 1,  // V-Blank period. CPU can access the VRAM and OAM
+        GBLCDMODE_VBLANK = 1, // V-Blank period. CPU can access the VRAM and OAM
                 
         GBLCDMODE_OAM    = 2, // OAM is being used ($FE00-$FE9F). CPU cannot access the OAM during this period
 
-        GBLCDMODE_OAMRAM = 3 // Both the OAM and VRAM are being used. The CPU cannot access either during this period
+        GBLCDMODE_OAMRAM = 3  // Both the OAM and VRAM are being used. The CPU cannot access either during this period
                               // This is where all rendering is done. Lasts for (172 + (SCX % 8) + Sprites) cycles
                               // Sprites causing this mode to take longer
     };
@@ -74,6 +75,13 @@ public:
     
     // Screen information
     byte* getScreenData()  { return mFrontBuffer; }
+    
+    /**
+     * Returns a 32x32 tile (256x256 px) color image that represents the
+     * current background map. This is a direct representation of the current
+     * state of the VRAM on the device.
+     */
+    virtual byte* getBackgroundMap(bool printGrid = true) = 0;
     
     // Debug
     void toggleBackground() { mBackgroundGlobalToggle = !mBackgroundGlobalToggle; }

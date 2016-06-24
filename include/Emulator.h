@@ -9,6 +9,7 @@
 #define EMULATOR_H
 
 #include "Common.h"
+#include "EmulatorConfiguration.h"
 #include "CPU.h"
 #include "Memory.h"
 #include "Timers.h"

@@ -4,7 +4,7 @@
 #include <fstream>
 using namespace std;
 
-RTC::RTC() : mRTCReg(-1), mLastLatchWrite(0xFF), mBaseTime(0), mHaltTime(0)
+RTC::RTC() : mBaseTime(0), mHaltTime(0), mRTCReg(-1), mLastLatchWrite(0xFF)
 {
     // Do nothing
 }

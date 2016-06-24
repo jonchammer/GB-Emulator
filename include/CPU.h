@@ -13,6 +13,7 @@
 #include <fstream>
 #include <cstdlib>
 #include "Common.h"
+#include "EmulatorConfiguration.h"
 #include "Debugger.h"
 #include "Emulator.h"
 #include "Memory.h"

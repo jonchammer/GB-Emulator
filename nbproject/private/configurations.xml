@@ -23,6 +23,7 @@
       <in>Common.h</in>
       <in>Debugger.h</in>
       <in>Emulator.h</in>
+      <in>EmulatorConfiguration.h</in>
       <in>FileIO.h</in>
       <in>GBCGraphics.h</in>
       <in>GBGraphics.h</in>
@@ -85,6 +86,8 @@
         <gdb_interceptlist>
           <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
         </gdb_interceptlist>
+        <gdb_signals>
+        </gdb_signals>
         <gdb_options>
           <DebugOptions>
           </DebugOptions>

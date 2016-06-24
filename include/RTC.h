@@ -57,18 +57,18 @@ private:
     int mRTCReg;           // The currently selected RTC register (-1 or 0x08-0x0C)
     byte mLastLatchWrite;  // Used to switch to latching mode
     
-    const int RTC_SECONDS   = 0; // Seconds [0, 59]
-    const int RTC_MINUTES   = 1; // Minutes [0, 59]
-    const int RTC_HOURS     = 2; // Hours   [0, 24]
-    const int RTC_DAYS_LOW  = 3; // Low 8 bits for Days [0, 0xFF]
-    const int RTC_DAYS_HIGH = 4; // High bit for days, carry bit, halt flag
+    static const int RTC_SECONDS   = 0; // Seconds [0, 59]
+    static const int RTC_MINUTES   = 1; // Minutes [0, 59]
+    static const int RTC_HOURS     = 2; // Hours   [0, 24]
+    static const int RTC_DAYS_LOW  = 3; // Low 8 bits for Days [0, 0xFF]
+    static const int RTC_DAYS_HIGH = 4; // High bit for days, carry bit, halt flag
     
-    const int FLAG_HALT     = 6; // Used for RTC_DAYS_HIGH
-    const int FLAG_OVERFLOW = 7; // Used for RTC_DAYS_HIGH
+    static const int FLAG_HALT     = 6; // Used for RTC_DAYS_HIGH
+    static const int FLAG_OVERFLOW = 7; // Used for RTC_DAYS_HIGH
     
-    const int SECONDS_PER_DAY    = 86400;
-    const int SECONDS_PER_HOUR   = 3600;
-    const int SECONDS_PER_MINUTE = 60;
+    static const int SECONDS_PER_DAY    = 86400;
+    static const int SECONDS_PER_HOUR   = 3600;
+    static const int SECONDS_PER_MINUTE = 60;
 };
 
 #endif /* RTC_H */

@@ -40,6 +40,7 @@ public:
     byte read(const word address) const;
     void write(const word address, const byte data);
     
+    byte* getBackgroundMap(bool printGrid);
     byte* getVRAM(int& vramSize) {vramSize = VRAMBankSize; return mVRAM;}
     
 private:
