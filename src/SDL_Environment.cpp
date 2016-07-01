@@ -13,9 +13,80 @@
 const int DEFAULT_WINDOW_WIDTH  = SCREEN_WIDTH_PIXELS  * 4;
 const int DEFAULT_WINDOW_HEIGHT = SCREEN_HEIGHT_PIXELS * 4;
 
+class Window
+{
+public:
+    Window(const string& title, int windowWidth, int windowHeight, int textureWidth, int textureHeight)
+        : mTextureWidth(textureWidth), mTextureHeight(textureHeight)
+    {
+        // Initialize the Window
+        mWindow = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, 
+            SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+        if (mWindow == NULL)
+        {
+            cout << "Unable to create window. SDL_Error: " << SDL_GetError() << endl;
+            return;
+        }
+
+        // Get the SDL constructs we need to render the game
+        mRenderer = SDL_CreateRenderer(mWindow, -1, 0);
+        mTexture  = SDL_CreateTexture(mRenderer, SDL_PIXELFORMAT_ARGB8888, 
+            SDL_TEXTUREACCESS_STREAMING, textureWidth, textureHeight);
+    }
+    
+    ~Window()
+    {
+        SDL_DestroyRenderer(mRenderer);
+        SDL_DestroyWindow(mWindow);
+        SDL_DestroyTexture(mTexture);
+    }
+    
+    /**
+     * Redraw this window using new pixels.
+     */
+    void update(const byte* data)
+    {
+        int* pixels;
+        int pitch;
+    
+        // Update the SDL texture with the most recent pixel data
+        SDL_LockTexture(mTexture, NULL, (void**) &pixels, &pitch);   
+        memcpy(pixels, data, pitch * mTextureHeight);
+        SDL_UnlockTexture(mTexture);
+
+        // Render the texture to the screen
+        SDL_RenderCopy(mRenderer, mTexture, NULL, NULL);
+        SDL_RenderPresent(mRenderer);
+    }
+    
+    /**
+     * Returns true if this event is informing us that our window should be closed.
+     */
+    bool shouldClose(const SDL_Event& event)
+    {
+        return (event.window.event == SDL_WINDOWEVENT_CLOSE && 
+                event.window.windowID == SDL_GetWindowID(mWindow));
+    }
+    
+    void setTitle(const string& title)
+    {   
+        SDL_SetWindowTitle(mWindow, title.c_str());
+    }
+    
+private:
+    SDL_Window* mWindow;
+    SDL_Renderer* mRenderer;
+    SDL_Texture* mTexture;
+    
+    int mTextureWidth;
+    int mTextureHeight;
+};
+
 // Globals
-Emulator* em;  // The emulator that is being used
-string title;  // The title of the game (used as the title of the window))
+Emulator* em;       // The emulator that is being used
+string title;       // The title of the game (used as the title of the window))
+Window* mainWindow; // Shows the game content
+Window* vRAMWindow; // Shows the contents of VRAM
 
 bool saveBackgroundMap()
 {
@@ -48,6 +119,20 @@ bool handleEvents()
             // Exit the main loop
             case SDL_QUIT: return true;
             
+            // Take care of closing windows when appropriate
+            case SDL_WINDOWEVENT:
+            {
+                if (mainWindow->shouldClose(event))
+                    return true;
+                else if (vRAMWindow->shouldClose(event))
+                {
+                    delete vRAMWindow;
+                    vRAMWindow = NULL;
+                    return false;
+                }                
+                else return false;
+            }
+            
             // Handle key down events
             case SDL_KEYDOWN:
             {
@@ -72,7 +157,7 @@ bool handleEvents()
                     // Misc.
                     case SDLK_p:  em->togglePaused(); break;
                     case SDLK_F5: em->getGraphics()->dumpVRAM("vram.dump"); break;
-                    case SDLK_F6: saveBackgroundMap(); break;
+                    case SDLK_F6: vRAMWindow = new Window("VRAM", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, 256, 256);
                     case SDLK_F7: cout << endl << endl << endl; break;
                     //case SDLK_g: em->getGraphics()->toggleGrid(); break;
                 }
@@ -103,7 +188,7 @@ bool handleEvents()
 }
 
 // FPS calculation - updates the window title once a second.
-void updateFPS(SDL_Window* window)
+void updateFPS(Window* window)
 {
     static int frame = 0; 
     static int time;
@@ -120,7 +205,7 @@ void updateFPS(SDL_Window* window)
         
         // Update the title so we can see the FPS
         snprintf(titleBuffer, 100, "%s. FPS = %.2f", title.c_str(), fps);
-        SDL_SetWindowTitle(window, titleBuffer);
+        window->setTitle(string(titleBuffer));
         
         // Save the game if the game has asked for it
         em->getMemory()->getLoadedCartridge()->save();
@@ -128,29 +213,19 @@ void updateFPS(SDL_Window* window)
 }
 
 // Returns true if the user has chosen to exit the program.
-bool update(SDL_Window* window, SDL_Texture* buffer, SDL_Renderer* renderer, StreamingAudioQueue* audioQueue)
+bool update(StreamingAudioQueue* audioQueue)
 {
-    static int* pixels;
-    static int pitch;
-    
     int startTime = SDL_GetTicks();
-    updateFPS(window);
+    updateFPS(mainWindow);
 
     // Take care of input and other events
     if (handleEvents())
         return true;
 
-    // Update the emulator
+    // Update the emulator and render the frame (including any auxilliary windows)
     em->update();
-
-    // Update the SDL texture with the most recent pixel data
-    SDL_LockTexture(buffer, NULL, (void**) &pixels, &pitch);   
-    memcpy(pixels, em->getGraphics()->getScreenData(), pitch * SCREEN_HEIGHT_PIXELS);
-    SDL_UnlockTexture(buffer);
-
-    // Render the texture to the screen
-    SDL_RenderCopy(renderer, buffer, NULL, NULL);
-    SDL_RenderPresent(renderer);
+    if (mainWindow != NULL) mainWindow->update(em->getGraphics()->getScreenData());
+    if (vRAMWindow != NULL) vRAMWindow->update(em->getGraphics()->getBackgroundMap(true));
     
     // In order to update the audio as fast as it is being handled, we
     // add an additional delay. When this is high, we will update faster.
@@ -193,31 +268,21 @@ void startEmulation(int /*argc*/, char** /*argv*/, Emulator* emulator)
         return;
     }
     
-    // Initialize the Window
-    SDL_Window* window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, 
-        SDL_WINDOWPOS_UNDEFINED, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-    if (window == NULL)
-    {
-        cout << "Unable to create window. SDL_Error: " << SDL_GetError() << endl;
-        return;
-    }
+    // Create the main window
+    mainWindow = new Window(title, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS);
     
-    // Get the SDL constructs we need to render the game
-    SDL_Renderer* renderer     = SDL_CreateRenderer(window, -1, 0);
-    SDL_Texture* buffer        = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, 
-        SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS);
-   
     // Create the audio queue, and attach the 'soundFunc' callback so the emulator
     // knows what to do when it fills the sound buffer.
     StreamingAudioQueue* audioQueue = new StreamingAudioQueue(44100, 2048);
     em->getSound()->setSoundCallback(&soundFunc, audioQueue);
     
     // Main loop
-    while (!update(window, buffer, renderer, audioQueue));
+    while (!update(audioQueue));
 
     // Cleanup
-    delete audioQueue;
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+    if (audioQueue != NULL) delete audioQueue;
+    if (mainWindow != NULL) delete mainWindow;
+    if (vRAMWindow != NULL) delete vRAMWindow;
+    
     SDL_Quit();
 }

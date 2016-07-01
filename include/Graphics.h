@@ -20,7 +20,7 @@ class Graphics : public Component
 {
 public:
     
-    const static int VRAMBankSize = 0x2000;
+    const static int VRAM_BANK_SIZE = 0x2000;
     
     // Platform independent memory addresses
     const static word VRAM_START = 0x8000;

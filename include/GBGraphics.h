@@ -41,11 +41,11 @@ public:
     void write(const word address, const byte data);
     
     byte* getBackgroundMap(bool printGrid);
-    byte* getVRAM(int& vramSize) {vramSize = VRAMBankSize; return mVRAM;}
+    byte* getVRAM(int& vramSize) {vramSize = VRAM_BANK_SIZE; return mVRAM;}
     
 private:
     //GPU memory
-    byte mVRAM[VRAMBankSize];
+    byte mVRAM[VRAM_BANK_SIZE];
     int mGB2RGBPalette[4];         // Gameboy palette -> ARGB color
     
     // GPU I/O ports

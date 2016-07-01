@@ -106,7 +106,9 @@ byte Memory::read(const word address) const
     
     // Read from echo RAM, which uses the same storage as the internal RAM
     else if (address >= 0xE000 && address <= 0xFDFF)
+    {
         data = mInternalRAM[address - 0xE000];
+    }
     
     // This area is restricted
     else if (address >= 0xFEA0 && address <= 0xFEFF)
@@ -128,12 +130,16 @@ byte Memory::read(const word address) const
     
     // Handle RAM bank reads in GBC mode
     else if (address == 0xFF70 && GBC(mConfig))
+    {
         return 0xF8 | mCurrentRAMBank;
+    }
     
     // Read from misc RAM - This statement is a touch convoluted, but it's required
     // for g++ to compile without a warning about the limited range of unsigned shorts
     else if ((address >= 0xFF00 && address <= 0xFFFE) || (address == 0xFFFF))
+    {
         data = mMiscRAM[address - 0xFF00];
+    }
     
     // Sanity check
     else
@@ -209,8 +215,10 @@ void Memory::write(const word address, const byte data)
         
     // Write to misc RAM - This statement is a touch convoluted, but it's required
     // for g++ to compile without a warning about the limited range of unsigned shorts
-    else if ((address >= 0xFF00 && address <= 0xFFFE) || (address == 0xFFFF))     
+    else if ((address >= 0xFF00 && address <= 0xFFFE) || (address == 0xFFFF))  
+    {
         mMiscRAM[address - 0xFF00] = data;
+    }
     
     // Sanity check
     else 

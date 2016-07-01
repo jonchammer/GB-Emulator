@@ -174,7 +174,7 @@ void GBCGraphics::update(int clockDelta)
 			//HDMA block copy
 			if (mHDMAActive)
 			{
-				HDMACopyBlock(mHDMASource, mVBK * VRAMBankSize + mHDMADestination);
+				HDMACopyBlock(mHDMASource, mVBK * VRAM_BANK_SIZE + mHDMADestination);
 				mHDMAControl--;
 				mHDMADestination += 0x10;
 				mHDMASource      += 0x10;
@@ -260,7 +260,7 @@ void GBCGraphics::reset()
 {
     Graphics::reset();
     
-	memset(mVRAM, 0x0, VRAMBankSize * 2);
+	memset(mVRAM, 0x0, VRAM_BANK_SIZE * 2);
     memset(mBackBuffer, 0xFF, 160 * 144 * 4 * sizeof(mBackBuffer[0]));
     memset(mNativeBuffer, 0x00, 160 * 144 * sizeof(mNativeBuffer[0]));
 
@@ -393,23 +393,22 @@ void GBCGraphics::write(word address, byte data)
     
 void GBCGraphics::writeVRAM(word addr, byte value)
 {   
-    //if (addr + 0x8000 > 0x9A00 && addr + 0x8000 <= 0x9BFF)
-    if (addr + 0x8000 == 0x9B33 && mVBK == 0)
+    /*if (addr + 0x8000 > 0x9A00 && addr + 0x8000 <= 0x9BFF)
     {
-        printf("0x%04x - %d:0x%04x\n", addr + 0x8000, mVBK, value);
+        printf("0x%04x - %d:0x%04x PC: 0x%04x\n", addr + 0x8000, mVBK, value, mMemory->getEmulator()->getCPU()->getProgramCounter());   
         cout.flush();
-    }
+    }*/
     
 	if (GET_LCD_MODE() != GBLCDMODE_OAMRAM || !LCD_ON())
 	{
-        mVRAM[mVBK * VRAMBankSize + addr] = value;
+        mVRAM[mVBK * VRAM_BANK_SIZE + addr] = value;
 	}
 }
 
 byte GBCGraphics::readVRAM(word addr) const
 {
 	if (GET_LCD_MODE() != GBLCDMODE_OAMRAM || !LCD_ON())
-        return mVRAM[mVBK * VRAMBankSize + addr];
+        return mVRAM[mVBK * VRAM_BANK_SIZE + addr];
     
 	else return 0xFF;
 }
@@ -458,7 +457,7 @@ void GBCGraphics::HDMA5Changed(byte value)
 			mHDMAActive = false;
 
 			word sourceAddr = mHDMASource;
-			word destAddr   = mVBK * VRAMBankSize + mHDMADestination;
+			word destAddr   = mVBK * VRAM_BANK_SIZE + mHDMADestination;
 			for (; (mHDMAControl & 0x7F) != 0x7F; mHDMAControl--, destAddr += 0x10, sourceAddr += 0x10)
 			{
 				if (HDMACopyBlock(sourceAddr, destAddr))
@@ -466,7 +465,7 @@ void GBCGraphics::HDMA5Changed(byte value)
 			}
 
 			mHDMASource      = sourceAddr;
-			mHDMADestination = destAddr - (mVBK * VRAMBankSize);
+			mHDMADestination = destAddr - (mVBK * VRAM_BANK_SIZE);
 			mHDMAControl     = 0xFF;
 		}
 	}
@@ -536,7 +535,7 @@ void GBCGraphics::renderBackground()
                 tileIdx = (signedByte) mVRAM[tileAddr - VRAM_START] + 128;
                         
             // The attributes are always in VRAM bank 1
-            byte tileAttributes = mVRAM[VRAMBankSize + (tileAddr - VRAM_START)];
+            byte tileAttributes = mVRAM[VRAM_BANK_SIZE + (tileAddr - VRAM_START)];
             
             // TEMPORARY: Zelda DX HACK
 //            {
@@ -564,7 +563,7 @@ void GBCGraphics::renderBackground()
                 correctedY = 7 - correctedY;
 
             // Figure out where the color for this tile is
-            int VBankOffset = VRAMBankSize * getBit(tileAttributes, 3);
+            int VBankOffset = VRAM_BANK_SIZE * getBit(tileAttributes, 3);
             int address     = VBankOffset + tileDataAddr + (tileIdx * 16);
             byte colorIdx   = GET_TILE_PIXEL(address - VRAM_START, correctedX, correctedY);
             
@@ -631,7 +630,7 @@ void GBCGraphics::renderWindow()
 				else
 					tileIdx = (signed char)mVRAM[tileIdxAddr] + 128;
 				
-                byte tileAttributes = mVRAM[VRAMBankSize + tileIdxAddr];
+                byte tileAttributes = mVRAM[VRAM_BANK_SIZE + tileIdxAddr];
 
                 byte flippedTileX = tileMapTileX;
                 byte flippedTileY = tileMapTileY;
@@ -648,7 +647,7 @@ void GBCGraphics::renderWindow()
                     flippedTileY = 7 - flippedTileY;
                 }
 
-                byte colorIdx = GET_TILE_PIXEL(VRAMBankSize * ((tileAttributes >> 3) & 0x1) + tileDataAddr + tileIdx * 16, flippedTileX, flippedTileY);
+                byte colorIdx = GET_TILE_PIXEL(VRAM_BANK_SIZE * ((tileAttributes >> 3) & 0x1) + tileDataAddr + tileIdx * 16, flippedTileX, flippedTileY);
                 word color;
                 memcpy(&color, mBGPD + (tileAttributes & 0x7) * 8 + colorIdx * 2, 2);
 
@@ -720,7 +719,7 @@ void GBCGraphics::renderSprites()
 			byte *cgbPalette      = &mOBPD[(spriteAttributes & 0x7) * 8];
             
             // Bit 3 tells which VRAM bank to use. This offset will either be 0 or VRAMBankSize
-			word cgbTileMapOffset = VRAMBankSize * testBit(spriteAttributes, 3);
+			word cgbTileMapOffset = VRAM_BANK_SIZE * testBit(spriteAttributes, 3);
 
 			// Determine where this sprite should be placed on the screen
 			int spritePixelX = 0;
@@ -803,7 +802,7 @@ void GBCGraphics::renderSprites()
 
 bool GBCGraphics::HDMACopyBlock(word source, word dest)
 {
-	if (dest >= (mVBK * VRAMBankSize) + VRAMBankSize || source == 0xFFFF)
+	if (dest >= (mVBK * VRAM_BANK_SIZE) + VRAM_BANK_SIZE || source == 0xFFFF)
 		return true;
 
 	mVRAM[dest + 0x0] = mMemory->read(source + 0x0);
@@ -858,7 +857,7 @@ byte* GBCGraphics::getBackgroundMap(bool printGrid)
                 tileIdx = (signedByte) mVRAM[tileAddr - VRAM_START] + 128;
 
             // The attributes are always in VRAM bank 1
-            byte tileAttributes = mVRAM[VRAMBankSize + (tileAddr - VRAM_START)];
+            byte tileAttributes = mVRAM[VRAM_BANK_SIZE + (tileAddr - VRAM_START)];
 
             byte correctedX = tileOffsetX;
             byte correctedY = tileOffsetY;
@@ -872,7 +871,7 @@ byte* GBCGraphics::getBackgroundMap(bool printGrid)
                 correctedY = 7 - correctedY;
 
             // Figure out where the color for this tile is
-            int VBankOffset = VRAMBankSize * getBit(tileAttributes, 3);
+            int VBankOffset = VRAM_BANK_SIZE * getBit(tileAttributes, 3);
             int address     = VBankOffset + tileDataAddr + (tileIdx * 16);
             byte colorIdx   = GET_TILE_PIXEL(address - VRAM_START, correctedX, correctedY);
 

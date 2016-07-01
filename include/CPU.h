@@ -123,6 +123,7 @@ public:
     void attachDebugger(Debugger* debugger) { mDebugger = debugger; }
     void setLogging(bool log)               { mLogging = log;       }
     
+    word getProgramCounter() {return mProgramCounter;}
 private:
     
     // Allow the debugger read only access to the state of the CPU

@@ -7,7 +7,8 @@
 
 #include "CPU.h"
 
-CPU::CPU(Emulator* emulator, Memory* memory, EmulatorConfiguration* configuration) : mEmulator(emulator), mMemory(memory), mDebugger(NULL), mConfig(configuration)
+CPU::CPU(Emulator* emulator, Memory* memory, EmulatorConfiguration* configuration) : 
+    mEmulator(emulator), mMemory(memory), mDebugger(NULL), mConfig(configuration)
 {
     reset();
 }
@@ -1141,7 +1142,7 @@ void CPU::CPU_RETURN()
 
 void CPU::CPU_RESTART(word addr)
 {
-    if (mDebugger != NULL) mDebugger->CPUStackPush();
+    //if (mDebugger != NULL) mDebugger->CPUStackPush();
     pushWordOntoStack(mProgramCounter);
     mProgramCounter = addr;
 }

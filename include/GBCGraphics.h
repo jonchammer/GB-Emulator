@@ -48,10 +48,10 @@ public:
     void write(const word address, const byte data);
     
     byte* getBackgroundMap(bool printGrid);
-    byte* getVRAM(int& vramSize) {vramSize = VRAMBankSize * 2; return mVRAM;}
+    byte* getVRAM(int& vramSize) {vramSize = VRAM_BANK_SIZE * 2; return mVRAM;}
 private:
     
-    byte mVRAM[VRAMBankSize * 2];
+    byte mVRAM[VRAM_BANK_SIZE * 2];
     int mGBC2RGBPalette[32768];    // GBG color -> ARGB color
     
     // GPU I/O ports

@@ -165,7 +165,7 @@ void GBGraphics::reset()
 {
     Graphics::reset();
     
-	memset(mVRAM, 0x0, VRAMBankSize);
+	memset(mVRAM, 0x0, VRAM_BANK_SIZE);
     
     // LCDC cannot be 0 initially or some games (like Pokemon Red) won't load.
 	mBGP  = 0x00;

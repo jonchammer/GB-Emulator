@@ -72,6 +72,7 @@ public:
     void attachComponent(Component* component, word startAddress, word endAddress);
     void attachDebugger(Debugger* debugger) { mDebugger = debugger; }
     
+    Emulator* getEmulator() {return mEmulator;}
 private:
     // Allow the debugger read only access to the state of the memory
     friend class Debugger;

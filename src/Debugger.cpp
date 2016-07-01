@@ -1,7 +1,8 @@
 #include "Debugger.h"
 #include "Common.h"
 
-Debugger::Debugger() : mEnabled(false), mPaused(false), mState(DEFAULT), mNextPush(true), mNumLastInstructions(1), mJoypadBreakpoints(0x0)
+Debugger::Debugger() : mEnabled(false), mPaused(false), mState(DEFAULT), 
+    mNextPush(true), mNumLastInstructions(1), mJoypadBreakpoints(0x0)
 {
     
 }
@@ -17,6 +18,7 @@ void showMenu()
          << "  S - Show stack trace"     << endl
          << "  M 0xXXXX - Show memory at address" << endl
          << "  N 0xXXXX 0xXX - Set memory at address to new value" << endl
+         << "  R [A|F|B|C|D|E|H|L] 0xXX - Set register to new value" << endl
          << "  Q - Quit debugging"       << endl << endl;
 }
 
@@ -48,13 +50,14 @@ void Debugger::CPUUpdate()
         mLastInstructions.pop_front();
     
     // Check to see have hit one of the user-defined breakpoints
-    if (!mPaused && hitBreakpoint(mCPU->mProgramCounter))
+    if (!mPaused && hitBreakpoint(mCPU->mProgramCounter) /*&& mCPU->mRegisters.hl == 0x9AE0*/)
     {
         mPaused = true;
         cout << "Breakpoint hit at address: "; printHex(cout, mCPU->mProgramCounter); cout << endl;
+        printState();
         showMenu();
     }
-    
+
     static size_t targetStackSize;
     
     if (mPaused)
@@ -196,7 +199,7 @@ void Debugger::executeCommand()
                 string address;
                 ss >> address >> address;
                 word addr = (word) stoul(address, NULL, 16);
-                printf("[0x%04x] = 0x%02x\n", addr, mMemory->read(addr));
+                printf("[0x%04X] = 0x%02X\n", addr, mMemory->read(addr));
                 break;
             }
             case 'n':
@@ -208,6 +211,25 @@ void Debugger::executeCommand()
                 word addr = (word) stoul(address, NULL, 16);
                 byte dat  = (byte) stoul(data, NULL, 16);
                 mMemory->write(addr, dat);
+                break;
+            }
+            case 'r':
+            {
+                stringstream ss(command);
+                string reg, val;
+                ss >> reg >> reg >> val;
+
+                byte data = (byte) stoul(val, NULL, 16);
+                
+                if      (reg == "a") mCPU->mRegisters.a = data;
+                else if (reg == "f") mCPU->mRegisters.f = data;
+                else if (reg == "b") mCPU->mRegisters.b = data;
+                else if (reg == "c") mCPU->mRegisters.c = data;
+                else if (reg == "d") mCPU->mRegisters.d = data;
+                else if (reg == "e") mCPU->mRegisters.e = data;
+                else if (reg == "h") mCPU->mRegisters.h = data;
+                else if (reg == "l") mCPU->mRegisters.l = data;
+                
                 break;
             }
             case 'q':

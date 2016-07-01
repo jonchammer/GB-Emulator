@@ -48,15 +48,15 @@ int main(int argc, char** argv)
     cartridge.printInfo();
         
     // Create and configure debugger
-    //Debugger debugger;
-    //debugger.setEnabled(true);
-    //debugger.setNumLastInstructions(200);
-    //debugger.setBreakpoint(0x6796);
-    //debugger.setBreakpoint(0x67AA);
+    Debugger debugger;
+    debugger.setEnabled(true);
+    debugger.setNumLastInstructions(200);
+    //debugger.setBreakpoint(0x2932);
+    //debugger.setBreakpoint(0x056A);
     //debugger.setPaused(true);
     //debugger.setJoypadBreakpoint(BUTTON_START);
     //debugger.setBreakpoint(0x28AA);
-    //emulator.attachDebugger(&debugger);
+    emulator.attachDebugger(&debugger);
     
     // Start the emulation
     startEmulation(argc, argv, &emulator);
