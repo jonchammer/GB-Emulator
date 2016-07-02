@@ -24,6 +24,8 @@ class Emulator;
 class Cartridge;
 class Debugger;
 
+const word SPEED_SWITCH_ADDRESS = 0xFF4D;
+
 class Memory 
 {
 public:

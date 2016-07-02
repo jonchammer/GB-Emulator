@@ -225,13 +225,13 @@ void GBGraphics::write(word address, byte data)
     
     switch (address)
     {
-        case LCDC:  LCDCChanged(data);  break;
-        case STAT:  STATChanged(data);  break;
+        case LCDC:  setLCDC(data);  break;
+        case STAT:  setSTAT(data);  break;
         case SCY:   mSCY = data;        break;
         case SCX:   mSCX = data;        break;
         case LY:    mLY = 0;            break;
-        case LYC:   LYCChanged(data);   break;
-        case DMA:   DMAChanged(data);   break;
+        case LYC:   setLYC(data);   break;
+        case DMA:   setDMA(data);   break;
         case BGP:   mBGP = data;        break;
         case OBP0:  mOBP0 = data;       break;
         case OBP1:  mOBP1 = data;       break;

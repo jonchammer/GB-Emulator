@@ -1350,9 +1350,9 @@ void CPU::CPU_HALT()
 
 void CPU::CPU_STOP()
 {
-    if (GBC(mConfig) && (mMemory->read(0xFF4D) & 0x1))
+    if (GBC(mConfig) && (mMemory->read(SPEED_SWITCH_ADDRESS) & 0x1))
     {
-        mMemory->write(0xFF4D, 0x0);
+        mMemory->write(SPEED_SWITCH_ADDRESS, 0x0);
         mConfig->doubleSpeed = !mConfig->doubleSpeed;
     }
 }

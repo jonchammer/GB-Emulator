@@ -122,136 +122,146 @@ void GBCGraphics::update(int clockDelta)
 
 		if (!LCD_ON())
 		{
-			mLY = 0;
+			mLY                = 0;
 			mClocksToNextState = 70224;
-            memset(mBackBuffer, 0xFF, 160 * 144 * 4 * sizeof(mBackBuffer[0]));
-            memset(mNativeBuffer, 0x00, 160 * 144 * sizeof(mNativeBuffer[0]));
+            
+            memset(mBackBuffer, 0xFF, SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * 4 * sizeof(mBackBuffer[0]));
+            memset(mNativeBuffer, 0x00, SCREEN_WIDTH_PIXELS * SCREEN_HEIGHT_PIXELS * sizeof(mNativeBuffer[0]));
             std::swap(mBackBuffer, mFrontBuffer);
 			continue;
 		}
 		
 		switch (mLCDMode)
 		{
-		case LCDMODE_LYXX_OAM:
-			SET_LCD_MODE(GBLCDMODE_OAM);
-            
-            // OAM interrupt selected
-			if ((mSTAT & 0x20) && !mLCDCInterrupted)
-			{
-                mMemory->requestInterrupt(INTERRUPT_LCD);
-				mLCDCInterrupted = true;
-			}
+            // Mode 2 - Lasts 80 cycles
+            case LCDMODE_LYXX_OAM:
+                SET_LCD_MODE(GBLCDMODE_OAM);
 
-			// LYC=LY checked in the beginning of scanline
-			checkCoincidenceFlag();
-			
-			mScrollXClocks     = (mSCX & 0x4) ? 4 : 0;
-			mLCDMode           = LCDMODE_LYXX_OAMRAM;
-			mClocksToNextState = 80;
-			break;
-
-		case LCDMODE_LYXX_OAMRAM:
-			prepareSpriteQueue();
-            
-			SET_LCD_MODE(GBLCDMODE_OAMRAM);
-
-			mLCDMode           = LCDMODE_LYXX_HBLANK;
-			mClocksToNextState = 172 + mScrollXClocks + SPRITE_CLOCKS[mSpriteQueue.size()];
-			break;
-
-		case LCDMODE_LYXX_HBLANK:
-			renderScanline();
-
-			SET_LCD_MODE(GBLCDMODE_HBLANK);
-            
-            //H-blank interrupt selected
-			if ((mSTAT & 0x08) && !mLCDCInterrupted)
-			{
-                mMemory->requestInterrupt(INTERRUPT_LCD);
-				mLCDCInterrupted = true;
-			}
-
-			//HDMA block copy
-			if (mHDMAActive)
-			{
-				HDMACopyBlock(mHDMASource, mVBK * VRAM_BANK_SIZE + mHDMADestination);
-				mHDMAControl--;
-				mHDMADestination += 0x10;
-				mHDMASource      += 0x10;
-
-				if ((mHDMAControl & 0x7F) == 0x7F)
-				{
-					mHDMAControl = 0xFF;
-					mHDMAActive  = false;
-				}
-			}
-
-			mLCDMode           = LCDMODE_LYXX_HBLANK_INC;
-			mClocksToNextState = 200 - mScrollXClocks - SPRITE_CLOCKS[mSpriteQueue.size()];
-			break;
-
-		case LCDMODE_LYXX_HBLANK_INC:
-			mLY++;
-            
-			// Reset LYC bit
-			mSTAT &= 0xFB;
-			
-			mLCDCInterrupted   = false;
-            mLCDMode           = (mLY == 144) ? LCDMODE_LY9X_VBLANK : LCDMODE_LYXX_OAM;
-			mClocksToNextState = 4;
-			break;
-
-		// Offscreen LCD modes
-		case LCDMODE_LY9X_VBLANK:
-            
-			// V-blank interrupt
-			if (mLY == 144)
-			{
-				SET_LCD_MODE(GBLCDMODE_VBLANK);
-                mMemory->requestInterrupt(INTERRUPT_VBLANK);
-
-				if (mSTAT & 0x10)
+                // OAM interrupt selected
+                if (testBit(mSTAT, 5) && !mLCDCInterrupted)
+                {
                     mMemory->requestInterrupt(INTERRUPT_LCD);
-			}
+                    mLCDCInterrupted = true;
+                }
 
-			// Checking LYC=LY in the beginning of scanline
-			checkCoincidenceFlag();
+                // LYC=LY checked in the beginning of scanline
+                checkCoincidenceFlag();
 
-			mLCDMode           = LCDMODE_LY9X_VBLANK_INC;
-			mClocksToNextState = 452;
-			break;
+                mScrollXClocks     = (mSCX & 0x4) ? 4 : 0;
+                mLCDMode           = LCDMODE_LYXX_OAMRAM;
+                mClocksToNextState = 80;
+                break;
 
-		case LCDMODE_LY9X_VBLANK_INC:
-			mLY++;
+            // Mode 3 - Lasts 172 cycles + a variable amount that depends on what's being rendered
+            case LCDMODE_LYXX_OAMRAM:
+                prepareSpriteQueue();
 
-			// Reset LYC bit
-			mSTAT &= 0xFB;
+                SET_LCD_MODE(GBLCDMODE_OAMRAM);
 
-            mLCDMode           = (mLY == 153) ? LCDMODE_LY00_VBLANK : LCDMODE_LY9X_VBLANK;
-			mLCDCInterrupted   = false;
-			mClocksToNextState = 4;
-			break;
+                mLCDMode           = LCDMODE_LYXX_HBLANK;
+                mClocksToNextState = 172 + mScrollXClocks + SPRITE_CLOCKS[mSpriteQueue.size()];// + 16; // The +16 is new.
 
-		case LCDMODE_LY00_VBLANK:
-            
-			// Checking LYC=LY in the beginning of scanline
-			// Here LY = 153
-			checkCoincidenceFlag();
-			
-			mLY                = 0;
-			mLCDMode           = LCDMODE_LY00_HBLANK;
-			mClocksToNextState = 452;
-			break;
+                break;
 
-		case LCDMODE_LY00_HBLANK:
-			SET_LCD_MODE(GBLCDMODE_HBLANK);
+            // Mode 1 - Lasts about 204 cycles, depending on how long Mode 3 took
+            case LCDMODE_LYXX_HBLANK:
+                renderScanline();
 
-			mLCDCInterrupted = false;
-            std::swap(mFrontBuffer, mBackBuffer);
-			mWindowLine        = 0;
-			mLCDMode           = LCDMODE_LYXX_OAM;
-			mClocksToNextState = 4;
-			break;
+                SET_LCD_MODE(GBLCDMODE_HBLANK);
+
+                //H-blank interrupt selected
+                if (testBit(mSTAT, 3) && !mLCDCInterrupted)
+                {
+                    mMemory->requestInterrupt(INTERRUPT_LCD);
+                    mLCDCInterrupted = true;
+                }
+
+                //HDMA block copy
+                if (mHDMAActive)
+                {
+                    HDMACopyBlock(mHDMASource, mVBK * VRAM_BANK_SIZE + mHDMADestination);
+                    mHDMAControl--;
+                    mHDMADestination += 0x10;
+                    mHDMASource      += 0x10;
+
+                    if ((mHDMAControl & 0x7F) == 0x7F)
+                    {
+                        mHDMAControl = 0xFF;
+                        mHDMAActive  = false;
+                    }
+                }
+
+                mLCDMode           = LCDMODE_LYXX_HBLANK_INC;
+                mClocksToNextState = 200 - mScrollXClocks - SPRITE_CLOCKS[mSpriteQueue.size()];
+                break;
+
+            case LCDMODE_LYXX_HBLANK_INC:
+                mLY++;
+
+                // Reset LYC bit
+                mSTAT = clearBit(mSTAT, 2);
+
+                mLCDCInterrupted   = false;
+                mLCDMode           = (mLY == 144) ? LCDMODE_LY9X_VBLANK : LCDMODE_LYXX_OAM;
+                mClocksToNextState = 4;
+                break;
+
+            // Mode 1 - VBlank period
+            case LCDMODE_LY9X_VBLANK:
+
+                // V-blank interrupt
+                if (mLY == 144)
+                {
+                    SET_LCD_MODE(GBLCDMODE_VBLANK);
+                    mMemory->requestInterrupt(INTERRUPT_VBLANK);
+
+                    if (testBit(mSTAT, 4))
+                        mMemory->requestInterrupt(INTERRUPT_LCD);
+
+                    std::swap(mFrontBuffer, mBackBuffer);
+                }
+
+                // Checking LYC=LY in the beginning of scanline
+                checkCoincidenceFlag();
+
+                mLCDMode           = LCDMODE_LY9X_VBLANK_INC;
+                mClocksToNextState = 452;
+                break;
+
+            case LCDMODE_LY9X_VBLANK_INC:
+                mLY++;
+
+                // Reset LYC bit
+                mSTAT = clearBit(mSTAT, 2);
+
+                // HACK: The emulator does not spend enough time in the V-Blank
+                // period right now. It should be spending about 1.1 ms, but it's
+                // a bit lower at the moment. By giving it a few extra scanlines
+                // we can make up the difference. TODO: Find more proper solution.
+                mLCDMode           = (mLY == 157/*153*/) ? LCDMODE_LY00_VBLANK : LCDMODE_LY9X_VBLANK;
+                mLCDCInterrupted   = false;
+                mClocksToNextState = 4;
+                break;
+
+            case LCDMODE_LY00_VBLANK:
+
+                // Checking LYC=LY in the beginning of scanline
+                // Here LY = 153
+                checkCoincidenceFlag();
+
+                mLY                = 0;
+                mLCDMode           = LCDMODE_LY00_HBLANK;
+                mClocksToNextState = 452;
+                break;
+
+            case LCDMODE_LY00_HBLANK:
+                SET_LCD_MODE(GBLCDMODE_HBLANK);
+
+                mLCDCInterrupted   = false;
+                mWindowLine        = 0;
+                mLCDMode           = LCDMODE_LYXX_OAM;
+                mClocksToNextState = 4;
+                break;
 		}
 	}
 }
@@ -363,25 +373,25 @@ void GBCGraphics::write(word address, byte data)
     
     switch (address)
     {
-        case LCDC:  LCDCChanged(data);  break;
-        case STAT:  STATChanged(data);  break;
-        case SCY:   mSCY = data;        break;
-        case SCX:   mSCX = data;        break;
-        case LY:    mLY = 0;            break;
-        case LYC:   LYCChanged(data);   break;
-        case DMA:   DMAChanged(data);   break;
-        case WY:    mWY = data;         break;
-        case WX:    mWX = data;         break;
-        case VBK:   mVBK = (data & 0x1);break;
-        case HDMA1: HDMA1Changed(data); break;
-        case HDMA2: HDMA2Changed(data); break;
-        case HDMA3: HDMA3Changed(data); break;
-        case HDMA4: HDMA4Changed(data); break;
-        case HDMA5: HDMA5Changed(data); break;
-        case BGPI:  mBGPI = data;       break;
-        case BGPD:  BGPDChanged(data);  break;
-        case OBPI:  mOBPI = data;       break;
-        case OBPD:  OBPDChanged(data);  break;
+        case LCDC:  setLCDC(data);       break;
+        case STAT:  setSTAT(data);       break;
+        case SCY:   mSCY = data;         break;
+        case SCX:   mSCX = data;         break;
+        case LY:    mLY = 0;             break;
+        case LYC:   setLYC(data);        break;
+        case DMA:   setDMA(data);        break;
+        case WY:    mWY = data;          break;
+        case WX:    mWX = data;          break;
+        case VBK:   mVBK = (data & 0x1); break;
+        case HDMA1: setHDMA1(data);      break;
+        case HDMA2: setHDMA2(data);      break;
+        case HDMA3: setHDMA3(data);      break;
+        case HDMA4: setHDMA4(data);      break;
+        case HDMA5: setHDMA5(data);      break;
+        case BGPI:  mBGPI = data;        break;
+        case BGPD:  setBGPD(data);       break;
+        case OBPI:  mOBPI = data;        break;
+        case OBPD:  setOBPD(data);       break;
         
         default:    
         {
@@ -413,27 +423,27 @@ byte GBCGraphics::readVRAM(word addr) const
 	else return 0xFF;
 }
 
-void GBCGraphics::HDMA1Changed(byte value) 
+void GBCGraphics::setHDMA1(byte value) 
 { 
 	mHDMASource = ((word) value << 8) | (mHDMASource & 0xFF);
 }
 
-void GBCGraphics::HDMA2Changed(byte value) 
+void GBCGraphics::setHDMA2(byte value) 
 { 
 	mHDMASource = (mHDMASource & 0xFF00) | (value & 0xF0);
 }
 
-void GBCGraphics::HDMA3Changed(byte value)
+void GBCGraphics::setHDMA3(byte value)
 {
 	mHDMADestination = (((word)(value & 0x1F)) << 8) | (mHDMADestination & 0xF0);
 }
 
-void GBCGraphics::HDMA4Changed(byte value)
+void GBCGraphics::setHDMA4(byte value)
 {
 	mHDMADestination = (mHDMADestination & 0xFF00) | (value & 0xF0);
 }
 
-void GBCGraphics::HDMA5Changed(byte value)
+void GBCGraphics::setHDMA5(byte value)
 {
 	mHDMAControl = value & 0x7F;
 
@@ -471,7 +481,7 @@ void GBCGraphics::HDMA5Changed(byte value)
 	}
 }
 
-void GBCGraphics::BGPDChanged(byte value) 
+void GBCGraphics::setBGPD(byte value) 
 {    
 	byte index   = mBGPI & 0x3F;
 	mBGPD[index] = value;
@@ -483,7 +493,7 @@ void GBCGraphics::BGPDChanged(byte value)
 	}
 }
 
-void GBCGraphics::OBPDChanged(byte value) 
+void GBCGraphics::setOBPD(byte value) 
 {
 	byte index   = mOBPI & 0x3F;
 	mOBPD[index] = value;

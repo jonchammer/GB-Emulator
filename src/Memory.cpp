@@ -118,12 +118,12 @@ byte Memory::read(const word address) const
     }
 
     // Handle double speed
-    else if (address == 0xFF4D)
+    else if (address == SPEED_SWITCH_ADDRESS)
     {
         // The first bit indicates if a speed switch has been prepared.
         // The last bit indicates whether or not we are currently in double speed mode
-        byte ret = 0x7E;
-        ret |= mMiscRAM[address - 0xFF00];
+        byte ret = 0x7E;     
+        ret |= (mMiscRAM[address - 0xFF00] & 0x1);
         ret |= ((mConfig->doubleSpeed ? 1 : 0) << 7);
         return ret;
     }
@@ -196,7 +196,7 @@ void Memory::write(const word address, const byte data)
         mMiscRAM[address - 0xFF00] = (data | 0xE0);
     
     // Handle double speed
-    else if (address == 0xFF4D)
+    else if (address == SPEED_SWITCH_ADDRESS)
     {
         // We only care about the last bit for GBC speed switches
         mMiscRAM[address - 0xFF00] = (data & 0x01);

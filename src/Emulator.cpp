@@ -110,12 +110,16 @@ void Emulator::loadCartridge(Cartridge* cartridge)
 
 void Emulator::sync(int cycles)
 {
-    if (GBC(mConfig) && mConfig->doubleSpeed)
-        cycles >>= 1;
+    //cycles = cycles - 1;
     
+     // In double-speed mode, each operation takes
+    // half as long
+    if (GBC(mConfig) && mConfig->doubleSpeed)
+        cycles /= 2;
+
     mGraphics->update(cycles);
     mTimers->update(cycles);
     mSound->update(cycles);
-    
+
     mCycleCount += cycles;
 }

@@ -99,13 +99,13 @@ private:
     void writeVRAM(word addr, byte value);
     byte readVRAM(word addr) const;
     
-    void HDMA1Changed(byte value);
-    void HDMA2Changed(byte value);
-    void HDMA3Changed(byte value);
-    void HDMA4Changed(byte value);
-    void HDMA5Changed(byte value);
-    void BGPDChanged(byte value);
-    void OBPDChanged(byte value);
+    void setHDMA1(byte value);
+    void setHDMA2(byte value);
+    void setHDMA3(byte value);
+    void setHDMA4(byte value);
+    void setHDMA5(byte value);
+    void setBGPD(byte value);
+    void setOBPD(byte value);
 };
 
 #endif /* GBCGRAPHICS_H */

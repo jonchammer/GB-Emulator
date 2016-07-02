@@ -200,13 +200,13 @@ protected:
     // Common functions
     void writeOAM(byte addr, byte value);
     byte readOAM(byte addr) const;
-    void LCDCChanged(byte value);
-    void STATChanged(byte value);
-    void LYCChanged(byte value);
+    void setLCDC(byte value);
+    void setSTAT(byte value);
+    void setLYC(byte value);
     void prepareSpriteQueue();
     void checkCoincidenceFlag();
     void DMAStep(int clockDelta);
-    void DMAChanged(byte value); 
+    void setDMA(byte value); 
 };
 
 #endif

@@ -133,13 +133,13 @@ byte Graphics::readOAM(byte addr) const
 	else return 0xFF;
 }
 
-void Graphics::LCDCChanged(byte value)
+void Graphics::setLCDC(byte value)
 {
 	// If LCD is being turned off
 	if (!(value & 0x80))
 	{
 		mSTAT &= ~0x3;
-		mLY = 0;
+        mLY = 0;
 	}
     
 	// If LCD is being turned on
@@ -150,7 +150,7 @@ void Graphics::LCDCChanged(byte value)
 		mScrollXClocks   = 0;
 		mLCDCInterrupted = false;
 
-		mLY = 0;
+        mLY = 0;
 		checkCoincidenceFlag();
 
 		// When LCD turned on, H-blank is active instead of OAM for 80 cycles
@@ -165,7 +165,7 @@ void Graphics::LCDCChanged(byte value)
 	mLCDC = value;
 }
 
-void Graphics::STATChanged(byte value)
+void Graphics::setSTAT(byte value)
 {
 	// Coincidence flag and mode flag are read-only
 	mSTAT = (mSTAT & 0x7) | (value & 0x78); 
@@ -178,7 +178,7 @@ void Graphics::STATChanged(byte value)
 	}
 }
 
-void Graphics::LYCChanged(byte value) 
+void Graphics::setLYC(byte value) 
 {
 	if (mLYC != value)
 	{
@@ -186,8 +186,6 @@ void Graphics::LYCChanged(byte value)
 		if (mLCDMode != LCDMODE_LYXX_HBLANK_INC && mLCDMode != LCDMODE_LY9X_VBLANK_INC)
 			checkCoincidenceFlag();
 	}
-    
-	else mLYC = value;
 }
 
 void Graphics::DMAStep(int clockDelta)
@@ -217,7 +215,7 @@ void Graphics::DMAStep(int clockDelta)
         mOAM[mOAMDMAProgress] = mMemory->read(mOAMDMASource | mOAMDMAProgress);
 }
 
-void Graphics::DMAChanged(byte value)
+void Graphics::setDMA(byte value)
 {
 	mOAMDMAStarted      = true;
 	mOAMDMASource       = value << 8;
