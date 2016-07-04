@@ -1,100 +1,6 @@
 #include "GBCGraphics.h"
 #include <cmath>
 
-void RGBToHSL(byte red, byte green, byte blue, double& h, double& s, double& l)
-{
-    double r = red   / 255.0;
-    double g = green / 255.0;
-    double b = blue  / 255.0;
-    
-    double r2, g2, b2;
-
-    h = 0.0, s = 0.0, l = 0.0; // default to black
-    double maxRGB = max(max(r, g), b);
-    double minRGB = min(min(r, g), b);
-
-    l = (minRGB + maxRGB) / 2.0;
-    if (l <= 0.0) return;
-
-    double vm = maxRGB - minRGB;
-    s = vm;
-    if (s <= 0.0) return;
-    
-    s /= ((l <= 0.5) ? (maxRGB + minRGB ) : (2.0 - maxRGB - minRGB));
-
-    r2 = (maxRGB - r) / vm;
-    g2 = (maxRGB - g) / vm;
-    b2 = (maxRGB - b) / vm;
-    
-    if (r == maxRGB)
-          h = (g == minRGB ? 5.0 + b2 : 1.0 - g2);
-    else if (g == maxRGB)
-          h = (b == minRGB ? 1.0 + r2 : 3.0 - b2);
-    else
-          h = (r == minRGB ? 3.0 + g2 : 5.0 - r2);
- 
-    h /= 6.0;
-}
-
-void HSLToRGB(double h, double s, double l, byte& red, byte& green, byte& blue)
-{
-    double r = l, g = l, b = l;   // default to gray
-    double v = ((l <= 0.5) ? (l * (1.0 + s)) : (l + s - l * s));
-    
-    if (v > 0)
-    {
-        double m  = l + l - v;
-        double sv = (v - m ) / v;
-        
-        h *= 6.0;
-        
-        int sextant  = (int)h;
-        double fract = h - sextant;
-        double vsf   = v * sv * fract;
-        double mid1  = m + vsf;
-        double mid2  = v - vsf;
-        
-        switch (sextant)
-        {
-            case 0:
-                r = v;
-                g = mid1;
-                b = m;
-                break;
-            case 1:
-                r = mid2;
-                g = v;
-                b = m;
-                break;
-            case 2:
-                r = m;
-                g = v;
-                b = mid1;
-                break;
-            case 3:
-                r = m;
-                g = mid2;
-                b = v;
-                break;
-            case 4:
-                r = mid1;
-                g = m;
-                b = v;
-                break;
-            case 5:
-                r = v;
-                g = m;
-                b = mid2;
-                break;
-          }
-    }
-    
-    // Convert from [0, 1] to [0, 255]
-    red   = r * 255;
-    green = g * 255;
-    blue  = b * 255;
-}
-
 GBCGraphics::GBCGraphics(Memory* memory, EmulatorConfiguration* configuration) :
     Graphics(memory, configuration)
 {
@@ -283,29 +189,10 @@ void GBCGraphics::reset()
 		mOBPD[i] = rand() % 0x100;
 
     // Initialize the colors that will be used
-    double h, s, l;
-    double gamma = 1.0 / mConfig->gbcDisplayGamma;
-    
-    for (int i = 0; i < 32768; i++)
-	{
-		byte b = ( i        & 0x1F) << 3;
-		byte g = ((i >>  5) & 0x1F) << 3;
-		byte r = ((i >> 10) & 0x1F) << 3;
-                
-        // Convert the color to HSL so we can manipulate it easier
-        RGBToHSL(r, g, b, h, s, l);
+    mPalette.reset();
+    mPalette.setGamma(mConfig->gbcDisplayGamma);
+    mPalette.setSaturation(mConfig->gbcDisplaySaturation);
         
-        // Apply corrections to make the color look more like a real GBC
-        // (as long as the configuration says to do so)
-        s *= mConfig->gbcDisplayColor;
-        l = pow(l, gamma);
-        
-        // Convert the color back to RGB
-        HSLToRGB(h, s, l, r, g, b);
-        
-		mGBC2RGBPalette[i] = 0xFF000000 | (r << 16) | (g << 8) | b;
-	}
-    
     // LCDC cannot be 0 initially or some games (like Pokemon Red) won't load.	
 	mHDMAActive         = false;
 	mHDMASource         = 0;
@@ -547,20 +434,6 @@ void GBCGraphics::renderBackground()
             // The attributes are always in VRAM bank 1
             byte tileAttributes = mVRAM[VRAM_BANK_SIZE + (tileAddr - VRAM_START)];
             
-            // TEMPORARY: Zelda DX HACK
-//            {
-//                if (tileX == 0 && tileY == 24 && tileAddr == 0x9B00)
-//                {
-//                    tileIdx = 0x54 + 128;
-//                    tileAttributes = 0x01;
-//                }
-//                if (tileX == 1 && tileY == 24 && tileAddr == 0x9B01)
-//                {
-//                    tileIdx = 0x55 + 128;
-//                    tileAttributes = 0x01;
-//                }
-//            }
-            
             byte correctedX = tileOffsetX;
             byte correctedY = tileOffsetY;
 
@@ -586,7 +459,7 @@ void GBCGraphics::renderBackground()
             mNativeBuffer[screenIndex] = (tileAttributes & 0x80) | colorIdx;
             screenIndex *= 4;
             
-            int c  = mGBC2RGBPalette[color & 0x7FFF];
+            int c  = mPalette.getColor(color & 0x7FFF);
             mBackBuffer[screenIndex]     = (c >> 16) & 0xFF; // Red
             mBackBuffer[screenIndex + 1] = (c >>  8) & 0xFF; // Green
             mBackBuffer[screenIndex + 2] = (c      ) & 0xFF; // Blue
@@ -665,7 +538,7 @@ void GBCGraphics::renderWindow()
                 int index = mLY * SCREEN_WIDTH_PIXELS + x;
                 mNativeBuffer[index] = (tileAttributes & 0x80) | colorIdx;
 
-                int c = mGBC2RGBPalette[color & 0x7FFF];
+                int c  = mPalette.getColor(color & 0x7FFF);
                 index *= 4;
                 mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
                 mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
@@ -773,7 +646,7 @@ void GBCGraphics::renderSprites()
                     mNativeBuffer[screenIndex] = colorIdx;
                     screenIndex *= 4;
                     
-                    int c = mGBC2RGBPalette[color & 0x7FFF];
+                    int c  = mPalette.getColor(color & 0x7FFF);
                     mBackBuffer[screenIndex]     = (c >> 16) & 0xFF; // Red
                     mBackBuffer[screenIndex + 1] = (c >>  8) & 0xFF; // Green
                     mBackBuffer[screenIndex + 2] = (c      ) & 0xFF; // Blue
@@ -799,7 +672,7 @@ void GBCGraphics::renderSprites()
                     mNativeBuffer[index] = colorIdx;
                     index *= 4;
                     
-                    int c  = mGBC2RGBPalette[color & 0x7FFF];
+                    int c  = mPalette.getColor(color & 0x7FFF);
                     mBackBuffer[index]     = (c >> 16) & 0xFF; // Red
                     mBackBuffer[index + 1] = (c >>  8) & 0xFF; // Green
                     mBackBuffer[index + 2] = (c      ) & 0xFF; // Blue
@@ -888,7 +761,7 @@ byte* GBCGraphics::getBackgroundMap(bool printGrid)
             word color;
             memcpy(&color, mBGPD + (tileAttributes & 0x7) * 8 + colorIdx * 2, 2);
 
-            int c                   = mGBC2RGBPalette[color & 0x7FFF];
+            int c                   = mPalette.getColor(color & 0x7FFF);
             int screenIndex         = 4 * (y * BACKGROUND_WIDTH + x);
             buffer[screenIndex]     = (c >> 16) & 0xFF; // Red
             buffer[screenIndex + 1] = (c >>  8) & 0xFF; // Green

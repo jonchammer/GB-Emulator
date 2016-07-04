@@ -16,6 +16,7 @@
 #include "Common.h"
 #include "Memory.h"
 #include "Emulator.h"
+#include "GBCColorPalette.h"
 
 class Memory;
 class Emulator;
@@ -52,7 +53,7 @@ public:
 private:
     
     byte mVRAM[VRAM_BANK_SIZE * 2];
-    int mGBC2RGBPalette[32768];    // GBG color -> ARGB color
+    GBCColorPalette mPalette;
     
     // GPU I/O ports
    

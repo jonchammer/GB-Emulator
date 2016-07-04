@@ -57,10 +57,8 @@ enum GameboyPalette
 
 enum System {GB, GBC, AUTOMATIC};
 
-const double DISPLAY_GAMMA_NONE = 1.0;
-const double DISPLAY_GAMMA_GBC  = 1.7;
-const double DISPLAY_COLOR_FULL = 1.0;
-const double DISPLAY_COLOR_GBC  = 0.85;
+const double DISPLAY_GAMMA_DEFAULT      = 1.0;
+const double DISPLAY_SATURATION_DEFAULT = 1.0;
 
 // Bit twiddling routines
 #define testBit(address, bit)   (!!((address) &  (1 << (bit))))

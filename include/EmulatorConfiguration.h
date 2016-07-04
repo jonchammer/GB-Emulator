@@ -19,10 +19,10 @@ struct EmulatorConfiguration
     int soundSampleBufferLength;  // The size of the sound system's sample buffer (in samples)
     bool skipBIOS;                // When true, the BIOS screen will be skipped
     GameboyPalette gbPalette;     // Adjust the colors of Gameboy games
-    double gbcDisplayGamma;       // Gamma correction applied to make the display look more like the GBC's. 
-                                  // Can be one of the DISPLAY_GAMMA_XXX constants
-    double gbcDisplayColor;       // [0, 1] - 0 is black/white, 1 is full color
-                                  // Can be one of the DISPLAY_COLOR_XXX constants
+    double gbcDisplayGamma;       // Gamma correction applied to lighten/darken the screen. 
+                                  // [0, infinity) or DISPLAY_GAMMA_DEFAULT.
+    double gbcDisplaySaturation;  // [0, 1] - 0 is black/white, 1 is full color
+                                  // Can also be DISPLAY_SATURATION_DEFAULT.
     bool doubleSpeed;             // When true, GBC double speed mode is activated. This should
                                   // not be set by the user. It will be used internally.
     
@@ -33,8 +33,8 @@ struct EmulatorConfiguration
         soundSampleBufferLength(1024),
         skipBIOS(false),
         gbPalette(GameboyPalette::GRAYSCALE), 
-        gbcDisplayGamma(DISPLAY_GAMMA_GBC),
-        gbcDisplayColor(DISPLAY_COLOR_GBC),
+        gbcDisplayGamma(DISPLAY_GAMMA_DEFAULT),
+        gbcDisplaySaturation(DISPLAY_SATURATION_DEFAULT),
         doubleSpeed(false) {}
 };
 
